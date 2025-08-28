@@ -11,6 +11,18 @@ public class Bullet : MonoBehaviour
     public Transform target;
     private float life;
 
+    public bool isPaused = false;
+
+    private void Start()
+    {
+        GameManager.GetInstance().onChangeGameState += OnChangeGameStateCallback;
+    }
+
+    public void OnChangeGameStateCallback(GameState newState)
+    {
+        isPaused = newState != GameState.Play;
+    }
+
     public void Shoot(Transform actualTarget)
     {
         target = actualTarget;
@@ -19,6 +31,9 @@ public class Bullet : MonoBehaviour
 
     private void Update()
     {
+        
+        if (isPaused) return;
+        
         // Tiempo de vida
         life += Time.deltaTime;
         
@@ -39,7 +54,7 @@ public class Bullet : MonoBehaviour
         }
         
         transform.position += dir.normalized * distance;
-        transform.forward = Vector3.Lerp(transform.forward, dir.normalized, 0.5f);
+        transform.forward = Vector3.Lerp(transform.forward, dir.normalized, 0.5f * Time.deltaTime);
         
     }
 

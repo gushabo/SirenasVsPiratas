@@ -16,14 +16,25 @@ public class Tower : MonoBehaviour
     
     private float fireCooldown;
     private Transform currentTarget;
+    private bool isPaused;
+    
 
     void Awake()
     {
         InvokeRepeating(nameof(UpdateTarget), 0f, retarget);
+        GameManager.GetInstance().onChangeGameState += OnChangeGameStateCallback;
+    }
+    
+    public void OnChangeGameStateCallback(GameState newState)
+    {
+        isPaused = newState != GameState.Play;
     }
 
     private void Update()
     {
+
+        if (isPaused) return;
+        
         fireCooldown -= Time.deltaTime;
         
         if (currentTarget == null) return;
