@@ -32,7 +32,7 @@ public class Damage : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Coral"))
         {
-            other.gameObject.GetComponent<Health>().TakeDamage(damage);
+            GameObject.Find("HealthText").GetComponent<HealthText>().ChangeHealthText(other.gameObject.GetComponent<Health>().health - damage);
             Destroy(gameObject);
         }
     }

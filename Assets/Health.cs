@@ -42,9 +42,13 @@ public class Health : MonoBehaviour
     public void TakeDamage(int damage)
     {
         health -= damage;
-        if(health <= 0) Die();
+        if(health <= 0 && enemyType== EnemyType.Coral) LoseGame();
+        else if(health <= 0 && enemyType!= EnemyType.Coral) Die();
+        
     } 
     void Die() => Destroy(gameObject);
+    
+    void LoseGame(){}
     
 }
 

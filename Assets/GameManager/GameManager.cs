@@ -28,10 +28,13 @@ public class GameManager : MonoBehaviour
     
     public GameState gameState;
     public Action<GameState> onChangeGameState;
+
+    public int CoralHealth;
     
     private void Start()
     {
         gameState = GameState.Play;
+        CoralHealth = 150;
     }
 
     public void ChangeGameState(GameState newGameState)
