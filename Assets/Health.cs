@@ -27,7 +27,12 @@ public class Health : MonoBehaviour
             {
                 maxHealth = 125;
                 break;
-            } 
+            }
+            case EnemyType.Coral:
+            {
+                maxHealth = 150;
+                break;
+            }
                 
         }
     }
@@ -40,19 +45,13 @@ public class Health : MonoBehaviour
         if(health <= 0) Die();
     } 
     void Die() => Destroy(gameObject);
-
-    private void OnCollisionEnter(Collision other)
-    {
-        if (other.gameObject.CompareTag("Coral"))
-        {
-            Destroy(gameObject);
-        }
-    }
+    
 }
 
 public enum EnemyType
 {
     Normal,
     Bandit,
-    Tank
+    Tank,
+    Coral
 }

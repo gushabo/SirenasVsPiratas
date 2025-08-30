@@ -19,7 +19,7 @@ public class Tower : MonoBehaviour
     private bool isPaused;
     
 
-    void Awake()
+    void Start()
     {
         InvokeRepeating(nameof(UpdateTarget), 0f, retarget);
         GameManager.GetInstance().onChangeGameState += OnChangeGameStateCallback;
