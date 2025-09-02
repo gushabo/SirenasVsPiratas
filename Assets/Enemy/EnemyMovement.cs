@@ -6,32 +6,11 @@ public class EnemyMovement : MonoBehaviour
     public List<Transform> targets = new List<Transform>();
     public int currentTarget = 0;
     public float speed;
-    public EnemyType enemyType; 
     public bool isPaused = false;
-
     
     private void Start()
     {
         GameManager.GetInstance().onChangeGameState += OnChangeGameStateCallback;
-        
-        switch (enemyType)
-        {
-            case EnemyType.Normal:
-            {
-                speed = 4;
-                break;
-            } 
-            case EnemyType.Bandit:
-            {
-                speed = 5;
-                break;
-            } 
-            case EnemyType.Tank:
-            {
-                speed = 2;
-                break;
-            } 
-        }
         
         currentTarget = 0;
         if (targets == null || targets.Count == 0)

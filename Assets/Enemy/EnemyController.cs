@@ -1,14 +1,15 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    [SerializeField] public EnemyType type;
-
-    private void Start()
+    [SerializeField] private EnemyTypes type;
+    
+    private void Awake()
     {
-        gameObject.GetComponent<Health>().enemyType = type;
-        gameObject.GetComponent<Damage>().enemyType = type;
-        gameObject.GetComponent<EnemyMovement>().enemyType = type;
+        gameObject.GetComponent<Health>().maxHealth = type.health;
+        gameObject.GetComponent<Damage>().damage = type.damage;
+        gameObject.GetComponent<EnemyMovement>().speed = type.speed;
     }
 }
