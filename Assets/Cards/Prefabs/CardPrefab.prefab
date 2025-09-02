@@ -523,6 +523,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1999243526354956482}
+  - component: {fileID: 4172538533882034730}
   m_Layer: 0
   m_Name: CardPrefab
   m_TagString: Untagged
@@ -546,6 +547,26 @@ Transform:
   - {fileID: 3462309511785617931}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4172538533882034730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4616683652018089834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ff2e87e11d0bb74a9825f87ebceadf1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Enemy: {fileID: 11400000, guid: d2696bb00c8445b4fa52131735032ed7, type: 2}
+  cardImage: {fileID: 9013429051506301638}
+  typeImages:
+  - {fileID: 3149975209240746278}
+  - {fileID: 7923817232165128746}
+  - {fileID: 4815515562133374614}
+  DamageText: {fileID: 4396390541764121411}
+  GoldText: {fileID: 3826238044491542146}
 --- !u!1 &4699430610588353294
 GameObject:
   m_ObjectHideFlags: 0

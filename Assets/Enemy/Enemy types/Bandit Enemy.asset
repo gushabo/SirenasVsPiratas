@@ -15,4 +15,4 @@ MonoBehaviour:
   health: 75
   damage: 8
   speed: 7
-  isCoral: 0
+  image: {fileID: -1627350631, guid: 5eca851bd89a049498d0136155ffe8b8, type: 3}

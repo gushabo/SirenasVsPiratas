@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f7d37e2ae7cbe743bb67b3ec97b6b16, type: 3}
   m_Name: Normal Enemy
   m_EditorClassIdentifier: 
-  name: Normal
   health: 100
   damage: 10
   speed: 4
+  image: {fileID: 2067363807, guid: 2fbaf44152dd48047b1c709712809713, type: 3}

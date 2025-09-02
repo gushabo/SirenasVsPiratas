@@ -6,4 +6,5 @@ public class EnemyTypes : ScriptableObject
     public int health;
     public int damage;
     public int speed;
+    public Sprite image;
 }
