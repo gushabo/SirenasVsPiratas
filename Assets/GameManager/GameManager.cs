@@ -4,6 +4,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     // ----- SingleTon ---------
+    #region Singleton
     public static GameManager instance { get; private set; }
     private void Awake()
     {
@@ -24,23 +25,25 @@ public class GameManager : MonoBehaviour
             instance = null;
         }
     }
+    #endregion
     // ------ Fin del singleton  ---------
     
     public GameState gameState;
     public Action<GameState> onChangeGameState;
-
-    public int CoralHealth;
     
+    [SerializeField] private GameObject pausePanel;
+
     private void Start()
     {
         gameState = GameState.Play;
-        CoralHealth = 150;
+        pausePanel.SetActive(false);
     }
 
     public void ChangeGameState(GameState newGameState)
     {
         gameState = newGameState;
         onChangeGameState?.Invoke(gameState);
+        pausePanel.SetActive(!pausePanel.activeSelf);
     }
 
     private void Update()
