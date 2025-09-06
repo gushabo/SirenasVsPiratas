@@ -524,6 +524,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1999243526354956482}
   - component: {fileID: 4172538533882034730}
+  - component: {fileID: 6059562925749413126}
   m_Layer: 0
   m_Name: CardPrefab
   m_TagString: Untagged
@@ -567,6 +568,19 @@ MonoBehaviour:
   - {fileID: 4815515562133374614}
   DamageText: {fileID: 4396390541764121411}
   GoldText: {fileID: 3826238044491542146}
+--- !u!114 &6059562925749413126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4616683652018089834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3e344e3b4abca3439c8fb469bc40b46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  worldPrefab: {fileID: 2117851461502595526, guid: f98d98a0569212b4b8b998f6764f1da2, type: 3}
 --- !u!1 &4699430610588353294
 GameObject:
   m_ObjectHideFlags: 0
