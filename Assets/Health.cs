@@ -18,7 +18,8 @@ public class Health : MonoBehaviour
         
     } 
     void Die() => Destroy(gameObject);
+
+    void LoseGame() => GameManager.GetInstance().gameState = GameState.GameOver;
     
-    void LoseGame(){}
     
 }
