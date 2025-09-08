@@ -1,23 +1,37 @@
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class EnemySpawner : MonoBehaviour
 {
-    public int numEnemies;
-    public List<GameObject> enemies;
+    public List<GameObject> enemies; // Prefabs de enemigos para instanciar
+    public float spawnInterval = 4f;
 
     private void Start()
     {
         GameManager.GetInstance().enemiesLeft = enemies.Count;
+        StartCoroutine(SpawnEnemies());
     }
 
-    private void Update()
+    private IEnumerator SpawnEnemies()
     {
-        for (int i = 0; i < numEnemies; i++)
+        while (true)
         {
-            Instantiate(enemies[i], transform.position, transform.rotation);
-            GameManager.GetInstance().enemiesLeft--;
+            yield return new WaitForSeconds(spawnInterval);
+
+            if (enemies.Count > 0)
+            {
+                // Seleccionar un enemigo aleatorio de la lista
+                int randomIndex = Random.Range(0, enemies.Count);
+                GameObject enemyToSpawn = enemies[randomIndex];
+
+                // Instanciar el enemigo en la posición del spawner
+                Instantiate(enemyToSpawn, transform.position, transform.rotation);
+
+                // Actualizar el contador en el GameManager
+                GameManager.GetInstance().enemiesLeft--;
+            }
         }
     }
 }

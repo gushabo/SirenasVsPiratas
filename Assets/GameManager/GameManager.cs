@@ -46,6 +46,7 @@ public class GameManager : MonoBehaviour
         gameState = GameState.Play;
         pausePanel.SetActive(false);
         gameOverPanel.SetActive(false);
+        winPanel.SetActive(false);
         
     }
 
