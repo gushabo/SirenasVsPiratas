@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         instance = this;
+        enemiesLeft = -1;
     }
     
     public static GameManager GetInstance() => instance;
@@ -32,29 +33,31 @@ public class GameManager : MonoBehaviour
     public GameState gameState;
     public Action<GameState> onChangeGameState;
     
-    // UI Panels
-    [SerializeField] private GameObject pausePanel;
-    [SerializeField] private GameObject gameOverPanel;
-    [SerializeField] private GameObject winPanel;
-    
     // Win system
     public int enemiesLeft;
-
+    public bool Lose;
+    
     private void Start()
     {
-        
+        Lose = false;
         gameState = GameState.Play;
-        pausePanel.SetActive(false);
-        gameOverPanel.SetActive(false);
-        winPanel.SetActive(false);
-        
     }
 
     public void ChangeGameState(GameState newGameState)
     {
         gameState = newGameState;
         onChangeGameState?.Invoke(gameState);
-        pausePanel.SetActive(!pausePanel.activeSelf);
+        if (newGameState == GameState.Play)
+        {
+            UiManager.GetInstance().pausePanel.SetActive(false);
+        }
+        else if (newGameState == GameState.Pause)
+        {
+            UiManager.GetInstance().pausePanel.SetActive(true);    
+        }else if (newGameState == GameState.GameOver)
+        {
+            UiManager.GetInstance().gameOverPanel.SetActive(true);
+        }
     }
 
     private void Update()
@@ -71,26 +74,27 @@ public class GameManager : MonoBehaviour
                 ChangeGameState(GameState.Pause);
             }
             
-            else if (gameState == GameState.GameOver)
-            {
-                gameOverPanel.SetActive(true);
-                ChangeGameState(GameState.Pause);
-                Invoke(nameof(GameOver),3f);
-            }
         }
+    }
 
-        if (enemiesLeft == 0)
+    public void CheckForEnemies()
+    {
+        if (enemiesLeft <= 0 && !Lose)
         {
             Win();
         }
-        
     }
-    
-    public void GameOver() => ChangeMainScene();
+
+    public void GameOver()
+    {
+        UiManager.GetInstance().gameOverPanel.SetActive(true);
+        Lose = true;
+        Invoke(nameof(ChangeMainScene), 3f);
+    }
 
     public void Win()
     {
-        winPanel.SetActive(true);
+        UiManager.GetInstance().winPanel.SetActive(true);
         Invoke(nameof(ChangeMainScene), 3f);
     }
 
