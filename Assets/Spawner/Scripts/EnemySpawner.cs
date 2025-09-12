@@ -8,7 +8,8 @@ public class EnemySpawner : MonoBehaviour
     public List<GameObject> enemies;
     int enemiesLeftToSpawn;
     public List<Transform> targets = new List<Transform>();
-    public float spawnInterval = 4f;
+    public float minSpawnInterval = 1f;
+    public float maxSpawnInterval = 4f;
 
     private void Start()
     {
@@ -19,21 +20,20 @@ public class EnemySpawner : MonoBehaviour
 
     private IEnumerator SpawnEnemies()
     {
+        int i = 0;
         while (true)
         {
-            yield return new WaitForSeconds(spawnInterval);
+            yield return new WaitForSeconds(Random.Range(minSpawnInterval, maxSpawnInterval));
 
             if (enemiesLeftToSpawn > 0)
             {
-                // Seleccionar un enemigo aleatorio de la lista
-                int randomIndex = Random.Range(0, enemies.Count);
-                GameObject enemyToSpawn = enemies[randomIndex];
-
+                GameObject enemyToSpawn = enemies[i];
                 // Instanciar el enemigo en la posición del spawner
                 var enemy = Instantiate(enemyToSpawn, transform.position, transform.rotation);
                 enemy.GetComponent<EnemyMovement>().targets = targets;
 
                 enemiesLeftToSpawn--;
+                i++;
             }
         }
     }
