@@ -340,7 +340,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &150449823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -356,7 +356,12 @@ MonoBehaviour:
   enemies:
   - {fileID: 3577160471080683198, guid: 7a4e6ca538e26ed4792d95a16f67261c, type: 3}
   - {fileID: 3577160471080683198, guid: 7a4e6ca538e26ed4792d95a16f67261c, type: 3}
-  - {fileID: 3577160471080683198, guid: 7a4e6ca538e26ed4792d95a16f67261c, type: 3}
+  targets:
+  - {fileID: 1468482923}
+  - {fileID: 2059329576}
+  - {fileID: 901929072}
+  - {fileID: 550351887}
+  - {fileID: 31821365}
   spawnInterval: 4
 --- !u!4 &150449824
 Transform:
@@ -2506,6 +2511,10 @@ PrefabInstance:
     - target: {fileID: 3577160471080683198, guid: 7a4e6ca538e26ed4792d95a16f67261c, type: 3}
       propertyPath: m_Name
       value: Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3577160471080683198, guid: 7a4e6ca538e26ed4792d95a16f67261c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5712980498426622443, guid: 7a4e6ca538e26ed4792d95a16f67261c, type: 3}
       propertyPath: 'targets.Array.data[0]'
