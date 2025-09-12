@@ -16,7 +16,6 @@ public class Health : MonoBehaviour
         {
             UiManager.GetInstance().LifeText.text = "Health: " + health;
         }
-        
     } 
 
     public void TakeDamage(int damage)
@@ -25,10 +24,14 @@ public class Health : MonoBehaviour
         if (health <= 0)
         {
             health = 0;
-            if(isCoral) GameManager.GetInstance().GameOver();
+            if (isCoral)
+            {
+                GameManager.GetInstance().Lose = true;
+                GameManager.GetInstance().GameOver();
+            }
             else if(!isCoral) Die();
-            UiManager.GetInstance().LifeText.text = "Health: " + health;
         }
+        if(isCoral) UiManager.GetInstance().LifeText.text = "Health: " + health;
     }
 
     void Die()
@@ -37,7 +40,5 @@ public class Health : MonoBehaviour
         GameManager.GetInstance().CheckForEnemies();
         Destroy(gameObject);
     }
-
-    
     
 }

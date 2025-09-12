@@ -1161,6 +1161,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scrollBar: {fileID: 1308118451}
+  defaultVolume: 0.081
 --- !u!82 &955572682
 AudioSource:
   m_ObjectHideFlags: 0
