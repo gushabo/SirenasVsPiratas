@@ -11,7 +11,6 @@ public class Health : MonoBehaviour
     void Start()
     {
         health = maxHealth;
-        GameManager.GetInstance().enemiesLeft += 1;
         if (isCoral)
         {
             UiManager.GetInstance().LifeText.text = "Health: " + health;

@@ -80,7 +80,6 @@ public class Tower : MonoBehaviour
 
     void Shoot(Transform target)
     {
-        print("se disparo");
         Bullet b = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation).GetComponent<Bullet>();
         b.Shoot(target);
     }

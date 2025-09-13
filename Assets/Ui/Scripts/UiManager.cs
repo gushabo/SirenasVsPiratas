@@ -41,11 +41,18 @@ public class UiManager : MonoBehaviour
     [Header("Life Panel")]
     [SerializeField] public GameObject LifePanel;
     [SerializeField] public TextMeshProUGUI LifeText;
+    [Header("Cambio de rondas")]
+    [SerializeField] public GameObject changeRoundPanel;
+    [SerializeField] public TextMeshProUGUI changeRoundText;
+    [SerializeField] public GameObject countDownPanel;
+    [SerializeField] public TextMeshProUGUI countDownText;
 
     private void Start()
     {
         pausePanel.SetActive(false);
         gameOverPanel.SetActive(false);
         winPanel.SetActive(false);
+        changeRoundPanel.SetActive(false);
+        countDownPanel.SetActive(false);
     }
 }

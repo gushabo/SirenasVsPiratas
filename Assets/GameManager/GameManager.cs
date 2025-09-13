@@ -1,4 +1,7 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,7 +18,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         instance = this;
-        enemiesLeft = -1;
+        //enemiesLeft = -1;
     }
     
     public static GameManager GetInstance() => instance;
@@ -35,11 +38,25 @@ public class GameManager : MonoBehaviour
     
     // Win system
     public int enemiesLeft;
+    public int roundsLeft;
+    public int actualRound;
     public bool Lose;
     
+    public List<GameObject> EnemySpawners;
+
+    private void OnEnable()
+    {
+        roundsLeft = EnemySpawners.Count - 1;
+        Lose = false;
+        actualRound = 0;
+        enemiesLeft = 0;
+        if (EnemySpawners.Count > 0)
+            EnemySpawners[actualRound].SetActive(true);
+    }
+
+
     private void Start()
     {
-        Lose = false;
         gameState = GameState.Play;
     }
 
@@ -79,9 +96,16 @@ public class GameManager : MonoBehaviour
 
     public void CheckForEnemies()
     {
-        if (enemiesLeft <= 0 && !Lose)
+        
+        Debug.Log($"enemies left: {enemiesLeft} | rounds left: {roundsLeft} | actual round: {actualRound}");
+        
+        if (enemiesLeft <= 0 && !Lose && roundsLeft  == actualRound)
         {
             Win();
+        }
+        else
+        {
+            EndOfRound();
         }
     }
 
@@ -102,6 +126,34 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene("MainMenu");
     }
+
+    public void EndOfRound()
+    {
+        if (roundsLeft == actualRound) return;
+        
+        EnemySpawners[actualRound].SetActive(false);
+        actualRound++;
+        UiManager.GetInstance().changeRoundPanel.SetActive(true);
+        print("nimodo papu se termino la ronda");
+        StartCoroutine(ChangeRound());
+    }
+
+    public IEnumerator ChangeRound()
+    {
+        print("cambio de ronda");
+        yield return new WaitForSeconds(1f);
+        UiManager.GetInstance().changeRoundPanel.SetActive(false);
+        UiManager.GetInstance().countDownPanel.SetActive(true);
+        UiManager.GetInstance().countDownText.text = "3";
+        yield return new WaitForSeconds(1f);
+        UiManager.GetInstance().countDownText.text = "2";
+        yield return new WaitForSeconds(1f);
+        UiManager.GetInstance().countDownText.text = "1";
+        yield return new WaitForSeconds(1f);
+        UiManager.GetInstance().countDownPanel.SetActive(false);
+        EnemySpawners[actualRound].SetActive(true);
+    }
+    
     
 }
 

@@ -21,7 +21,7 @@ public class EnemySpawner : MonoBehaviour
     private IEnumerator SpawnEnemies()
     {
         int i = 0;
-        while (true)
+        while (enemiesLeftToSpawn > 0)
         {
             yield return new WaitForSeconds(Random.Range(minSpawnInterval, maxSpawnInterval));
 
