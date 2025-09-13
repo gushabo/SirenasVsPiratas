@@ -127,4 +127,4 @@ MonoBehaviour:
   triggerDelay: 2
   radius: 4
   damage: 50
-  vfxPrefab: {fileID: 0}
+  vfxPrefab: {fileID: 1022215825983436762, guid: 28dc6e0cee94ec248a93d3f344a942ef, type: 3}

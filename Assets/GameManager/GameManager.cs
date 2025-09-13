@@ -58,6 +58,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         gameState = GameState.Play;
+        UiManager.GetInstance().roundsText.text = "Ronda " + (actualRound+1) + " de " + (roundsLeft+1);
     }
 
     public void ChangeGameState(GameState newGameState)
@@ -96,9 +97,6 @@ public class GameManager : MonoBehaviour
 
     public void CheckForEnemies()
     {
-        
-        Debug.Log($"enemies left: {enemiesLeft} | rounds left: {roundsLeft} | actual round: {actualRound}");
-        
         if (enemiesLeft <= 0 && !Lose && roundsLeft  == actualRound)
         {
             Win();
@@ -133,14 +131,13 @@ public class GameManager : MonoBehaviour
         
         EnemySpawners[actualRound].SetActive(false);
         actualRound++;
+        UiManager.GetInstance().roundsText.text = "Ronda " + (actualRound+1) + " de " + (roundsLeft+1);
         UiManager.GetInstance().changeRoundPanel.SetActive(true);
-        print("nimodo papu se termino la ronda");
         StartCoroutine(ChangeRound());
     }
 
     public IEnumerator ChangeRound()
     {
-        print("cambio de ronda");
         yield return new WaitForSeconds(1f);
         UiManager.GetInstance().changeRoundPanel.SetActive(false);
         UiManager.GetInstance().countDownPanel.SetActive(true);
@@ -153,8 +150,6 @@ public class GameManager : MonoBehaviour
         UiManager.GetInstance().countDownPanel.SetActive(false);
         EnemySpawners[actualRound].SetActive(true);
     }
-    
-    
 }
 
 public enum GameState

@@ -46,7 +46,8 @@ public class UiManager : MonoBehaviour
     [SerializeField] public TextMeshProUGUI changeRoundText;
     [SerializeField] public GameObject countDownPanel;
     [SerializeField] public TextMeshProUGUI countDownText;
-
+    [Header("Aviso Rondas")]
+    [SerializeField] public TextMeshProUGUI roundsText;
     private void Start()
     {
         pausePanel.SetActive(false);
