@@ -16,11 +16,7 @@ public class EnemyMovement : MonoBehaviour
         if (targets == null || targets.Count == 0)
         {
             enabled = false;
-            return;
         }
-        
-        transform.position = targets[0].position;
-        currentTarget++;
     }
 
     public void OnChangeGameStateCallback(GameState newState)

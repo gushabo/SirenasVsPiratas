@@ -1,4 +1,7 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,6 +18,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         instance = this;
+        //enemiesLeft = -1;
     }
     
     public static GameManager GetInstance() => instance;
@@ -32,29 +36,46 @@ public class GameManager : MonoBehaviour
     public GameState gameState;
     public Action<GameState> onChangeGameState;
     
-    // UI Panels
-    [SerializeField] private GameObject pausePanel;
-    [SerializeField] private GameObject gameOverPanel;
-    [SerializeField] private GameObject winPanel;
-    
     // Win system
     public int enemiesLeft;
+    public int roundsLeft;
+    public int actualRound;
+    public bool Lose;
+    
+    public List<GameObject> EnemySpawners;
+
+    private void OnEnable()
+    {
+        roundsLeft = EnemySpawners.Count - 1;
+        Lose = false;
+        actualRound = 0;
+        enemiesLeft = 0;
+        if (EnemySpawners.Count > 0)
+            EnemySpawners[actualRound].SetActive(true);
+    }
+
 
     private void Start()
     {
-        
         gameState = GameState.Play;
-        pausePanel.SetActive(false);
-        gameOverPanel.SetActive(false);
-        winPanel.SetActive(false);
-        
+        UiManager.GetInstance().roundsText.text = "Ronda " + (actualRound+1) + " de " + (roundsLeft+1);
     }
 
     public void ChangeGameState(GameState newGameState)
     {
         gameState = newGameState;
         onChangeGameState?.Invoke(gameState);
-        pausePanel.SetActive(!pausePanel.activeSelf);
+        if (newGameState == GameState.Play)
+        {
+            UiManager.GetInstance().pausePanel.SetActive(false);
+        }
+        else if (newGameState == GameState.Pause)
+        {
+            UiManager.GetInstance().pausePanel.SetActive(true);    
+        }else if (newGameState == GameState.GameOver)
+        {
+            UiManager.GetInstance().gameOverPanel.SetActive(true);
+        }
     }
 
     private void Update()
@@ -71,26 +92,31 @@ public class GameManager : MonoBehaviour
                 ChangeGameState(GameState.Pause);
             }
             
-            else if (gameState == GameState.GameOver)
-            {
-                gameOverPanel.SetActive(true);
-                ChangeGameState(GameState.Pause);
-                Invoke(nameof(GameOver),3f);
-            }
         }
+    }
 
-        if (enemiesLeft == 0)
+    public void CheckForEnemies()
+    {
+        if (enemiesLeft <= 0 && !Lose && roundsLeft  == actualRound)
         {
             Win();
         }
-        
+        else
+        {
+            EndOfRound();
+        }
     }
-    
-    public void GameOver() => ChangeMainScene();
+
+    public void GameOver()
+    {
+        UiManager.GetInstance().gameOverPanel.SetActive(true);
+        Lose = true;
+        Invoke(nameof(ChangeMainScene), 3f);
+    }
 
     public void Win()
     {
-        winPanel.SetActive(true);
+        UiManager.GetInstance().winPanel.SetActive(true);
         Invoke(nameof(ChangeMainScene), 3f);
     }
 
@@ -98,7 +124,32 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene("MainMenu");
     }
-    
+
+    public void EndOfRound()
+    {
+        if (roundsLeft == actualRound) return;
+        
+        EnemySpawners[actualRound].SetActive(false);
+        actualRound++;
+        UiManager.GetInstance().roundsText.text = "Ronda " + (actualRound+1) + " de " + (roundsLeft+1);
+        UiManager.GetInstance().changeRoundPanel.SetActive(true);
+        StartCoroutine(ChangeRound());
+    }
+
+    public IEnumerator ChangeRound()
+    {
+        yield return new WaitForSeconds(1f);
+        UiManager.GetInstance().changeRoundPanel.SetActive(false);
+        UiManager.GetInstance().countDownPanel.SetActive(true);
+        UiManager.GetInstance().countDownText.text = "3";
+        yield return new WaitForSeconds(1f);
+        UiManager.GetInstance().countDownText.text = "2";
+        yield return new WaitForSeconds(1f);
+        UiManager.GetInstance().countDownText.text = "1";
+        yield return new WaitForSeconds(1f);
+        UiManager.GetInstance().countDownPanel.SetActive(false);
+        EnemySpawners[actualRound].SetActive(true);
+    }
 }
 
 public enum GameState
