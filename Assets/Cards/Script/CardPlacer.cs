@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-
 public class CardPlacer : MonoBehaviour
 {
     public static CardPlacer Instance;
@@ -23,42 +22,63 @@ public class CardPlacer : MonoBehaviour
     [Tooltip("Grosor de la línea del hex gris")]
     public float lineWidth = 0.03f;
 
-    private GameObject selectedPrefab;
+    // --- NUEVO: tipo de carta seleccionada ---
+    private struct SelectedCard
+    {
+        public GameObject prefab;   // prefab de torreta o de “módulo de mejora”
+        public bool isUpgrade;      // true = mejora, false = construir
+    }
+    private SelectedCard selected;
 
-    // Control de ocupación por celda axial
-    private HashSet<Vector2Int> occupied = new HashSet<Vector2Int>();
+    // En lugar de HashSet, guardamos la torreta colocada por celda
+    private readonly Dictionary<Vector2Int, GameObject> placedTowers = new();
 
-    // Vista previa del hex
+    // Vista previa (hex)
     private LineRenderer hexPreview;
     private Vector2Int hoveredAxial;
     private bool hasValidHover;
-
-   
 
     private void Awake()
     {
         Instance = this;
 
-        if (cam == null)
-            cam = Camera.main;
+        if (cam == null) cam = Camera.main;
 
         // Crear el line renderer para el hex gris
         GameObject lrObj = new GameObject("HexPreview");
         lrObj.transform.SetParent(transform, false);
         hexPreview = lrObj.AddComponent<LineRenderer>();
-        hexPreview.positionCount = 7; // 6 vértices + el primero para cerrar el loop
+        hexPreview.positionCount = 7;
         hexPreview.useWorldSpace = true;
         hexPreview.widthMultiplier = lineWidth;
         hexPreview.loop = false;
-        hexPreview.material = new Material(Shader.Find("Sprites/Default")); // simple, sin iluminación
+
+        // Mejor compatibilidad (URP/Default):
+        var shader = Shader.Find("Universal Render Pipeline/Unlit");
+        if (shader == null) shader = Shader.Find("Sprites/Default");
+        hexPreview.material = new Material(shader);
+
         hexPreview.startColor = new Color(0.7f, 0.7f, 0.7f, 0.85f);
         hexPreview.endColor = new Color(0.7f, 0.7f, 0.7f, 0.85f);
+        hexPreview.numCornerVertices = 3;
+        hexPreview.numCapVertices = 3;
+        hexPreview.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        hexPreview.receiveShadows = false;
+        hexPreview.sortingOrder = 1000;
         hexPreview.enabled = false;
     }
 
-    public void SetSelectedCard(GameObject prefab)
+    // --- NUEVO: seleccionar carta con tipo ---
+    public void SetSelectedBuild(GameObject towerPrefab)
     {
-        selectedPrefab = prefab;
+        selected = new SelectedCard { prefab = towerPrefab, isUpgrade = false };
+        UpdatePreviewVisibility();
+    }
+
+    public void SetSelectedUpgrade(GameObject upgradePrefab)
+    {
+        selected = new SelectedCard { prefab = upgradePrefab, isUpgrade = true };
+        Debug.Log("Hice cositas");
         UpdatePreviewVisibility();
     }
 
@@ -66,84 +86,101 @@ public class CardPlacer : MonoBehaviour
     {
         UpdateHoverAndPreview();
 
-        if (selectedPrefab != null && Input.GetMouseButtonDown(0))
+        // Click izquierdo para colocar / mejorar
+        if (selected.prefab != null && Input.GetMouseButtonDown(0))
         {
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
                 return;
 
             if (!hasValidHover) return;
 
-            // Ya validamos que no está ocupada
+            // Centro del hex en mundo
             Vector3 basePos = HexGrid.AxialToWorld(hoveredAxial, cellRadius);
             Vector3 spawnPos = basePos;
 
-            // Ajustar altura con el raycast real al piso para respetar terreno
+            // Alinear Y con el suelo bajo el mouse
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, 1000f, groundMask))
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f, groundMask))
                 spawnPos.y = hit.point.y;
 
-            // Levantar la torreta la mitad de su altura (si tiene Renderer)
-            float lift = 0f;
-            var rend = selectedPrefab.GetComponentInChildren<Renderer>();
-            if (rend != null) lift = rend.bounds.size.y * 0.5f;
-            spawnPos.y += lift;
+            if (!selected.isUpgrade)
+            {
+                // Construcción de nueva torreta (solo si no hay torreta en esta celda)
+                if (!placedTowers.ContainsKey(hoveredAxial))
+                {
+                    float lift = 0f;
+                    var rend = selected.prefab.GetComponentInChildren<Renderer>();
+                    if (rend != null) lift = rend.bounds.size.y * 0.5f;
+                    spawnPos.y += lift;
 
-            Instantiate(selectedPrefab, spawnPos, Quaternion.identity);
-            occupied.Add(hoveredAxial);
+                    var tower = Instantiate(selected.prefab, spawnPos, Quaternion.identity);
+                    placedTowers[hoveredAxial] = tower;
 
-            // Limpiar selección después de colocar
-            selectedPrefab = null;
+                    // (Opcional) guarda su axial para liberar luego
+                    var h = tower.GetComponent<TurretCellHandle>();
+                    if (h == null) h = tower.AddComponent<TurretCellHandle>();
+                    h.axial = hoveredAxial;
+                }
+            }
+            else
+            {
+                // Mejora: requiere que YA exista una torreta en la celda
+                if (placedTowers.TryGetValue(hoveredAxial, out var tower))
+                {
+                    // Estrategia simple: instanciar el “módulo” como hijo
+                    // o llamar a un componente de la torre que aplique la mejora.
+                    var upgradable = tower.GetComponent<TowerUpgradable>();
+                    if (upgradable == null) upgradable = tower.AddComponent<TowerUpgradable>();
+
+                    upgradable.ApplyUpgrade(selected.prefab);
+                }
+            }
+
+            // Limpiar selección
+            selected = default;
             UpdatePreviewVisibility();
         }
 
-        // Cancelar selección (opcional con click derecho)
+        // Click derecho para cancelar
         if (Input.GetMouseButtonDown(1))
         {
-            selectedPrefab = null;
+            selected = default;
             UpdatePreviewVisibility();
         }
     }
 
     private void UpdateHoverAndPreview()
     {
-        if (selectedPrefab == null)
+        if (selected.prefab == null)
         {
             hexPreview.enabled = false;
             hasValidHover = false;
             return;
         }
 
-        //if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
-        //{
-        //    hexPreview.enabled = false;
-        //    hasValidHover = false;
-        //    return;
-        //}
-
+        // Raycast SOLO al suelo (groundMask), no colisiona con torretas
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, 1000f, groundMask))
+        if (Physics.Raycast(ray, out RaycastHit groundHit, 100f, groundMask, QueryTriggerInteraction.Ignore))
         {
-            // Calcular celda axial
-            Vector3 flatPoint = hit.point;
-            flatPoint.y = 0f; // proyección al plano XZ para el cálculo
+            Vector3 flatPoint = groundHit.point;
+            flatPoint.y = 0f;
 
             Vector2Int axial = HexGrid.WorldToAxial(flatPoint, cellRadius);
             Vector3 center = HexGrid.AxialToWorld(axial, cellRadius);
-            center.y = hit.point.y + previewYOffset;
+            center.y = groundHit.point.y + previewYOffset;
 
             hoveredAxial = axial;
-            bool isFree = !occupied.Contains(axial);
-            hasValidHover = isFree;
 
-            // Dibujar hex
-            Vector3[] corners = HexGrid.GetHexCorners(new Vector3(center.x, center.y, center.z), cellRadius);
+            bool cellHasTower = placedTowers.ContainsKey(axial);
+            hasValidHover = selected.isUpgrade ? cellHasTower : !cellHasTower;
+
+            if (hexPreview.positionCount != 7) hexPreview.positionCount = 7;
+            Vector3[] corners = HexGrid.GetHexCorners(center, cellRadius);
             hexPreview.enabled = true;
-            for (int i = 0; i < 6; i++)
-                hexPreview.SetPosition(i, corners[i]);
-            hexPreview.SetPosition(6, corners[0]); // cerrar
+            for (int i = 0; i < 6; i++) hexPreview.SetPosition(i, corners[i]);
+            hexPreview.SetPosition(6, corners[0]);
 
-            // Color: gris si libre, rojo si ocupado
-            Color c = isFree ? new Color(0.7f, 0.7f, 0.7f, 0.9f) : new Color(1f, 0.2f, 0.2f, 0.9f);
+            Color c = hasValidHover ? new Color(0.2f, 0.9f, 0.2f, 1f) : new Color(1f, 0.2f, 0.2f, 0.95f);
             hexPreview.startColor = c;
             hexPreview.endColor = c;
         }
@@ -156,12 +193,31 @@ public class CardPlacer : MonoBehaviour
 
     private void UpdatePreviewVisibility()
     {
-        hexPreview.enabled = (selectedPrefab != null);
+        hexPreview.enabled = (selected.prefab != null);
     }
 
-    // (Opcional) Si luego quieres liberar una celda cuando destruyas una torreta:
+    // Si destruyes una torreta, puedes liberar su celda:
     public void FreeCell(Vector2Int axial)
     {
-        occupied.Remove(axial);
+        if (placedTowers.TryGetValue(axial, out var t))
+        {
+            placedTowers.Remove(axial);
+            if (t != null) Destroy(t);
+        }
+        else
+        {
+            placedTowers.Remove(axial);
+        }
+    }
+}
+
+// Pequeño helper para liberar celda al destruir una torreta
+public class TurretCellHandle : MonoBehaviour
+{
+    public Vector2Int axial;
+    private void OnDestroy()
+    {
+        if (CardPlacer.Instance != null)
+            CardPlacer.Instance.FreeCell(axial);
     }
 }

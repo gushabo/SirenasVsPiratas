@@ -1,13 +1,23 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class CardSpawn : MonoBehaviour
 {
-    public GameObject worldPrefab;
+    public GameObject worldPrefab;    // torreta
 
-    public void OnCardClicked()
+    public GameObject upgradePrefab;
+  
+
+    // Botón de carta de "torreta"
+    public void OnBuildCardClicked()
     {
-        CardPlacer.Instance.SetSelectedCard(worldPrefab);
-        Debug.Log("Clickeado");
+        CardPlacer.Instance.SetSelectedBuild(worldPrefab);
+        Debug.Log("Seleccionada carta: Construcción");
+    }
+
+    // Botón de carta de "mejora"
+    public void OnUpgradeCardClicked()
+    {
+        CardPlacer.Instance.SetSelectedUpgrade(upgradePrefab);
+        Debug.Log("Seleccionada carta: Mejora");
     }
 }

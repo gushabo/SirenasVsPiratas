@@ -225,6 +225,7 @@ GameObject:
   - component: {fileID: 3488870290350991941}
   - component: {fileID: 582232721995337465}
   - component: {fileID: 8170453829368692706}
+  - component: {fileID: 1564002532033009355}
   m_Layer: 0
   m_Name: CardImage
   m_TagString: Untagged
@@ -335,7 +336,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 8170453829368692706}
         m_TargetAssemblyTypeName: CardSpawn, Assembly-CSharp
-        m_MethodName: OnBuildCardClicked
+        m_MethodName: OnUpgradeCardClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -378,6 +379,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   worldPrefab: {fileID: 6071271336939312677, guid: d0c26750ee996344aba3b3756379caea, type: 3}
+  upgradePrefab: {fileID: 2117851461502595526, guid: f98d98a0569212b4b8b998f6764f1da2, type: 3}
+--- !u!114 &1564002532033009355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1266190538670822797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 679cd4e8edb7c7846a80cbad5d0428aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  level: 0
+  maxLevel: 3
+  mountPoint: {fileID: 0}
 --- !u!1 &2244250600938395605
 GameObject:
   m_ObjectHideFlags: 0
@@ -616,7 +633,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1999243526354956482}
   m_Layer: 0
-  m_Name: CardPrefab
+  m_Name: CardMejora
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
