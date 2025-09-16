@@ -44,3 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a9afe37055f31240ac9ebfd19bdbd24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cam: {fileID: 0}
+  cellRadius: 1
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 64
+  previewYOffset: 0.02
+  lineWidth: 0.03
