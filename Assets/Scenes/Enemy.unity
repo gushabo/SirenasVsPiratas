@@ -1364,6 +1364,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6444509922535496292, guid: 0b749cf2453113248a163b567e89a092, type: 3}
+      propertyPath: 'deck.Array.data[0]'
+      value: 
+      objectReference: {fileID: 4616683652018089834, guid: 1a11b676709d0964db06b30ae938a3b8, type: 3}
     - target: {fileID: 7319765992586790317, guid: 0b749cf2453113248a163b567e89a092, type: 3}
       propertyPath: m_Name
       value: CanvasVideo

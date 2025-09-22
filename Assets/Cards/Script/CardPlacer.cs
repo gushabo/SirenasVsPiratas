@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+Ôªøusing System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -6,26 +6,27 @@ public class CardPlacer : MonoBehaviour
 {
     public static CardPlacer Instance;
 
+    private CardHighlight currentUIHighlight;
     [Header("Camera")]
     public Camera cam;
 
     [Header("Grid")]
-    [Tooltip("Radio del hex (distancia del centro a cada vÈrtice)")]
+    [Tooltip("Radio del hex (distancia del centro a cada v√©rtice)")]
     public float cellRadius = 1.0f;
 
-    [Tooltip("Capas v·lidas a las que se les puede hacer click (suelo)")]
+    [Tooltip("Capas v√°lidas a las que se les puede hacer click (suelo)")]
     public LayerMask groundMask = ~0;
 
     [Header("Preview")]
     [Tooltip("Altura del preview/hex sobre el piso")]
     public float previewYOffset = 0.02f;
-    [Tooltip("Grosor de la lÌnea del hex gris")]
+    [Tooltip("Grosor de la l√≠nea del hex gris")]
     public float lineWidth = 0.03f;
 
     // --- NUEVO: tipo de carta seleccionada ---
     private struct SelectedCard
     {
-        public GameObject prefab;   // prefab de torreta o de ìmÛdulo de mejoraî
+        public GameObject prefab;   // prefab de torreta o de ‚Äúm√≥dulo de mejora‚Äù
         public bool isUpgrade;      // true = mejora, false = construir
     }
     private SelectedCard selected;
@@ -69,15 +70,17 @@ public class CardPlacer : MonoBehaviour
     }
 
     // --- NUEVO: seleccionar carta con tipo ---
-    public void SetSelectedBuild(GameObject towerPrefab)
+    public void SetSelectedBuild(GameObject towerPrefab, CardHighlight sourceHighlight = null)
     {
         selected = new SelectedCard { prefab = towerPrefab, isUpgrade = false };
+        currentUIHighlight = sourceHighlight;
         UpdatePreviewVisibility();
     }
 
-    public void SetSelectedUpgrade(GameObject upgradePrefab)
+    public void SetSelectedUpgrade(GameObject upgradePrefab, CardHighlight sourceHighlight = null)
     {
         selected = new SelectedCard { prefab = upgradePrefab, isUpgrade = true };
+        currentUIHighlight = sourceHighlight;
         Debug.Log("Hice cositas");
         UpdatePreviewVisibility();
     }
@@ -105,7 +108,7 @@ public class CardPlacer : MonoBehaviour
 
             if (!selected.isUpgrade)
             {
-                // ConstrucciÛn de nueva torreta (solo si no hay torreta en esta celda)
+                // Construcci√≥n de nueva torreta (solo si no hay torreta en esta celda)
                 if (!placedTowers.ContainsKey(hoveredAxial))
                 {
                     float lift = 0f;
@@ -127,7 +130,7 @@ public class CardPlacer : MonoBehaviour
                 // Mejora: requiere que YA exista una torreta en la celda
                 if (placedTowers.TryGetValue(hoveredAxial, out var tower))
                 {
-                    // Estrategia simple: instanciar el ìmÛduloî como hijo
+                    // Estrategia simple: instanciar el ‚Äúm√≥dulo‚Äù como hijo
                     // o llamar a un componente de la torre que aplique la mejora.
                     var upgradable = tower.GetComponent<TowerUpgradable>();
                     if (upgradable == null) upgradable = tower.AddComponent<TowerUpgradable>();
@@ -136,9 +139,19 @@ public class CardPlacer : MonoBehaviour
                 }
             }
 
-            // Limpiar selecciÛn
-            selected = default;
-            UpdatePreviewVisibility();
+            // Tras colocar o mejorar con √©xito:
+            if (HandManager.Instance != null && currentUIHighlight != null)
+            {
+                HandManager.Instance.RemoveCardByHighlight(currentUIHighlight);
+            }
+
+           
+
+
+
+            ClearSelectionAndUIHighlight();
+
+            
         }
 
         // Click derecho para cancelar
@@ -147,6 +160,24 @@ public class CardPlacer : MonoBehaviour
             selected = default;
             UpdatePreviewVisibility();
         }
+    }
+
+    private void ClearSelectionAndUIHighlight()
+    {
+        selected = default;
+
+        // Apaga el highlight del bot√≥n que estaba activo (si sigues usando currentUIHighlight)
+        if (currentUIHighlight != null)
+        {
+            currentUIHighlight.SetSelected(false);
+            currentUIHighlight = null;
+        }
+
+        // --- NUEVO: que HandManager apague CUALQUIER otra carta seleccionada ---
+        if (HandManager.Instance != null)
+            HandManager.Instance.NotifyPlacementCleared();
+
+        UpdatePreviewVisibility();
     }
 
     private void UpdateHoverAndPreview()
@@ -211,7 +242,7 @@ public class CardPlacer : MonoBehaviour
     }
 }
 
-// PequeÒo helper para liberar celda al destruir una torreta
+// Peque√±o helper para liberar celda al destruir una torreta
 public class TurretCellHandle : MonoBehaviour
 {
     public Vector2Int axial;
