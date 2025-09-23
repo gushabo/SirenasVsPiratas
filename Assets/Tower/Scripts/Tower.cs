@@ -3,11 +3,12 @@ using UnityEngine;
 
 public class Tower : MonoBehaviour
 {
-    [Header("Stats")] 
-    [SerializeField] private float range = 12f;
-    [SerializeField] private float fireRate = 1.5f;
-    [SerializeField] private float turnSpeed = 10f;
-    [SerializeField] private float retarget = 0.25f;
+    [Header("Stats")]
+    [SerializeField] public int damageBullet = 20;
+    [SerializeField] public float range = 12f;
+    [SerializeField] public float fireRate = 1.5f;
+    [SerializeField] public float turnSpeed = 10f;
+    [SerializeField] public float retarget = 0.25f;
     
     [Header("References")]
     [SerializeField] private Transform head;
@@ -81,7 +82,10 @@ public class Tower : MonoBehaviour
     void Shoot(Transform target)
     {
         Bullet b = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation).GetComponent<Bullet>();
+        b.damage = damageBullet;
         b.Shoot(target);
+
+        
     }
     
     void OnDrawGizmosSelected()

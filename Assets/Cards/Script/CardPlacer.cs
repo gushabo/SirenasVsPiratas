@@ -26,8 +26,8 @@ public class CardPlacer : MonoBehaviour
     // --- NUEVO: tipo de carta seleccionada ---
     private struct SelectedCard
     {
-        public GameObject prefab;   // prefab de torreta o de “módulo de mejora”
-        public bool isUpgrade;      // true = mejora, false = construir
+        public GameObject prefab;   
+        public bool isUpgrade;    
     }
     private SelectedCard selected;
 

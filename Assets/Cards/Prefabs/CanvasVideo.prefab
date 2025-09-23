@@ -241,7 +241,7 @@ MonoBehaviour:
   cardPrefab: {fileID: 4616683652018089834, guid: 1a11b676709d0964db06b30ae938a3b8, type: 3}
   handTransform: {fileID: 5647841017809572691}
   fanSpread: 6
-  cardSpacing: -120
+  cardSpacing: -160
   verticalSpacing: 40
   cardsMaxInHand: 8
   cardsInHand: []

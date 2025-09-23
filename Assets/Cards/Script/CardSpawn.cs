@@ -3,12 +3,14 @@ using UnityEngine;
 public class CardSpawn : MonoBehaviour
 {
     public GameObject worldPrefab;    // torreta
-    public GameObject upgradePrefab;
+    public GameObject upgradePrefab;  
+
+
 
     // Botón de carta de "torreta"
     public void OnBuildCardClicked()
     {
-        var highlight = GetComponent<CardHighlight>(); // asegúrate que está en el MISMO GO del botón
+        var highlight = GetComponent<CardHighlight>(); 
         HandManager.Instance.SelectBuild(worldPrefab, highlight);
     }
 
