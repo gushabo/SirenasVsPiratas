@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviour
     
     private void OnEnable()
     {
-        roundsLeft = EnemySpawners.Count - 1;
+        //roundsLeft = EnemySpawners.Count - 1;
         Lose = false;
         actualRound = 0;
         enemiesLeft = 0;
@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour
     {
         gameState = GameState.Play;
         canPause = true;
-        UiManager.GetInstance().roundsText.text = "Ronda " + (actualRound+1) + " de " + (roundsLeft+1);
+        //UiManager.GetInstance().roundsText.text = "Ronda " + (actualRound+1) + " de " + (roundsLeft+1);
     }
 
     public void PauseGame()
