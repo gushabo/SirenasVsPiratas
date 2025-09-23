@@ -11,7 +11,7 @@ public class EnemyMovement : MonoBehaviour
     private void Start()
     {
         GameManager.GetInstance().onChangeGameState += OnChangeGameStateCallback;
-        
+        if(GameManager.GetInstance().gameState == GameState.Pause) isPaused = true;
         currentTarget = 0;
         if (targets == null || targets.Count == 0)
         {
@@ -41,4 +41,5 @@ public class EnemyMovement : MonoBehaviour
             currentTarget = 0;
         }
     }
+    
 }

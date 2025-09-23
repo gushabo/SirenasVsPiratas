@@ -18,7 +18,6 @@ public class GameManager : MonoBehaviour
             return;
         }
         instance = this;
-        //enemiesLeft = -1;
     }
     
     public static GameManager GetInstance() => instance;
@@ -44,6 +43,8 @@ public class GameManager : MonoBehaviour
     
     public List<GameObject> EnemySpawners;
 
+    public bool canPause;
+    
     private void OnEnable()
     {
         roundsLeft = EnemySpawners.Count - 1;
@@ -58,7 +59,23 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         gameState = GameState.Play;
+        canPause = true;
         UiManager.GetInstance().roundsText.text = "Ronda " + (actualRound+1) + " de " + (roundsLeft+1);
+    }
+
+    public void PauseGame()
+    {
+        if (canPause)
+        {
+            if (gameState == GameState.Pause)
+            {
+                ChangeGameState(GameState.Play);
+            }
+            else if (gameState == GameState.Play)
+            {
+                ChangeGameState(GameState.Pause);
+            }
+        }
     }
 
     public void ChangeGameState(GameState newGameState)
@@ -82,16 +99,10 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            
-            if (gameState == GameState.Pause)
+            if (canPause)
             {
-                ChangeGameState(GameState.Play);
+                PauseGame();
             }
-            else if (gameState == GameState.Play)
-            {
-                ChangeGameState(GameState.Pause);
-            }
-            
         }
     }
 
@@ -131,6 +142,7 @@ public class GameManager : MonoBehaviour
         
         EnemySpawners[actualRound].SetActive(false);
         actualRound++;
+        canPause = false;
         UiManager.GetInstance().roundsText.text = "Ronda " + (actualRound+1) + " de " + (roundsLeft+1);
         UiManager.GetInstance().changeRoundPanel.SetActive(true);
         StartCoroutine(ChangeRound());
@@ -148,8 +160,10 @@ public class GameManager : MonoBehaviour
         UiManager.GetInstance().countDownText.text = "1";
         yield return new WaitForSeconds(1f);
         UiManager.GetInstance().countDownPanel.SetActive(false);
+        canPause = true;
         EnemySpawners[actualRound].SetActive(true);
     }
+
 }
 
 public enum GameState

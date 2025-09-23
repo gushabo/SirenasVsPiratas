@@ -23,6 +23,7 @@ public class Tower : MonoBehaviour
     {
         InvokeRepeating(nameof(UpdateTarget), 0f, retarget);
         GameManager.GetInstance().onChangeGameState += OnChangeGameStateCallback;
+        if(GameManager.GetInstance().gameState == GameState.Pause) isPaused = true;
     }
     
     public void OnChangeGameStateCallback(GameState newState)
@@ -76,8 +77,7 @@ public class Tower : MonoBehaviour
         currentTarget = (bestTarget != null && (bestTarget.position - transform.position).sqrMagnitude <= range * range) ? bestTarget : null;
         
     }
-
-
+    
     void Shoot(Transform target)
     {
         Bullet b = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation).GetComponent<Bullet>();
@@ -89,5 +89,6 @@ public class Tower : MonoBehaviour
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, range);
     }
+    
     
 }

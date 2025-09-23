@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Fish : MonoBehaviour
@@ -10,70 +8,86 @@ public class Fish : MonoBehaviour
     [SerializeField] float armTime = 0.25f;
     [SerializeField] float triggerDelay = 5f;
 
-    [Header("Explocion")] 
-    [SerializeField] float radius;
-    [SerializeField] int damage; 
+    [Header("Explosión")] 
+    [SerializeField] float radius = 3f;
+    [SerializeField] int damage = 20; 
     [SerializeField] GameObject vfxPrefab;
 
     private bool armed;
+    private bool isPaused;
+    private bool detonationStarted;              // <-- evita múltiples corrutinas
+    private readonly Collider[] buffer = new Collider[64];
 
-    
-
-    private void Start()
+    void Start()
     {
         Invoke(nameof(Arm), armTime);
+
+        var gm = GameManager.GetInstance();
+        if (gm != null)
+        {
+            gm.onChangeGameState += OnChangeGameStateCallback;
+            isPaused = gm.gameState != GameState.Play; // estado inicial
+        }
     }
 
-    public void Arm() => armed = true; 
-
-    private void OnTriggerEnter(Collider other)
+    void OnDestroy()
     {
-        if (!armed) return;
-        if(!MatchesTag(other)) return;
-        
-        print("Se va a detonar el fish");
-        
-        StartCoroutine(ExplodeAfter(triggerDelay));
-        
+        var gm = GameManager.GetInstance();
+        if (gm != null) gm.onChangeGameState -= OnChangeGameStateCallback;
     }
-    
+
+    public void OnChangeGameStateCallback(GameState newState)
+    {
+        isPaused = newState != GameState.Play;
+    }
+
+    void Arm() => armed = true; 
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (!armed || detonationStarted) return;
+        if (!MatchesTag(other)) return;
+
+        detonationStarted = true;
+        StartCoroutine(ExplodeAfterPausedAware(triggerDelay));
+    }
+
     bool MatchesTag(Collider c)
     {
         for (int i = 0; i < triggerTags.Length; i++)
             if (c.CompareTag(triggerTags[i])) return true;
         return false;
     }
-    
-    // Explosion
-    private readonly Collider[] buffer = new Collider[64];
 
-    IEnumerator ExplodeAfter(float t)
+    // Corrutina "pausable": solo descuenta tiempo cuando NO está en pausa
+    IEnumerator ExplodeAfterPausedAware(float delay)
     {
-        yield return new WaitForSeconds(t);
+        float remaining = delay;
+        while (remaining > 0f)
+        {
+            // si está pausado, espera al siguiente frame sin descontar tiempo
+            if (!isPaused)
+                remaining -= Time.deltaTime;
+            yield return null;
+        }
         Explode();
     }
 
     public void Explode()
     {
         if (vfxPrefab) Instantiate(vfxPrefab, transform.position, Quaternion.identity);
-        
-        int count = Physics.OverlapSphereNonAlloc(
-            transform.position, radius, buffer);
-        
+
+        int count = Physics.OverlapSphereNonAlloc(transform.position, radius, buffer);
         for (int i = 0; i < count; i++)
         {
             var col = buffer[i];
-
-            // Daño
             var hp = col.GetComponentInParent<Health>();
-            if (hp != null && damage > 0f) hp.TakeDamage(damage);
-            print("Hizo el dmg");
+            if (hp != null && damage > 0) hp.TakeDamage(damage);
         }
 
         Destroy(gameObject);
     }
-    
-    // Gizmos para ver el radio
+
     void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(1f, 0.4f, 0f, 0.25f);
