@@ -300,7 +300,6 @@ GameObject:
   - component: {fileID: 3488870290350991941}
   - component: {fileID: 582232721995337465}
   - component: {fileID: 6604999619763055373}
-  - component: {fileID: 9159795553711416586}
   - component: {fileID: 6322380459895633289}
   m_Layer: 0
   m_Name: CardImage
@@ -457,20 +456,6 @@ MonoBehaviour:
   glowEffect: {fileID: 93311484869445677}
   selectScale: 1.1
   cardRoot: {fileID: 0}
---- !u!114 &9159795553711416586
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1266190538670822797}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 679cd4e8edb7c7846a80cbad5d0428aa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mountPoint: {fileID: 0}
-  upgradeType: 0
 --- !u!114 &6322380459895633289
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -484,7 +469,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   worldPrefab: {fileID: 0}
-  upgradePrefab: {fileID: 4616683652018089834}
+  upgradePrefab: {fileID: 3081831070071417252, guid: 314a621256aef5d4f9ebaff0146c528c, type: 3}
 --- !u!1 &2244250600938395605
 GameObject:
   m_ObjectHideFlags: 0

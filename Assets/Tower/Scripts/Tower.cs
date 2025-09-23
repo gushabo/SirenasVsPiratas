@@ -93,5 +93,31 @@ public class Tower : MonoBehaviour
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, range);
     }
-    
+
+
+
+
+
+    // En Tower.cs
+    public void AddDamage(float amount)
+    {
+        damageBullet = Mathf.Max(0, damageBullet + Mathf.RoundToInt(amount));
+        // Opcional: feedback (sonido/partículas)
+    }
+
+    public void AddFireRate(float amount)
+    {
+        // fireRate = disparos/segundo. Nunca dejes que sea <= 0
+        fireRate = Mathf.Max(0.05f, fireRate + amount);
+        // No hace falta tocar fireCooldown: en el próximo disparo ya usa el nuevo 1f / fireRate
+    }
+
+    public void AddRange(float amount)
+    {
+        range = Mathf.Max(0f, range + amount);
+        // Retarget inmediato para “aprovechar” el nuevo rango
+        UpdateTarget();
+    }
+
+
 }

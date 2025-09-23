@@ -1,56 +1,95 @@
+// TowerUpgradable.cs
+using System.Collections.Generic;
 using UnityEngine;
 
+[DisallowMultipleComponent]
 public class TowerUpgradable : MonoBehaviour
 {
-    public Transform mountPoint;
+    public Transform mountPoint;   // dónde “colgar” el adorno visual (si existe)
+    private Tower torre;           // tu script de torreta (debe tener damageBullet, fireRate, range)
 
-    [SerializeField]
-    private TypeUpgrade upgradeType;
+    // Lleva conteo por tipo para stacking/duplicados
+    private readonly Dictionary<TypeUpgrade, int> stacksPorTipo = new();
 
-    private Tower Torreta;
+    public enum TypeUpgrade { Damage, FireRate, Range }
 
-    public enum TypeUpgrade
+    void Awake()
     {
-        Damage,
-        FireRate,
-        Range
+        // Mejor en Awake para usarlo si la mejora llega en el primer frame
+        torre = GetComponent<Tower>();
+        if (torre == null)
+            Debug.LogError($"[{name}] No encontré componente Tower. Agrega 'Tower' al prefab de la torreta.");
     }
 
-    void Start()
-    {
-        Torreta = GetComponent<Tower>();
-    }
-
+    /// <summary>
+    /// Aplica una mejora instanciando (opcional) su visual y modificando stats.
+    /// </summary>
     public void ApplyUpgrade(GameObject upgradePrefab)
     {
+        if (torre == null || upgradePrefab == null) return;
+
+        // Lee los datos desde el prefab
+        var data = upgradePrefab.GetComponent<UpgradeModule>();
+        if (data == null)
+        {
+            Debug.LogWarning($"[{name}] El upgradePrefab no tiene UpgradeModule. Se ignora.");
+            return;
+        }
+
+        // Reglas de acumulación
+        stacksPorTipo.TryGetValue(data.type, out int currentStacks);
+
+        if (!data.stackable && currentStacks >= 1)
+        {
+            Debug.Log($"[{name}] Ya se aplicó una mejora de tipo {data.type}. No es acumulable.");
+            return;
+        }
+        if (data.stackable && data.maxStacks > 0 && currentStacks >= data.maxStacks)
+        {
+            Debug.Log($"[{name}] Tope de acumulación alcanzado para {data.type} ({data.maxStacks}).");
+            return;
+        }
+
+        // 1) Visual (opcional)
         Transform parent = mountPoint != null ? mountPoint : transform;
+        if (data.cosmeticChild != null)
+        {
+            var visual = Instantiate(data.cosmeticChild, parent);
+            visual.transform.localPosition = Vector3.zero;
+            visual.transform.localRotation = Quaternion.identity;
+            visual.transform.localScale = Vector3.one;
+        }
+        else
+        {
+            // Si prefieres instanciar TODO el prefab como adorno, descomenta:
+            // var visual = Instantiate(upgradePrefab, parent);
+            // visual.transform.localPosition = Vector3.zero;
+            // visual.transform.localRotation = Quaternion.identity;
+            // visual.transform.localScale = Vector3.one;
+        }
 
-        var module = Instantiate(upgradePrefab, parent);
-        module.transform.localPosition = Vector3.zero;
-        module.transform.localRotation = Quaternion.identity;
-        module.transform.localScale = Vector3.one;
+        // 2) Stats
+        ApplyStatUpgrade(data.type, data.amount);
 
-        ApplyStatUpgrade(upgradeType, module); 
+        // 3) Incrementa contador
+        stacksPorTipo[data.type] = currentStacks + 1;
     }
 
-    private void ApplyStatUpgrade(TypeUpgrade type, GameObject upgradePrefab)
+    // En TowerUpgradable.cs
+    private void ApplyStatUpgrade(TypeUpgrade type, float amount)
     {
         switch (type)
         {
             case TypeUpgrade.Damage:
-                Torreta.damageBullet += 15;
+                torre.AddDamage(amount);     // antes: torre.damageBullet += amount;
                 break;
             case TypeUpgrade.FireRate:
-                Torreta.fireRate += 0.5f;
+                torre.AddFireRate(amount);   // antes: torre.fireRate += amount;
                 break;
             case TypeUpgrade.Range:
-                Torreta.range += 1f;
-                break;
-            default:
-                Debug.LogWarning("NBo exoiaodiwdjoiakróuooe");
+                torre.AddRange(amount);      // antes: torre.range += amount; // sin retarget inmediato
                 break;
         }
     }
 
-   
 }

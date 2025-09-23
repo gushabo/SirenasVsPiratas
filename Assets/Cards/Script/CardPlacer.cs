@@ -128,15 +128,19 @@ public class CardPlacer : MonoBehaviour
             else
             {
                 // Mejora: requiere que YA exista una torreta en la celda
+            
                 if (placedTowers.TryGetValue(hoveredAxial, out var tower))
                 {
-                    // Estrategia simple: instanciar el “módulo” como hijo
-                    // o llamar a un componente de la torre que aplique la mejora.
                     var upgradable = tower.GetComponent<TowerUpgradable>();
                     if (upgradable == null) upgradable = tower.AddComponent<TowerUpgradable>();
 
-                    upgradable.ApplyUpgrade(selected.prefab);
+                    upgradable.ApplyUpgrade(selected.prefab); // <- usa UpgradeModule del prefab
                 }
+                else
+                {
+                    Debug.Log("No hay torreta en esa celda: no se puede aplicar mejora.");
+                }
+
             }
 
             // Tras colocar o mejorar con éxito:
