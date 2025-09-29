@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class DeckManager : MonoBehaviour
 {
-    [Header("Deck (arrastra prefabs aquí en el Inspector)")]
+    [Header("Aqui va pregfabsowowo")]
     public List<GameObject> deck = new List<GameObject>();
 
     private int currentIndex = 0;
 
-    /// <summary>
+  
     /// ¿Hay cartas para robar?
-    /// </summary>
+   
     public bool CanDraw => deck != null && deck.Count > 0;
     private void Start()
     {
@@ -21,9 +21,10 @@ public class DeckManager : MonoBehaviour
 
         }
     }
-    /// <summary>
+
+   
     /// Entrega la siguiente carta del deck y la agrega a la mano.
-    /// </summary>
+  
     public void DrawCard(HandManager handManager)
     {
         if (!CanDraw || handManager == null) return;
@@ -34,13 +35,27 @@ public class DeckManager : MonoBehaviour
         handManager.AddCardToHand(prefab);
     }
 
-    /// <summary>
+   
     /// Agrega varias cartas seguidas (opcional).
-    /// </summary>
+    
     public void DrawCards(HandManager handManager, int count)
     {
         if (!CanDraw || handManager == null) return;
         for (int i = 0; i < count; i++)
             DrawCard(handManager);
+    }
+
+    public void DrawRandomCards(HandManager handManager, int count = 3)
+    {
+        if (!CanDraw || handManager == null) return;
+
+        for (int i = 0; i < count; i++)
+        {
+          
+            int randomIndex = Random.Range(0, deck.Count);
+
+            var prefab = deck[randomIndex];
+            handManager.AddCardToHand(prefab);
+        }
     }
 }
