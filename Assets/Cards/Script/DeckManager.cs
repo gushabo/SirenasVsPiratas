@@ -51,7 +51,7 @@ public class DeckManager : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            // escoger un índice aleatorio dentro del mazo
+          
             int randomIndex = Random.Range(0, deck.Count);
 
             var prefab = deck[randomIndex];
