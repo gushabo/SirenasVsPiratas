@@ -44,4 +44,18 @@ public class DeckManager : MonoBehaviour
         for (int i = 0; i < count; i++)
             DrawCard(handManager);
     }
+
+    public void DrawRandomCards(HandManager handManager, int count = 3)
+    {
+        if (!CanDraw || handManager == null) return;
+
+        for (int i = 0; i < count; i++)
+        {
+            // escoger un índice aleatorio dentro del mazo
+            int randomIndex = Random.Range(0, deck.Count);
+
+            var prefab = deck[randomIndex];
+            handManager.AddCardToHand(prefab);
+        }
+    }
 }
