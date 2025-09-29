@@ -11,9 +11,12 @@ public class CardPlacer : MonoBehaviour
     [Header("Camera")]
     public Camera cam;
 
-    [Header("Grid")]
+   
     [Tooltip("Radio del hex (distancia del centro a cada vértice)")]
+    [Header("Grid")]
     public float cellRadius = 1.0f;
+    public Vector3 gridOrigin = Vector3.zero; // ← pon aquí el centro de un hex real del mapa
+
 
     [Tooltip("Capas válidas a las que se les puede hacer click (suelo)")]
     public LayerMask groundMask = ~0;
@@ -116,7 +119,7 @@ public class CardPlacer : MonoBehaviour
             if (!hasValidHover) return;
 
             // Centro del hex
-            Vector3 basePos = HexGrid.AxialToWorld(hoveredAxial, cellRadius);
+            Vector3 basePos = HexGridFlat.AxialToWorld(hoveredAxial, cellRadius, gridOrigin);
             Vector3 spawnPos = basePos;
 
             // Alinear Y al piso bajo el puntero
@@ -205,8 +208,8 @@ public class CardPlacer : MonoBehaviour
         {
             Vector3 flatPoint = groundHit.point; flatPoint.y = 0f;
 
-            Vector2Int axial = HexGrid.WorldToAxial(flatPoint, cellRadius);
-            Vector3 center = HexGrid.AxialToWorld(axial, cellRadius);
+            Vector2Int axial = HexGridFlat.WorldToAxial(flatPoint, cellRadius, gridOrigin);
+            Vector3 center = HexGridFlat.AxialToWorld(axial, cellRadius, gridOrigin);
             center.y = groundHit.point.y + previewYOffset;
 
             hoveredAxial = axial;
@@ -216,7 +219,7 @@ public class CardPlacer : MonoBehaviour
 
             // Dibujar hex
             if (hexPreview.positionCount != 7) hexPreview.positionCount = 7;
-            Vector3[] corners = HexGrid.GetHexCorners(center, cellRadius);
+            Vector3[] corners = HexGridFlat.GetHexCorners(center, cellRadius);
             hexPreview.enabled = true;
             for (int i = 0; i < 6; i++) hexPreview.SetPosition(i, corners[i]);
             hexPreview.SetPosition(6, corners[0]);

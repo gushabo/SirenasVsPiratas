@@ -1,21 +1,32 @@
 using UnityEngine;
 
-public static class HexGrid
+public static class HexGridFlat
 {
-    // Convenciones: hexagono "pointy top" (puntas arriba/abajo)
-    // Fórmulas basadas en red axial (q, r)
-    // x = world.x, z = world.z (usamos plano XZ)
+    const float SQRT3 = 1.73205080757f;
 
-    public static Vector2Int WorldToAxial(Vector3 worldPos, float radius)
+    // Axial (q,r) -> mundo (XZ), FLAT-TOP
+    public static Vector3 AxialToWorld(Vector2Int axial, float radius, Vector3 origin, float y = 0f)
     {
-        float qf = (Mathf.Sqrt(3f) / 3f * worldPos.x - 1f / 3f * worldPos.z) / radius;
-        float rf = (2f / 3f * worldPos.z) / radius;
+        int q = axial.x;
+        int r = axial.y;
+        float x = radius * 1.5f * q;
+        float z = radius * SQRT3 * (r + q * 0.5f);
+        return new Vector3(origin.x + x, y, origin.z + z);
+    }
 
-        // Pasar a coordenadas cubo para redondeo correcto
-        float xf = qf;
-        float zf = rf;
-        float yf = -xf - zf;
+    // mundo (XZ) -> Axial (q,r), FLAT-TOP
+    public static Vector2Int WorldToAxial(Vector3 worldPos, float radius, Vector3 origin)
+    {
+        // coords relativas al origen
+        float x = worldPos.x - origin.x;
+        float z = worldPos.z - origin.z;
 
+        // inversa del flat-top
+        float qf = (2f / 3f) * x / radius;
+        float rf = (-1f / 3f) * x / radius + (1f / SQRT3) * z / radius;
+
+        // redondeo cúbico correcto
+        float xf = qf, zf = rf, yf = -xf - zf;
         int rx = Mathf.RoundToInt(xf);
         int ry = Mathf.RoundToInt(yf);
         int rz = Mathf.RoundToInt(zf);
@@ -24,37 +35,22 @@ public static class HexGrid
         float y_diff = Mathf.Abs(ry - yf);
         float z_diff = Mathf.Abs(rz - zf);
 
-        if (x_diff > y_diff && x_diff > z_diff)
-            rx = -ry - rz;
-        else if (y_diff > z_diff)
-            ry = -rx - rz;
-        else
-            rz = -rx - ry;
+        if (x_diff > y_diff && x_diff > z_diff) rx = -ry - rz;
+        else if (y_diff > z_diff) ry = -rx - rz;
+        else rz = -rx - ry;
 
-        // axial: q = x, r = z
         return new Vector2Int(rx, rz);
     }
 
-    public static Vector3 AxialToWorld(Vector2Int axial, float radius, float y = 0f)
-    {
-        int q = axial.x;
-        int r = axial.y;
-
-        float x = radius * Mathf.Sqrt(3f) * (q + r * 0.5f);
-        float z = radius * 1.5f * r;
-
-        return new Vector3(x, y, z);
-    }
-
-    // Devuelve los 6 vértices (en mundo) del hex centrado en "center"
+    // 6 vértices FLAT-TOP
     public static Vector3[] GetHexCorners(Vector3 center, float radius)
     {
-        Vector3[] corners = new Vector3[6];
+        var corners = new Vector3[6];
         for (int i = 0; i < 6; i++)
         {
-            float angleDeg = 60f * i - 30f; // pointy-top
-            float angleRad = Mathf.Deg2Rad * angleDeg;
-            corners[i] = center + new Vector3(radius * Mathf.Cos(angleRad), 0f, radius * Mathf.Sin(angleRad));
+            float angleDeg = 60f * i; // flat-top
+            float rad = angleDeg * Mathf.Deg2Rad;
+            corners[i] = center + new Vector3(radius * Mathf.Cos(rad), 0f, radius * Mathf.Sin(rad));
         }
         return corners;
     }
