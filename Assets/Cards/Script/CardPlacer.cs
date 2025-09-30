@@ -14,14 +14,14 @@ public class CardPlacer : MonoBehaviour
    
     [Tooltip("Radio del hex (distancia del centro a cada vértice)")]
     [Header("Grid")]
-    public float cellRadius = 1.0f;
-    public Vector3 gridOrigin = Vector3.zero; // ← pon aquí el centro de un hex real del mapa
+    public float cellRadius = 1.2f;
+    public Vector3 gridOrigin = Vector3.zero; 
 
 
-    [Tooltip("Capas válidas a las que se les puede hacer click (suelo)")]
+   
     public LayerMask groundMask = ~0;
 
-    [Header("Preview")]
+ 
     [Tooltip("Altura del preview/hex sobre el piso")]
     public float previewYOffset = 0.03f;
     [Tooltip("Grosor de la línea del hex")]
@@ -104,10 +104,10 @@ public class CardPlacer : MonoBehaviour
 
     void Update()
     {
-        // 1) Leer input unificado (actualiza pointerPos, pressedThisFrame, pointerActive)
+       
         ReadPointer();
 
-        // 2) Actualizar hover/preview siguiendo el mouse o el dedo (Moved/Stationary)
+       
         UpdateHoverAndPreview(pointerActive ? (Vector2?)pointerPos : null);
 
         if (selected.prefab == null) return;

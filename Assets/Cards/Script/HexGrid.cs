@@ -14,7 +14,7 @@ public static class HexGridFlat
         return new Vector3(origin.x + x, y, origin.z + z);
     }
 
-    // mundo (XZ) -> Axial (q,r), FLAT-TOP
+   
     public static Vector2Int WorldToAxial(Vector3 worldPos, float radius, Vector3 origin)
     {
         // coords relativas al origen
@@ -42,13 +42,13 @@ public static class HexGridFlat
         return new Vector2Int(rx, rz);
     }
 
-    // 6 vértices FLAT-TOP
+   
     public static Vector3[] GetHexCorners(Vector3 center, float radius)
     {
         var corners = new Vector3[6];
         for (int i = 0; i < 6; i++)
         {
-            float angleDeg = 60f * i; // flat-top
+            float angleDeg = 60f * i; 
             float rad = angleDeg * Mathf.Deg2Rad;
             corners[i] = center + new Vector3(radius * Mathf.Cos(rad), 0f, radius * Mathf.Sin(rad));
         }
