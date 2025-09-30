@@ -35,8 +35,8 @@ public class Health : MonoBehaviour
 
     void Die()
     {
-        GameManager.GetInstance().enemiesLeft--;
-        GameManager.GetInstance().CheckForEnemies();
+        LevelManager.GetInstance().enemiesLeft--;
+        LevelManager.GetInstance().CheckForEnemies();
         Destroy(gameObject);
     }
     

@@ -10,8 +10,8 @@ public class Damage : MonoBehaviour
         if (other.gameObject.CompareTag("Coral"))
         {
             other.gameObject.GetComponent<Health>().TakeDamage(damage);
-            GameManager.GetInstance().enemiesLeft--;
-            GameManager.GetInstance().CheckForEnemies();
+            LevelManager.GetInstance().enemiesLeft--;
+            LevelManager.GetInstance().CheckForEnemies();
             Destroy(gameObject);
         }
     }
