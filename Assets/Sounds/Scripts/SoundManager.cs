@@ -9,7 +9,7 @@ public class SoundManager : MonoBehaviour
     public static SoundManager GetInstance() => Instance;
 
     [Header("UI")]
-    [SerializeField] private Scrollbar scrollBar;
+    [SerializeField] private Slider scrollBar;
 
     [Header("Volumen")]
     [Range(0f, 1f)]
@@ -34,6 +34,8 @@ public class SoundManager : MonoBehaviour
         {
             Debug.LogError("SoundManager requiere un AudioSource en el mismo GameObject.");
         }
+        
+        
     }
 
     private void OnEnable()
@@ -68,12 +70,6 @@ public class SoundManager : MonoBehaviour
         PlayerPrefs.SetFloat(PREF_KEY, value);
         PlayerPrefs.Save();
     }
-
-    public void PlayOneShot(AudioClip clip, float volumeScale = 1f)
-    {
-        if (clip == null || audioSource == null) return;
-        audioSource.PlayOneShot(clip, volumeScale);
-    }
     
     private void ApplyVolume(float value)
     {
@@ -82,6 +78,26 @@ public class SoundManager : MonoBehaviour
         if (audioSource != null)
             audioSource.volume = value;
     }
+    
+    public void BindSlider(Slider newBar)
+    {
+        // Quita listener del anterior
+        if (scrollBar != null)
+            scrollBar.onValueChanged.RemoveListener(ChangeAudioValue);
+
+        scrollBar = newBar;
+
+        // Alinea el valor visual al volumen actual
+        float volume = PlayerPrefs.GetFloat(PREF_KEY, defaultVolume);
+        ApplyVolume(volume);
+
+        if (scrollBar != null)
+        {
+            scrollBar.SetValueWithoutNotify(volume);
+            scrollBar.onValueChanged.AddListener(ChangeAudioValue);
+        }
+    }
+    
     
     
 }
