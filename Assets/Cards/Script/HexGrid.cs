@@ -14,7 +14,7 @@ public static class HexGridFlat
         return new Vector3(origin.x + x, y, origin.z + z);
     }
 
-   
+    // Mundo (XZ) -> Axial (q,r), FLAT-TOP
     public static Vector2Int WorldToAxial(Vector3 worldPos, float radius, Vector3 origin)
     {
         // coords relativas al origen
@@ -42,16 +42,47 @@ public static class HexGridFlat
         return new Vector2Int(rx, rz);
     }
 
-   
+    // Devuelve los 6 vértices de un hexágono flat-top
     public static Vector3[] GetHexCorners(Vector3 center, float radius)
     {
         var corners = new Vector3[6];
         for (int i = 0; i < 6; i++)
         {
-            float angleDeg = 60f * i; 
+            // flat-top empieza en 30°
+            float angleDeg = 60f * i + 30f;
             float rad = angleDeg * Mathf.Deg2Rad;
             corners[i] = center + new Vector3(radius * Mathf.Cos(rad), 0f, radius * Mathf.Sin(rad));
         }
         return corners;
+    }
+
+    // Construye un mesh de hexágono (relleno sólido)
+    public static Mesh BuildHexMesh(Vector3 center, float radius)
+    {
+        Vector3[] corners = GetHexCorners(center, radius);
+
+        Mesh mesh = new Mesh();
+
+        // 7 vértices: centro + 6 esquinas
+        Vector3[] verts = new Vector3[7];
+        verts[0] = center;
+        for (int i = 0; i < 6; i++)
+            verts[i + 1] = corners[i];
+
+        // Triángulos (6 alrededor del centro)
+        int[] tris = new int[18];
+        for (int i = 0; i < 6; i++)
+        {
+            tris[i * 3] = 0;               // centro
+            tris[i * 3 + 1] = i + 1;       // esquina actual
+            tris[i * 3 + 2] = (i == 5 ? 1 : i + 2); // siguiente esquina
+        }
+
+        mesh.vertices = verts;
+        mesh.triangles = tris;
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+
+        return mesh;
     }
 }

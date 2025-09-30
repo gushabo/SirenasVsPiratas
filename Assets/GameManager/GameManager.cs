@@ -95,16 +95,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            if (canPause)
-            {
-                PauseGame();
-            }
-        }
-    }
+   
 
     public void CheckForEnemies()
     {

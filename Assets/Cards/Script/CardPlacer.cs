@@ -11,23 +11,17 @@ public class CardPlacer : MonoBehaviour
     [Header("Camera")]
     public Camera cam;
 
-   
-    [Tooltip("Radio del hex (distancia del centro a cada vértice)")]
     [Header("Grid")]
     public float cellRadius = 1.2f;
-    public Vector3 gridOrigin = Vector3.zero; 
+    public Vector3 gridOrigin = Vector3.zero;
 
-
-   
     public LayerMask groundMask = ~0;
 
- 
     [Tooltip("Altura del preview/hex sobre el piso")]
     public float previewYOffset = 0.03f;
     [Tooltip("Grosor de la línea del hex")]
     public float lineWidth = 0.04f;
 
-    // --- selección actual ---
     private struct SelectedCard
     {
         public GameObject prefab;
@@ -35,26 +29,27 @@ public class CardPlacer : MonoBehaviour
     }
     private SelectedCard selected;
 
-    // Torretas por celda
     private readonly Dictionary<Vector2Int, GameObject> placedTowers = new();
 
     // Preview
     private LineRenderer hexPreview;
+    private MeshFilter hexFill;
+    private MeshRenderer hexFillRenderer;
+
     private Vector2Int hoveredAxial;
     private bool hasValidHover;
 
-    // Estado de puntero
     private Vector2 pointerPos;
-    private bool pointerActive;          // hay mouse o al menos 1 toque
-    private bool pressedThisFrame;       // click/touch Began
-    private int activeFingerId = -1;     // finger que seguimos para hover/colocar
+    private bool pointerActive;
+    private bool pressedThisFrame;
+    private int activeFingerId = -1;
 
     void Awake()
     {
         Instance = this;
         if (cam == null) cam = Camera.main;
 
-        // LineRenderer
+        // Borde (LineRenderer)
         var lrObj = new GameObject("HexPreview");
         lrObj.transform.SetParent(transform, false);
         hexPreview = lrObj.AddComponent<LineRenderer>();
@@ -69,7 +64,6 @@ public class CardPlacer : MonoBehaviour
         hexPreview.alignment = LineAlignment.View;
         hexPreview.textureMode = LineTextureMode.Stretch;
 
-        // Material que respeta color
         var shader = Shader.Find("Sprites/Default");
         if (shader == null) shader = Shader.Find("Unlit/Color");
         if (shader == null) shader = Shader.Find("Universal Render Pipeline/Unlit");
@@ -77,12 +71,29 @@ public class CardPlacer : MonoBehaviour
 
         hexPreview.enabled = false;
 
-        // evitar z-fighting
+        // Relleno (Mesh)
+        var fillObj = new GameObject("HexFill");
+        fillObj.transform.SetParent(transform, false);
+        hexFill = fillObj.AddComponent<MeshFilter>();
+        hexFillRenderer = fillObj.AddComponent<MeshRenderer>();
+
+        var shaderFill = Shader.Find("Unlit/Color");
+        if (shaderFill == null) shaderFill = Shader.Find("Universal Render Pipeline/Unlit");
+
+        var matFill = new Material(shaderFill);
+        matFill.color = new Color(0f, 1f, 0f, 0.5f); // verde transparente
+        hexFillRenderer.material = matFill;
+
+        hexFillRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        hexFillRenderer.receiveShadows = false;
+
+
+        hexFill.gameObject.SetActive(false);
+
         previewYOffset = Mathf.Max(previewYOffset, 0.03f);
         lineWidth = Mathf.Max(lineWidth, 0.03f);
     }
 
-    // --- API desde HandManager ---
     public void SetSelectedBuild(GameObject towerPrefab, CardHighlight sourceHighlight = null)
     {
         selected = new SelectedCard { prefab = towerPrefab, isUpgrade = false };
@@ -104,25 +115,19 @@ public class CardPlacer : MonoBehaviour
 
     void Update()
     {
-       
         ReadPointer();
-
-       
         UpdateHoverAndPreview(pointerActive ? (Vector2?)pointerPos : null);
 
         if (selected.prefab == null) return;
 
-        // 3) Colocar/mejorar en el frame del toque/click
         if (pressedThisFrame)
         {
             if (IsPointerOverUI()) return;
             if (!hasValidHover) return;
 
-            // Centro del hex
             Vector3 basePos = HexGridFlat.AxialToWorld(hoveredAxial, cellRadius, gridOrigin);
             Vector3 spawnPos = basePos;
 
-            // Alinear Y al piso bajo el puntero
             Ray ray = cam.ScreenPointToRay(pointerPos);
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, groundMask))
                 spawnPos.y = hit.point.y;
@@ -154,14 +159,12 @@ public class CardPlacer : MonoBehaviour
                 }
             }
 
-            // Consumir carta de la mano
             if (HandManager.Instance != null && currentUIHighlight != null)
                 HandManager.Instance.RemoveCardByHighlight(currentUIHighlight);
 
             ClearSelectionAndUIHighlight();
         }
 
-        // 4) Cancelar con dos dedos (o clic derecho en PC)
 #if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
         if (Input.GetMouseButtonDown(1))
         {
@@ -198,11 +201,11 @@ public class CardPlacer : MonoBehaviour
         if (selected.prefab == null || !pointer.HasValue)
         {
             hexPreview.enabled = false;
+            hexFill.gameObject.SetActive(false);
             hasValidHover = false;
             return;
         }
 
-        // Raycast al suelo desde el puntero actual
         Ray ray = cam.ScreenPointToRay(pointer.Value);
         if (Physics.Raycast(ray, out RaycastHit groundHit, 100f, groundMask, QueryTriggerInteraction.Ignore))
         {
@@ -213,36 +216,43 @@ public class CardPlacer : MonoBehaviour
             center.y = groundHit.point.y + previewYOffset;
 
             hoveredAxial = axial;
-
             bool cellHasTower = placedTowers.ContainsKey(axial);
             hasValidHover = selected.isUpgrade ? cellHasTower : !cellHasTower;
 
-            // Dibujar hex
+            // Borde
             if (hexPreview.positionCount != 7) hexPreview.positionCount = 7;
             Vector3[] corners = HexGridFlat.GetHexCorners(center, cellRadius);
             hexPreview.enabled = true;
             for (int i = 0; i < 6; i++) hexPreview.SetPosition(i, corners[i]);
             hexPreview.SetPosition(6, corners[0]);
 
-            // Colores por estado
+            // Color
             Color c = !hasValidHover ? new Color(1f, 0.2f, 0.2f, 0.95f)   // rojo
                      : (selected.isUpgrade ? new Color(1f, 0.85f, 0.1f, 1f) // amarillo
-                                           : new Color(0.2f, 0.9f, 0.2f, 1f)); // verde
+                                           : new Color(0.2f, 0.9f, 0.2f, 0.7f)); // verde semi-transparente
 
             hexPreview.startColor = c;
             hexPreview.endColor = c;
 
-            // URP/otros shaders pueden requerir setear el color del material
             var mat = hexPreview.material;
             if (mat != null)
             {
                 if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", c);
                 if (mat.HasProperty("_Color")) mat.SetColor("_Color", c);
             }
+
+            // Relleno
+            hexFill.mesh = HexGridFlat.BuildHexMesh(center, cellRadius);
+            hexFill.gameObject.SetActive(true);
+
+            var fillMat = hexFillRenderer.material;
+            if (fillMat.HasProperty("_Color")) fillMat.color = c;
+            if (fillMat.HasProperty("_BaseColor")) fillMat.SetColor("_BaseColor", c);
         }
         else
         {
             hexPreview.enabled = false;
+            hexFill.gameObject.SetActive(false);
             hasValidHover = false;
         }
     }
@@ -250,9 +260,9 @@ public class CardPlacer : MonoBehaviour
     private void UpdatePreviewVisibility()
     {
         hexPreview.enabled = (selected.prefab != null);
+        if (hexFill != null) hexFill.gameObject.SetActive(selected.prefab != null);
     }
 
-    // Si destruyes una torreta, puedes liberar su celda:
     public void FreeCell(Vector2Int axial)
     {
         if (placedTowers.TryGetValue(axial, out var t))
@@ -266,25 +276,19 @@ public class CardPlacer : MonoBehaviour
         }
     }
 
-    // =========================
-    //       INPUT UNIFICADO
-    // =========================
     private void ReadPointer()
     {
         pressedThisFrame = false;
         pointerActive = false;
 
 #if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
-        // Mouse
         pointerPos = Input.mousePosition;
         pointerActive = true;
         if (Input.GetMouseButtonDown(0)) pressedThisFrame = true;
-        activeFingerId = -1; // no aplica
+        activeFingerId = -1;
 #else
-        // Touch
         if (Input.touchCount > 0)
         {
-            // Usamos siempre el primer toque como puntero de “hover” y colocación.
             Touch t = Input.GetTouch(0);
             pointerPos = t.position;
             pointerActive = (t.phase == TouchPhase.Began ||
@@ -311,7 +315,6 @@ public class CardPlacer : MonoBehaviour
 #if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
         return EventSystem.current.IsPointerOverGameObject();
 #else
-        // Usa el fingerId activo si existe; si no, intenta con el 0.
         int fid = (activeFingerId >= 0) ? activeFingerId :
                   (Input.touchCount > 0 ? Input.GetTouch(0).fingerId : -1);
         return fid >= 0 && EventSystem.current.IsPointerOverGameObject(fid);
@@ -319,7 +322,6 @@ public class CardPlacer : MonoBehaviour
     }
 }
 
-// Helper para liberar celda al destruir una torreta
 public class TurretCellHandle : MonoBehaviour
 {
     public Vector2Int axial;
