@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -46,6 +47,7 @@ public class LevelManager : MonoBehaviour
     // Roundas y niveles
     private int levelIndex;
     private int roundIndex;
+    
     private int maxRounds = 2;
     private int maxLevels = 3;
     
@@ -55,16 +57,22 @@ public class LevelManager : MonoBehaviour
     // Spawner
     private EnemySpawner currentSpawner;
 
-    //
+    // Timers
     private float timer;      // para delays
     private bool waveDone;    // set por el evento del spawner
     
     // Game Manager
     private GameManager gm;
     
+    public bool isPaused;
+    
     void Start()
     {
         gm = GameManager.GetInstance();
+        gm.onChangeGameState += OnChangeGameStateCallback;
+        if(gm.gameState ==  GameState.Pause) isPaused = true;
+        
+        
         levelIndex = 0;
         roundIndex = 0;
         
@@ -76,13 +84,46 @@ public class LevelManager : MonoBehaviour
         StartRound();
     }
 
+    public void OnChangeGameStateCallback(GameState newState)
+    {
+        isPaused = newState != GameState.Play;
+    }
+    
     public void StartRound()
     {
         levelsGO[levelIndex][roundIndex].SetActive(true);
+        UiManager.GetInstance().UpdateRoundLevelText(roundIndex, levelIndex);
+
     }
 
     public void CheckForEnemies()
     {
+        if (enemiesLeft == 0)
+        {
+            StartCoroutine(CambioDeRonda());
+        }
+    }
+
+    public IEnumerator CambioDeRonda()
+    {
+        float counter = 0;
+        UiManager.GetInstance().CambioDeRonda(roundIndex);
+        while (counter < delayBetweenRounds)
+        {
+            if (!isPaused)
+                counter += Time.deltaTime;
+            yield return null;
+        }
+        UiManager.GetInstance().ApagarCambioRondas();
+        if (roundIndex == 2)
+        {
+            roundIndex = 0;
+            levelIndex ++;
+            if (levelIndex >= maxLevels)
+                gm.Win();
+        }
+        else { roundIndex ++; }
+        StartRound();
     }
 
     public void BuildLevels()
@@ -90,11 +131,7 @@ public class LevelManager : MonoBehaviour
         levelsEnemySpawner.Clear();
         levelsGO.Clear();
 
-        if (levelsRoot == null)
-        {
-            Debug.LogError("Asigna 'levelsRoot' en el inspector.");
-            return;
-        }
+        if (levelsRoot == null) return;
 
         for (int i = 0; i < levelsRoot.childCount; i++)
         {
@@ -103,22 +140,22 @@ public class LevelManager : MonoBehaviour
             var spawnerList = new List<EnemySpawner>();
             var goList      = new List<GameObject>();
 
-            // 1) Copiamos todos los hijos a una lista de Transforms para poder ordenarlos por nombre
+            // Sacar todos los hijos del item del transform
             var children = new List<Transform>(levelT.childCount);
             for (int j = 0; j < levelT.childCount; j++)
                 children.Add(levelT.GetChild(j));
 
             children.Sort((a, b) => string.Compare(a.name, b.name, StringComparison.Ordinal));
 
-            // 2) Recorremos en orden y llenamos ambas estructuras
+            // El for each para ir rellenando las listas
             foreach (var child in children)
             {
                 var go = child.gameObject;
 
-                // Si quieres **solo** los que tengan EnemySpawner, filtra aquí:
+                // Filtrado de items con el componente del spawner
                 if (!go.TryGetComponent<EnemySpawner>(out var sp)) continue;
 
-                go.SetActive(false); // arrancan apagados
+                go.SetActive(false);
 
                 spawnerList.Add(sp);
                 goList.Add(go);
@@ -131,7 +168,7 @@ public class LevelManager : MonoBehaviour
             }
         }
 
-        // Seguridad: tamaños deben coincidir
+        // las 2 listas deben de tener el mismo tamaño
         if (levelsEnemySpawner.Count != levelsGO.Count)
         {
             Debug.LogWarning($"Desfase en niveles: EnemySpawner={levelsEnemySpawner.Count} vs GO={levelsGO.Count}");

@@ -67,6 +67,7 @@ public class UiManager : MonoBehaviour
         countDownPanel.SetActive(false);
     }
 
+    // Sonidos
     public void ActualizarValorSlider()
     {
         sliderSonido.value = SoundManager.GetInstance().audioSource.volume;
@@ -76,6 +77,22 @@ public class UiManager : MonoBehaviour
     {
         SoundManager.GetInstance().ChangeAudioValue(sliderSonido.value);
     }
-    
+
+    // Rondas y niveles
+    public void CambioDeRonda(int num)
+    {
+        changeRoundPanel.SetActive(true);
+        changeRoundText.text = ($"Ronda {num+1} superada");
+    }
+
+    public void ApagarCambioRondas()
+    {
+        changeRoundPanel.SetActive(false);
+    }
+
+    public void UpdateRoundLevelText(int roundIndex, int levelIndex)
+    {
+        roundsText.text = $"Nivel {levelIndex + 1} / Ronda {roundIndex + 1}";
+    }
     
 }

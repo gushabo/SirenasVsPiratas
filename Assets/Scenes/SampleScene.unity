@@ -2576,6 +2576,8 @@ MonoBehaviour:
   levelsRoot: {fileID: 1035841175}
   delayBetweenRounds: 1
   delayBetweenLevels: 2
+  enemiesLeft: 0
+  isPaused: 0
 --- !u!4 &1035841175
 Transform:
   m_ObjectHideFlags: 0
@@ -2934,12 +2936,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8252356069087011138, guid: 5b54fbac31494404b919579040180060, type: 3}
       propertyPath: enemies.Array.size
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8252356069087011138, guid: 5b54fbac31494404b919579040180060, type: 3}
       propertyPath: 'enemies.Array.data[0]'
       value: 
-      objectReference: {fileID: 2117851461502595526, guid: f98d98a0569212b4b8b998f6764f1da2, type: 3}
+      objectReference: {fileID: 2117851461502595526, guid: 160fd43479f13b541a552e1f165d630f, type: 3}
     - target: {fileID: 8252356069087011138, guid: 5b54fbac31494404b919579040180060, type: 3}
       propertyPath: 'enemies.Array.data[1]'
       value: 
@@ -3602,12 +3604,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8252356069087011138, guid: 5b54fbac31494404b919579040180060, type: 3}
       propertyPath: enemies.Array.size
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8252356069087011138, guid: 5b54fbac31494404b919579040180060, type: 3}
       propertyPath: 'enemies.Array.data[0]'
       value: 
-      objectReference: {fileID: 2117851461502595526, guid: f98d98a0569212b4b8b998f6764f1da2, type: 3}
+      objectReference: {fileID: 2117851461502595526, guid: 160fd43479f13b541a552e1f165d630f, type: 3}
     - target: {fileID: 8252356069087011138, guid: 5b54fbac31494404b919579040180060, type: 3}
       propertyPath: 'enemies.Array.data[1]'
       value: 
@@ -3973,7 +3975,7 @@ GameObject:
   - component: {fileID: 1704692289}
   - component: {fileID: 1704692288}
   m_Layer: 5
-  m_Name: Roundas_T
+  m_Name: Rounds_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
