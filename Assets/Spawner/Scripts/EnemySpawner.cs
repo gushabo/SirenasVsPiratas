@@ -10,13 +10,19 @@ public class EnemySpawner : MonoBehaviour
     public float minSpawnInterval = 1f;
     public float maxSpawnInterval = 4f;
     public bool isPaused;
+    
+    public LevelManager lvlManager = LevelManager.GetInstance();
 
     private void Start()
     {
-        GameManager.GetInstance().enemiesLeft = enemies.Count;
+        
+        //Revisar la pausa
         GameManager.GetInstance().onChangeGameState += OnChangeGameStateCallback;
         if(GameManager.GetInstance().gameState ==  GameState.Pause) isPaused = true;
+        
+        // Conteo de enemigos
         enemiesLeftToSpawn = enemies.Count;
+        lvlManager.enemiesLeft = enemiesLeftToSpawn;
         StartCoroutine(SpawnEnemies());
     }
     

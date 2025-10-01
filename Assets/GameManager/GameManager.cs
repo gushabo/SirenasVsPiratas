@@ -36,9 +36,9 @@ public class GameManager : MonoBehaviour
     public Action<GameState> onChangeGameState;
     
     // Win system
-    public int enemiesLeft;
-    public int roundsLeft;
-    public int actualRound;
+    //public int enemiesLeft;
+    //public int roundsLeft;
+    //public int actualRound;
     public bool Lose;
     
     public List<GameObject> EnemySpawners;
@@ -49,10 +49,9 @@ public class GameManager : MonoBehaviour
     {
         //roundsLeft = EnemySpawners.Count - 1;
         Lose = false;
-        actualRound = 0;
-        enemiesLeft = 0;
-        if (EnemySpawners.Count > 0)
-            EnemySpawners[actualRound].SetActive(true);
+        //actualRound = 0;
+        //enemiesLeft = 0;
+        //if (EnemySpawners.Count > 0) EnemySpawners[actualRound].SetActive(true);
     }
 
 
@@ -105,7 +104,8 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
+    
+    /*
     public void CheckForEnemies()
     {
         if (enemiesLeft <= 0 && !Lose && roundsLeft  == actualRound)
@@ -117,7 +117,8 @@ public class GameManager : MonoBehaviour
             EndOfRound();
         }
     }
-
+    */
+    
     public void GameOver()
     {
         UiManager.GetInstance().gameOverPanel.SetActive(true);
@@ -136,6 +137,7 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("MainMenu");
     }
 
+    /*
     public void EndOfRound()
     {
         if (roundsLeft == actualRound) return;
@@ -147,7 +149,7 @@ public class GameManager : MonoBehaviour
         UiManager.GetInstance().changeRoundPanel.SetActive(true);
         StartCoroutine(ChangeRound());
     }
-
+    
     public IEnumerator ChangeRound()
     {
         yield return new WaitForSeconds(1f);
@@ -163,6 +165,7 @@ public class GameManager : MonoBehaviour
         canPause = true;
         EnemySpawners[actualRound].SetActive(true);
     }
+    */
 
 }
 

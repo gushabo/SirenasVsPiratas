@@ -121,6 +121,7 @@ GameObject:
   - component: {fileID: 8073546728822131203}
   - component: {fileID: 7147354353803623302}
   - component: {fileID: 4151380429299501667}
+  - component: {fileID: 284647568944106665}
   m_Layer: 0
   m_Name: Tower_2
   m_TagString: Tower
@@ -230,6 +231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45a3069f58afefa408f56296a28a5596, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damageBullet: 20
   range: 10
   fireRate: 0.5
   turnSpeed: 10
@@ -237,3 +239,16 @@ MonoBehaviour:
   head: {fileID: 7474224705270856767}
   firePoint: {fileID: 3556876019035144062}
   bulletPrefab: {fileID: 1487648303375675369, guid: a801784afee2f994084bb823f50d554e, type: 3}
+--- !u!114 &284647568944106665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5319951917642570496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 679cd4e8edb7c7846a80cbad5d0428aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mountPoint: {fileID: 0}

@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UiManager : MonoBehaviour
 {
@@ -32,22 +33,31 @@ public class UiManager : MonoBehaviour
     [Header("Pause Panel")]
     [SerializeField] public GameObject pausePanel;
     [SerializeField] public TextMeshProUGUI pauseText;
+    
     [Header("GameOver Panel")]
     [SerializeField] public GameObject gameOverPanel;
     [SerializeField] public TextMeshProUGUI gameOverText;
+    
     [Header("Win Panel")]
     [SerializeField] public GameObject winPanel;
     [SerializeField] public TextMeshProUGUI winText;
+    
     [Header("Life Panel")]
     [SerializeField] public GameObject LifePanel;
     [SerializeField] public TextMeshProUGUI LifeText;
+    
     [Header("Cambio de rondas")]
     [SerializeField] public GameObject changeRoundPanel;
     [SerializeField] public TextMeshProUGUI changeRoundText;
     [SerializeField] public GameObject countDownPanel;
     [SerializeField] public TextMeshProUGUI countDownText;
+    
     [Header("Aviso Rondas")]
     [SerializeField] public TextMeshProUGUI roundsText;
+    
+    [Header("Sonido")]
+    [SerializeField] public Slider sliderSonido;
+    
     private void Start()
     {
         pausePanel.SetActive(false);
@@ -56,4 +66,16 @@ public class UiManager : MonoBehaviour
         changeRoundPanel.SetActive(false);
         countDownPanel.SetActive(false);
     }
+
+    public void ActualizarValorSlider()
+    {
+        sliderSonido.value = SoundManager.GetInstance().audioSource.volume;
+    }
+
+    public void SendVolumeToManager()
+    {
+        SoundManager.GetInstance().ChangeAudioValue(sliderSonido.value);
+    }
+    
+    
 }

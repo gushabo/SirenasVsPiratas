@@ -35,6 +35,9 @@ public class HandManager : MonoBehaviour
         UpdateHandVisuals();
     }
 
+ 
+    
+
     public void AddCardToHand(GameObject cardPrefabToUse)
     {
         if (cardPrefabToUse == null || handTransform == null) return;
@@ -52,7 +55,7 @@ public class HandManager : MonoBehaviour
             handTransform
         );
 
-        // 🔗 Vincula el root correcto al highlight
+       
         var hl = newCard.GetComponentInChildren<CardHighlight>(true);
         if (hl != null) hl.BindRoot(newCard);
 
@@ -61,7 +64,7 @@ public class HandManager : MonoBehaviour
     }
 
 
-    // ---------- NUEVO: API de selección única ----------
+  
 
     public void SelectBuild(GameObject buildPrefab, CardHighlight highlight)
     {
@@ -69,7 +72,7 @@ public class HandManager : MonoBehaviour
         currentSelected = highlight;
         if (currentSelected != null) currentSelected.SetSelected(true);
 
-        // Le decimos al placer cuál prefab y cuál highlight está activo
+        
         CardPlacer.Instance.SetSelectedBuild(buildPrefab, currentSelected);
     }
 

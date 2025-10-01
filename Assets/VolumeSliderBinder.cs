@@ -6,6 +6,6 @@ public class VolumeSliderBinder : MonoBehaviour
     {
         var sm = SoundManager.GetInstance();
         var slider = GetComponent<Slider>();
-        if (sm != null && slider != null) sm.BindSlider(slider);
+        //if (sm != null && slider != null) sm.BindSlider(slider);
     }
 }
