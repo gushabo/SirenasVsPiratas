@@ -26,7 +26,8 @@ public class Health : MonoBehaviour
             if (isCoral)
             {
                 GameManager.GetInstance().Lose = true;
-                GameManager.GetInstance().GameOver();
+                GameManager.GetInstance().ChangeGameState(GameState.Pause);
+                UiManager.GetInstance().TurnOffPausePanel();
             }
             else if(!isCoral) Die();
         }

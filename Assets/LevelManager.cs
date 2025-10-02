@@ -96,6 +96,8 @@ public class LevelManager : MonoBehaviour
 
     public void CheckForEnemies()
     {
+        if(gm.Lose){gm.GameOver(); return; }
+        
         if (enemiesLeft == 0)
         {
             StartCoroutine(CambioDeRonda());
@@ -112,6 +114,7 @@ public class LevelManager : MonoBehaviour
                 counter += Time.deltaTime;
             yield return null;
         }
+        
         UiManager.GetInstance().ApagarCambioRondas();
         if (roundIndex == 2)
         {
@@ -124,7 +127,7 @@ public class LevelManager : MonoBehaviour
                 UiManager.GetInstance().CambiarDeNivel();
             }
         }
-        else
+        else if (!gm.Lose)
         {
             roundIndex ++; 
             StartRound();   

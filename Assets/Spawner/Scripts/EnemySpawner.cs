@@ -48,7 +48,7 @@ public class EnemySpawner : MonoBehaviour
                 yield return null;
             }
 
-            if (enemiesLeftToSpawn > 0)
+            if (enemiesLeftToSpawn > 0 && !GameManager.GetInstance().Lose)
             {
                 GameObject enemyToSpawn = enemies[i];
                 // Instanciar el enemigo en la posición del spawner

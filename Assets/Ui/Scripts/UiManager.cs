@@ -109,6 +109,11 @@ public class UiManager : MonoBehaviour
         changeLvlButton.SetActive(false);
         changeRoundPanel.SetActive(false);
     }
+
+    public void TurnOffPausePanel()
+    {
+        pausePanel.SetActive(false);
+    }
     
     
 }

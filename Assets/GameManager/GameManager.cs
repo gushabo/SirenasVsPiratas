@@ -98,7 +98,6 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         UiManager.GetInstance().gameOverPanel.SetActive(true);
-        Lose = true;
         Invoke(nameof(ChangeMainScene), 3f);
     }
 
