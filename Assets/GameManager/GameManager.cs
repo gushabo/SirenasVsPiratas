@@ -37,8 +37,6 @@ public class GameManager : MonoBehaviour
     
     // Win or lose
     public bool Lose;
-    
-    public List<GameObject> EnemySpawners;
 
     public bool canPause;
     
