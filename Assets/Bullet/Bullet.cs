@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    
+    [Header("Damage")]
     [SerializeField] public int damage;
     [SerializeField] private float speed;
     [SerializeField] private float lifeTime;
@@ -12,9 +14,17 @@ public class Bullet : MonoBehaviour
     private float life;
 
     public bool isPaused = false;
-
+    
+    
+    [Header("Orientation")]
+    [SerializeField] private Transform rotateTransform;        // si es null, usa this.transform
+    [SerializeField] private Vector3 modelForwardAxis = Vector3.forward; // eje “nariz” del modelo
+    [SerializeField] private Vector3 rotationOffsetEuler;      // offset fijo (p. ej., (0,0,90))
+    [SerializeField] private float turnSpeed = 20f;            // suavizado de giro
+    
     private void Start()
     {
+        if (rotateTransform == null) rotateTransform = transform;
         GameManager.GetInstance().onChangeGameState += OnChangeGameStateCallback;
     }
 
@@ -44,17 +54,25 @@ public class Bullet : MonoBehaviour
             return;
         }
         
+        // Mover
         Vector3 dir = target.position - transform.position;
-        float distance = speed * Time.deltaTime;
+        float step = speed * Time.deltaTime;
 
-        if (dir.magnitude < distance)
-        {
-            Hit();
-            return;
-        }
-        
-        transform.position += dir.normalized * distance;
-        transform.forward = Vector3.Lerp(transform.forward, dir.normalized, 0.5f * Time.deltaTime);
+        if (dir.magnitude <= step) { Hit(); return; }
+        transform.position += dir.normalized * step;
+
+        // Orientar correctamente usando quaternions
+        Quaternion look = Quaternion.LookRotation(dir.normalized, Vector3.up);
+
+        // Corrige si tu modelo no usa +Z como “frente”
+        Quaternion axisFix = Quaternion.FromToRotation(Vector3.forward, modelForwardAxis.normalized);
+
+        // Offset opcional (roll/pitch extra)
+        Quaternion rotOffset = Quaternion.Euler(rotationOffsetEuler);
+
+        Quaternion desired = look * axisFix * rotOffset;
+        rotateTransform.rotation = Quaternion.Slerp(rotateTransform.rotation, desired, turnSpeed * Time.deltaTime);
+    
         
     }
 
