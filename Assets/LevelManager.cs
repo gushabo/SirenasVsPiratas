@@ -78,8 +78,6 @@ public class LevelManager : MonoBehaviour
         
         // Rellena la lista
         BuildLevels();
-        // Imprime la lista
-        //PrintLevels();
         // Iniciar las rondas
         StartRound();
     }
@@ -121,9 +119,16 @@ public class LevelManager : MonoBehaviour
             levelIndex ++;
             if (levelIndex >= maxLevels)
                 gm.Win();
+            else
+            {
+                UiManager.GetInstance().CambiarDeNivel();
+            }
         }
-        else { roundIndex ++; }
-        StartRound();
+        else
+        {
+            roundIndex ++; 
+            StartRound();   
+        }
     }
 
     public void BuildLevels()

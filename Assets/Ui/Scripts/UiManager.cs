@@ -51,6 +51,7 @@ public class UiManager : MonoBehaviour
     [SerializeField] public TextMeshProUGUI changeRoundText;
     [SerializeField] public GameObject countDownPanel;
     [SerializeField] public TextMeshProUGUI countDownText;
+    [SerializeField] public GameObject changeLvlButton;
     
     [Header("Aviso Rondas")]
     [SerializeField] public TextMeshProUGUI roundsText;
@@ -83,6 +84,7 @@ public class UiManager : MonoBehaviour
     {
         changeRoundPanel.SetActive(true);
         changeRoundText.text = ($"Ronda {num+1} superada");
+        changeLvlButton.SetActive(false);
     }
 
     public void ApagarCambioRondas()
@@ -94,5 +96,19 @@ public class UiManager : MonoBehaviour
     {
         roundsText.text = $"Nivel {levelIndex + 1} / Ronda {roundIndex + 1}";
     }
+
+    public void CambiarDeNivel()
+    {
+        changeRoundText.text = ($"Felicidades pasaste de nivel");
+        changeLvlButton.SetActive(true);
+        changeRoundPanel.SetActive(true);
+    }
+
+    public void CambiarDeNivel2()
+    {
+        changeLvlButton.SetActive(false);
+        changeRoundPanel.SetActive(false);
+    }
+    
     
 }
