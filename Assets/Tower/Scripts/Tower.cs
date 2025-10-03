@@ -73,19 +73,17 @@ public class Tower : MonoBehaviour
                 bestTarget = h.transform;
             }
         }
-        
         currentTarget = (bestTarget != null && (bestTarget.position - transform.position).sqrMagnitude <= range * range) ? bestTarget : null;
-        
     }
 
 
     void Shoot(Transform target)
     {
+        //FxManager.GetInstance().SetFX(FxType.Bullet, firePoint.position, firePoint.rotation);
+        
         Bullet b = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation).GetComponent<Bullet>();
         b.damage = damageBullet;
         b.Shoot(target);
-
-        
     }
     
     void OnDrawGizmosSelected()
@@ -93,29 +91,24 @@ public class Tower : MonoBehaviour
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, range);
     }
-
-
-
-
-
-    // En Tower.cs
+    
     public void AddDamage(float amount)
     {
         damageBullet = Mathf.Max(0, damageBullet + Mathf.RoundToInt(amount));
-        // Opcional: feedback (sonido/partículas)
+        // Opcional: feedback (sonido/partï¿½culas)
     }
 
     public void AddFireRate(float amount)
     {
         // fireRate = disparos/segundo. Nunca dejes que sea <= 0
         fireRate = Mathf.Max(0.05f, fireRate + amount);
-        // No hace falta tocar fireCooldown: en el próximo disparo ya usa el nuevo 1f / fireRate
+        // No hace falta tocar fireCooldown: en el prï¿½ximo disparo ya usa el nuevo 1f / fireRate
     }
 
     public void AddRange(float amount)
     {
         range = Mathf.Max(0f, range + amount);
-        // Retarget inmediato para “aprovechar” el nuevo rango
+        // Retarget inmediato para ï¿½aprovecharï¿½ el nuevo rango
         UpdateTarget();
     }
 

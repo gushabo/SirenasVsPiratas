@@ -130,7 +130,7 @@ MonoBehaviour:
   retarget: 0.25
   head: {fileID: 7327119669839233051}
   firePoint: {fileID: 1502903948022011788}
-  bulletPrefab: {fileID: 1487648303375675369, guid: a801784afee2f994084bb823f50d554e, type: 3}
+  bulletPrefab: {fileID: 1579005169823951863, guid: e859b00ec0b00fb4dba4bccc8215a24e, type: 3}
 --- !u!114 &7776642608041291740
 MonoBehaviour:
   m_ObjectHideFlags: 0

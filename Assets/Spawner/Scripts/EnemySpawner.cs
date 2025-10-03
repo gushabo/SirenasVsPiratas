@@ -5,18 +5,27 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     public List<GameObject> enemies;
-    int enemiesLeftToSpawn;
+    public int enemiesLeftToSpawn;
     public List<Transform> targets = new List<Transform>();
     public float minSpawnInterval = 1f;
     public float maxSpawnInterval = 4f;
     public bool isPaused;
+    
+    public LevelManager lvlManager;
 
     private void Start()
     {
-        GameManager.GetInstance().enemiesLeft = enemies.Count;
+        
+        //Revisar la pausa
         GameManager.GetInstance().onChangeGameState += OnChangeGameStateCallback;
         if(GameManager.GetInstance().gameState ==  GameState.Pause) isPaused = true;
+        
+        lvlManager = LevelManager.GetInstance();
+        if (lvlManager == null) return;
+        
+        // Conteo de enemigos
         enemiesLeftToSpawn = enemies.Count;
+        lvlManager.enemiesLeft = enemiesLeftToSpawn;
         StartCoroutine(SpawnEnemies());
     }
     
@@ -39,7 +48,7 @@ public class EnemySpawner : MonoBehaviour
                 yield return null;
             }
 
-            if (enemiesLeftToSpawn > 0)
+            if (enemiesLeftToSpawn > 0 && !GameManager.GetInstance().Lose)
             {
                 GameObject enemyToSpawn = enemies[i];
                 // Instanciar el enemigo en la posición del spawner
@@ -50,5 +59,6 @@ public class EnemySpawner : MonoBehaviour
                 i++;
             }
         }
+        gameObject.SetActive(false);
     }
 }

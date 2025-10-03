@@ -9,13 +9,13 @@ public class SoundManager : MonoBehaviour
     public static SoundManager GetInstance() => Instance;
 
     [Header("UI")]
-    [SerializeField] private Slider scrollBar;
+    //[SerializeField] private Slider scrollBar;
 
     [Header("Volumen")]
     [Range(0f, 1f)]
     [SerializeField] private float defaultVolume = 0.5f;
 
-    private AudioSource audioSource;
+    public AudioSource audioSource;
     private const string PREF_KEY = "MasterVolume";
     
     private void Awake()
@@ -40,8 +40,7 @@ public class SoundManager : MonoBehaviour
 
     private void OnEnable()
     {
-        if (scrollBar != null)
-            scrollBar.onValueChanged.AddListener(ChangeAudioValue);
+        //if (scrollBar != null) scrollBar.onValueChanged.AddListener(ChangeAudioValue);
     }
 
     private void Start()
@@ -49,14 +48,12 @@ public class SoundManager : MonoBehaviour
         float volume = PlayerPrefs.GetFloat(PREF_KEY, defaultVolume);
         ApplyVolume(volume);
 
-        if (scrollBar != null)
-            scrollBar.value = volume;
+        //if (scrollBar != null) scrollBar.value = volume;
     }
 
     private void OnDisable()
     {
-        if (scrollBar != null)
-            scrollBar.onValueChanged.RemoveListener(ChangeAudioValue);
+        //if (scrollBar != null) scrollBar.onValueChanged.RemoveListener(ChangeAudioValue);
     }
 
     private void OnDestroy()
@@ -78,26 +75,6 @@ public class SoundManager : MonoBehaviour
         if (audioSource != null)
             audioSource.volume = value;
     }
-    
-    public void BindSlider(Slider newBar)
-    {
-        // Quita listener del anterior
-        if (scrollBar != null)
-            scrollBar.onValueChanged.RemoveListener(ChangeAudioValue);
-
-        scrollBar = newBar;
-
-        // Alinea el valor visual al volumen actual
-        float volume = PlayerPrefs.GetFloat(PREF_KEY, defaultVolume);
-        ApplyVolume(volume);
-
-        if (scrollBar != null)
-        {
-            scrollBar.SetValueWithoutNotify(volume);
-            scrollBar.onValueChanged.AddListener(ChangeAudioValue);
-        }
-    }
-    
     
     
 }
