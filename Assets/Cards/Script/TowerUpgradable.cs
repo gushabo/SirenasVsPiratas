@@ -21,9 +21,7 @@ public class TowerUpgradable : MonoBehaviour
             Debug.LogError($"[{name}] No encontré componente Tower. Agrega 'Tower' al prefab de la torreta.");
     }
 
-    /// <summary>
-    /// Aplica una mejora instanciando (opcional) su visual y modificando stats.
-    /// </summary>
+  
     public void ApplyUpgrade(GameObject upgradePrefab)
     {
         if (torre == null || upgradePrefab == null) return;
