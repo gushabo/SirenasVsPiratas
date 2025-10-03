@@ -2893,7 +2893,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1083459711
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2909,8 +2909,7 @@ MonoBehaviour:
   fx_pools:
   - type: 0
     fxPrefab: {fileID: 1579005169823951863, guid: e859b00ec0b00fb4dba4bccc8215a24e, type: 3}
-    pool:
-    - {fileID: 1579005169823951863, guid: e859b00ec0b00fb4dba4bccc8215a24e, type: 3}
+    pool: []
 --- !u!4 &1083459712
 Transform:
   m_ObjectHideFlags: 0

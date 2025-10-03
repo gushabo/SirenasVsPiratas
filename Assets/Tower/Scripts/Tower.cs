@@ -79,11 +79,11 @@ public class Tower : MonoBehaviour
 
     void Shoot(Transform target)
     {
-        //FxManager.GetInstance().SetFX(FxType.Bullet, firePoint.position, firePoint.rotation);
+        FxManager.GetInstance().SetFX(FxType.Bullet, firePoint.position, firePoint.rotation);
         
-        Bullet b = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation).GetComponent<Bullet>();
-        b.damage = damageBullet;
-        b.Shoot(target);
+        //Bullet b = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation).GetComponent<Bullet>();
+        //b.damage = damageBullet;
+        //b.Shoot(target);
     }
     
     void OnDrawGizmosSelected()

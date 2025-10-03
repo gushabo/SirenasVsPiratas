@@ -1,4 +1,3 @@
-// TowerUpgradable.cs
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,7 +8,8 @@ public class TowerUpgradable : MonoBehaviour
     private Tower torre;           // tu script de torreta (debe tener damageBullet, fireRate, range)
 
     // Lleva conteo por tipo para stacking/duplicados
-    private readonly Dictionary<TypeUpgrade, int> stacksPorTipo = new();
+    private readonly Dictionary<TypeUpgrade, int> stacksPorTipo =
+     new Dictionary<TypeUpgrade, int>();
 
     public enum TypeUpgrade { Damage, FireRate, Range }
 
