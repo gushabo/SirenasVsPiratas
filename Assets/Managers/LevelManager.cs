@@ -38,7 +38,6 @@ public class LevelManager : MonoBehaviour
 
     [Header("Delays (segundos)")]
     [SerializeField] private float delayBetweenRounds = 1f;
-    [SerializeField] private float delayBetweenLevels = 2f;
 
     // Lista bidimensional para guardar rondas y niveles
     private readonly List<List<EnemySpawner>> levelsEnemySpawner = new();
@@ -48,7 +47,6 @@ public class LevelManager : MonoBehaviour
     private int levelIndex;
     private int roundIndex;
     
-    private int maxRounds = 2;
     private int maxLevels = 3;
     
     public int enemiesLeft;
