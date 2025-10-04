@@ -49,7 +49,7 @@ public static class HexGridFlat
         for (int i = 0; i < 6; i++)
         {
             // flat-top empieza en 30°
-            float angleDeg = 60f * i + 30f;
+            float angleDeg = 60f * i ;
             float rad = angleDeg * Mathf.Deg2Rad;
             corners[i] = center + new Vector3(radius * Mathf.Cos(rad), 0f, radius * Mathf.Sin(rad));
         }
