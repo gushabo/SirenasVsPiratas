@@ -30,8 +30,8 @@ Transform:
   m_GameObject: {fileID: 6071271336939312677}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0.5, z: -0.19152}
+  m_LocalScale: {x: 2.3347, y: 2.3347, z: 2.3347}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6392171190471476161}
@@ -124,7 +124,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damageBullet: 20
-  range: 6
+  range: 15
   fireRate: 0.75
   turnSpeed: 10
   retarget: 0.25

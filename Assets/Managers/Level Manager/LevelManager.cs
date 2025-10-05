@@ -31,8 +31,11 @@ public class LevelManager : MonoBehaviour
     }
     #endregion
     // ------ Fin del singleton  ---------
-    
-    
+
+
+    [Header("Draft")]
+    [SerializeField] private DraftPicker draftPicker;   // <- arrástralo en el Inspector
+
     [Header("Jerarquía")]
     [SerializeField] private Transform levelsRoot;   // padre "Levels"
 
@@ -104,31 +107,37 @@ public class LevelManager : MonoBehaviour
 
     public IEnumerator CambioDeRonda()
     {
-        float counter = 0;
+        // 1) (opcional) UI de "cambio de ronda"
         UiManager.GetInstance().CambioDeRonda(roundIndex);
+
+        // 2) Esperar el draft: se abre y esta corrutina se pausa hasta Confirmar
+        if (draftPicker != null)
+            yield return draftPicker.ShowAndWait();
+
+        // 3) (opcional) pequeño delay “cosmético” si quieres mantenerlo
+        float counter = 0f;
         while (counter < delayBetweenRounds)
         {
-            if (!isPaused)
-                counter += Time.deltaTime;
+            if (!isPaused) counter += Time.deltaTime;
             yield return null;
         }
-        
+
         UiManager.GetInstance().ApagarCambioRondas();
+
+        // 4) Avanzar ronda / nivel como ya lo hacías
         if (roundIndex == 2)
         {
             roundIndex = 0;
-            levelIndex ++;
+            levelIndex++;
             if (levelIndex >= maxLevels)
                 gm.Win();
             else
-            {
                 UiManager.GetInstance().CambiarDeNivel();
-            }
         }
         else if (!gm.Lose)
         {
-            roundIndex ++; 
-            StartRound();   
+            roundIndex++;
+            StartRound();
         }
     }
 

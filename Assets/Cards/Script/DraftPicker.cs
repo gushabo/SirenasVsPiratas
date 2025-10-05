@@ -1,10 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class DraftPicker : MonoBehaviour
 {
+
+
+    public event Action OnConfirmed;   // <- avisa cuando confirman
+
     [Header("Referencias")]
     public DeckManager deckManager;
     public HandManager handManager;
@@ -112,13 +118,27 @@ public class DraftPicker : MonoBehaviour
         foreach (var c in _choices)
         {
             if (!c.IsSelected) continue;
-            
             handManager.AddCardToHand(c.PrefabRef);
         }
 
         ClearChoices();
         HideDraftUI();
         handManager.DeselectAll();
+
+        OnConfirmed?.Invoke();  // <- ¡dispara el callback!
+    }
+
+
+    public IEnumerator ShowAndWait()
+    {
+        bool done = false;
+        void Handler() { done = true; OnConfirmed -= Handler; }
+
+        OnConfirmed += Handler;
+        StartDraft();
+
+        while (!done)
+            yield return null;
     }
 
     private void Reroll() => StartDraft();
