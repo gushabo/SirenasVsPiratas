@@ -50,7 +50,7 @@ GameObject:
   - component: {fileID: 5874920115396402125}
   m_Layer: 0
   m_Name: Pirata_Normal
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -65,8 +65,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -5.352186, y: 0.0000009536743, z: -6.1269755}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 4, y: 4, z: 4}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3174996623179022140}
   - {fileID: 877854392317164591}
@@ -187,6 +187,7 @@ MonoBehaviour:
   targets: []
   currentTarget: 0
   speed: 0
+  turnSpeed: 5
   isPaused: 0
 --- !u!114 &5874920115396402125
 MonoBehaviour:
