@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,12 +10,12 @@ public class DraftPicker : MonoBehaviour
     public HandManager handManager;
 
     [Header("UI Draft")]
-    public Transform draftContainer;     // contenedor con HorizontalLayoutGroup
-    public GameObject cardChoicePrefab;  // ← TU CardChoiceUI
+    public Transform draftContainer;     
+    public GameObject cardChoicePrefab; 
     public Button confirmButton;
-    public Button rerollButton;          // opcional
-    public GameObject overlayPanel;      // panel negro que bloquea fondo
-    public Text counterText;             // "0/3" (UI.Text normal)
+    public Button rerollButton;          
+    public GameObject overlayPanel;      
+    public TextMeshProUGUI counterText;             
 
     [Header("Parámetros")]
     public int choicesCount = 5;
@@ -49,14 +50,14 @@ public class DraftPicker : MonoBehaviour
 
         RefreshButtons();
 
-        // Fuerza relayout por si tarda en refrescar
+        
         var rt = draftContainer as RectTransform;
         if (rt) LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
     }
 
     private DraftSelectableUI CreateDraftCardUI(GameObject prefabReal)
     {
-        // Instancia el UI
+      
         var uiGO = Instantiate(cardChoicePrefab, draftContainer);
         var ui = uiGO.GetComponent<DraftSelectableUI>();
         if (!ui) ui = uiGO.AddComponent<DraftSelectableUI>();
@@ -79,7 +80,7 @@ public class DraftPicker : MonoBehaviour
     {
        
 
-        // 1) PreviewData en cualquier hijo (tu caso: CardCanvas/CardImage)
+       
         var data = prefabReal.GetComponentInChildren<CardPreviewData>(true);
         if (data != null && data.art != null) return data.art;
 
@@ -90,7 +91,7 @@ public class DraftPicker : MonoBehaviour
     }
 
 
-    // === Selección ===
+  
     public void ToggleSelection(DraftSelectableUI view)
     {
         if (!view) return;
@@ -111,7 +112,7 @@ public class DraftPicker : MonoBehaviour
         foreach (var c in _choices)
         {
             if (!c.IsSelected) continue;
-            // Añade a la mano el PREFAB REAL (no el UI)
+            
             handManager.AddCardToHand(c.PrefabRef);
         }
 
@@ -121,8 +122,7 @@ public class DraftPicker : MonoBehaviour
     }
 
     private void Reroll() => StartDraft();
-
-    // === Helpers UI ===
+ // === Helpers UI ===
     private void ShowDraftUI()
     {
         if (overlayPanel) overlayPanel.SetActive(true);
@@ -146,6 +146,14 @@ public class DraftPicker : MonoBehaviour
         _choices.Clear();
         _selectedCount = 0;
         UpdateCounter();
+    }
+
+    public void HideDraft()
+    {
+
+        ClearChoices();
+        HideDraftUI();
+        handManager.DeselectAll();
     }
 
     private void RefreshButtons()
