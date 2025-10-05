@@ -42,11 +42,7 @@ public class HandManager : MonoBehaviour
     {
         if (cardPrefabToUse == null || handTransform == null) return;
 
-        if (cardsInHand.Count >= cardsMaxInHand)
-        {
-            Debug.Log("La mano ya está llena.");
-            return;
-        }
+       
 
         GameObject newCard = Instantiate(
             cardPrefabToUse,

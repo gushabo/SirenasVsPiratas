@@ -301,6 +301,7 @@ GameObject:
   - component: {fileID: 582232721995337465}
   - component: {fileID: 8170453829368692706}
   - component: {fileID: 6604999619763055373}
+  - component: {fileID: 9171795699881079590}
   m_Layer: 0
   m_Name: CardImage
   m_TagString: Untagged
@@ -355,7 +356,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -1627350631, guid: 5eca851bd89a049498d0136155ffe8b8, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -469,6 +470,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   glowEffect: {fileID: 93311484869445677}
   selectScale: 1.1
+  cardRoot: {fileID: 0}
+--- !u!114 &9171795699881079590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1266190538670822797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd179c74b50b4834e99823fe7abd2cf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  art: {fileID: -1627350631, guid: 5eca851bd89a049498d0136155ffe8b8, type: 3}
 --- !u!1 &2244250600938395605
 GameObject:
   m_ObjectHideFlags: 0
@@ -740,7 +755,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3462309511785617931}
   - component: {fileID: 6116629825175762122}
-  - component: {fileID: 7255342154664954336}
   - component: {fileID: 939242307306004969}
   - component: {fileID: 8998809949744294099}
   - component: {fileID: 3637855550633995175}
@@ -796,29 +810,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!114 &7255342154664954336
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4699430610588353294}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
-  m_ReferencePixelsPerUnit: 256
-  m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
-  m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
-  m_PhysicalUnit: 3
-  m_FallbackScreenDPI: 96
-  m_DefaultSpriteDPI: 96
-  m_DynamicPixelsPerUnit: 128
-  m_PresetInfoIsWorld: 1
 --- !u!114 &939242307306004969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -850,6 +841,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   glowEffect: {fileID: 0}
   selectScale: 1.1
+  cardRoot: {fileID: 0}
 --- !u!61 &3637855550633995175
 BoxCollider2D:
   m_ObjectHideFlags: 0
