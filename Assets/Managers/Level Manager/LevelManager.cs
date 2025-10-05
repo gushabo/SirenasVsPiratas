@@ -107,14 +107,15 @@ public class LevelManager : MonoBehaviour
 
     public IEnumerator CambioDeRonda()
     {
-        // 1) (opcional) UI de "cambio de ronda"
+        //el ui de cambio de ronda
         UiManager.GetInstance().CambioDeRonda(roundIndex);
 
-        // 2) Esperar el draft: se abre y esta corrutina se pausa hasta Confirmar
+       
+        //Mi drafteo para que espere hasta que ya confirme
         if (draftPicker != null)
             yield return draftPicker.ShowAndWait();
 
-        // 3) (opcional) pequeño delay “cosmético” si quieres mantenerlo
+      
         float counter = 0f;
         while (counter < delayBetweenRounds)
         {
@@ -124,7 +125,7 @@ public class LevelManager : MonoBehaviour
 
         UiManager.GetInstance().ApagarCambioRondas();
 
-        // 4) Avanzar ronda / nivel como ya lo hacías
+      
         if (roundIndex == 2)
         {
             roundIndex = 0;

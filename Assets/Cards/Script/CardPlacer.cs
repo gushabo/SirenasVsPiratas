@@ -22,6 +22,13 @@ public class CardPlacer : MonoBehaviour
     [Tooltip("Grosor de la línea del hex")]
     public float lineWidth = 0.04f;
 
+    // === NEW: Colores para estados (opcional) ===
+    [Header("Preview Colors")]
+    public Color colorBuild = new Color(0.2f, 0.9f, 0.2f, 0.7f);
+    public Color colorUpgrade = new Color(1f, 0.85f, 0.1f, 1f);
+    public Color colorRemove = new Color(1f, 0.2f, 0.2f, 0.95f);
+    public Color colorInvalid = new Color(1f, 0.2f, 0.2f, 0.95f);
+
     private struct SelectedCard
     {
         public GameObject prefab;
@@ -43,6 +50,9 @@ public class CardPlacer : MonoBehaviour
     private bool pointerActive;
     private bool pressedThisFrame;
     private int activeFingerId = -1;
+
+    // === NEW: Modo eliminar ===
+    private bool removeMode = false;
 
     void Awake()
     {
@@ -81,12 +91,11 @@ public class CardPlacer : MonoBehaviour
         if (shaderFill == null) shaderFill = Shader.Find("Universal Render Pipeline/Unlit");
 
         var matFill = new Material(shaderFill);
-        matFill.color = new Color(0f, 1f, 0f, 0.5f); // verde transparente
+        matFill.color = new Color(0f, 1f, 0f, 0.5f);
         hexFillRenderer.material = matFill;
 
         hexFillRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         hexFillRenderer.receiveShadows = false;
-
 
         hexFill.gameObject.SetActive(false);
 
@@ -96,6 +105,8 @@ public class CardPlacer : MonoBehaviour
 
     public void SetSelectedBuild(GameObject towerPrefab, CardHighlight sourceHighlight = null)
     {
+        // salir del modo eliminar si estaba activo
+        removeMode = false; // NEW
         selected = new SelectedCard { prefab = towerPrefab, isUpgrade = false };
         currentUIHighlight = sourceHighlight;
         UpdatePreviewVisibility();
@@ -103,6 +114,7 @@ public class CardPlacer : MonoBehaviour
 
     public void SetSelectedUpgrade(GameObject upgradePrefab, CardHighlight sourceHighlight = null)
     {
+        removeMode = false; // NEW
         selected = new SelectedCard { prefab = upgradePrefab, isUpgrade = true };
         currentUIHighlight = sourceHighlight;
         UpdatePreviewVisibility();
@@ -113,17 +125,55 @@ public class CardPlacer : MonoBehaviour
         ClearSelectionAndUIHighlight();
     }
 
+    // === NEW: API pública para el botón de UI ===
+    public void ToggleRemoveMode()
+    {
+        // si había algo seleccionado para construir/mejorar, lo limpiamos
+        selected = default;
+        removeMode = !removeMode;
+        UpdatePreviewVisibility();
+        // (Opcional) aquí podrías avisar a la UI para cambiar color del botón
+    }
+    public void ExitRemoveMode()
+    {
+        if (!removeMode) return;
+        removeMode = false;
+        UpdatePreviewVisibility();
+    }
+
     void Update()
     {
         ReadPointer();
+
+        // Mostrar preview también en modo eliminar
         UpdateHoverAndPreview(pointerActive ? (Vector2?)pointerPos : null);
 
-        if (selected.prefab == null) return;
+        // === NEW: tecla de salida rápida ===
+        if (Input.GetKeyDown(KeyCode.Escape))
+            ExitRemoveMode();
 
+        // Lógica de click/tap
         if (pressedThisFrame)
         {
             if (IsPointerOverUI()) return;
             if (!hasValidHover) return;
+
+            // --- MODO ELIMINAR ---
+            if (removeMode)
+            {
+                if (placedTowers.TryGetValue(hoveredAxial, out var t) && t != null)
+                {
+                    // Quita del diccionario y destruye
+                    placedTowers.Remove(hoveredAxial);
+                    Destroy(t);
+                }
+              
+                ExitRemoveMode();
+                return;
+            }
+
+           
+            if (selected.prefab == null) return;
 
             Vector3 basePos = HexGridFlat.AxialToWorld(hoveredAxial, cellRadius, gridOrigin);
             Vector3 spawnPos = basePos;
@@ -168,13 +218,16 @@ public class CardPlacer : MonoBehaviour
 #if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
         if (Input.GetMouseButtonDown(1))
         {
+            // click derecho cancela selección y modo eliminar
             selected = default;
+            removeMode = false; // NEW
             UpdatePreviewVisibility();
         }
 #else
         if (Input.touchCount >= 2)
         {
             selected = default;
+            removeMode = false; // NEW
             UpdatePreviewVisibility();
         }
 #endif
@@ -183,6 +236,7 @@ public class CardPlacer : MonoBehaviour
     private void ClearSelectionAndUIHighlight()
     {
         selected = default;
+        removeMode = false; // NEW
 
         if (currentUIHighlight != null)
         {
@@ -198,7 +252,8 @@ public class CardPlacer : MonoBehaviour
 
     private void UpdateHoverAndPreview(Vector2? pointer)
     {
-        if (selected.prefab == null || !pointer.HasValue)
+        
+        if ((selected.prefab == null && !removeMode) || !pointer.HasValue)
         {
             hexPreview.enabled = false;
             hexFill.gameObject.SetActive(false);
@@ -217,7 +272,12 @@ public class CardPlacer : MonoBehaviour
 
             hoveredAxial = axial;
             bool cellHasTower = placedTowers.ContainsKey(axial);
-            hasValidHover = selected.isUpgrade ? cellHasTower : !cellHasTower;
+
+          
+            if (removeMode)
+                hasValidHover = cellHasTower;
+            else
+                hasValidHover = selected.isUpgrade ? cellHasTower : !cellHasTower;
 
             // Borde
             if (hexPreview.positionCount != 7) hexPreview.positionCount = 7;
@@ -226,10 +286,13 @@ public class CardPlacer : MonoBehaviour
             for (int i = 0; i < 6; i++) hexPreview.SetPosition(i, corners[i]);
             hexPreview.SetPosition(6, corners[0]);
 
-            // Color
-            Color c = !hasValidHover ? new Color(1f, 0.2f, 0.2f, 0.95f)   // rojo
-                     : (selected.isUpgrade ? new Color(1f, 0.85f, 0.1f, 1f) // amarillo
-                                           : new Color(0.2f, 0.9f, 0.2f, 0.7f)); // verde semi-transparente
+         
+            Color c;
+            if (removeMode)
+                c = hasValidHover ? colorRemove : colorInvalid;
+            else
+                c = !hasValidHover ? colorInvalid
+                    : (selected.isUpgrade ? colorUpgrade : colorBuild);
 
             hexPreview.startColor = c;
             hexPreview.endColor = c;
@@ -241,7 +304,6 @@ public class CardPlacer : MonoBehaviour
                 if (mat.HasProperty("_Color")) mat.SetColor("_Color", c);
             }
 
-            // Relleno
             hexFill.mesh = HexGridFlat.BuildHexMesh(center, cellRadius);
             hexFill.gameObject.SetActive(true);
 
@@ -259,8 +321,9 @@ public class CardPlacer : MonoBehaviour
 
     private void UpdatePreviewVisibility()
     {
-        hexPreview.enabled = (selected.prefab != null);
-        if (hexFill != null) hexFill.gameObject.SetActive(selected.prefab != null);
+        bool show = (selected.prefab != null) || removeMode; 
+        hexPreview.enabled = show;
+        if (hexFill != null) hexFill.gameObject.SetActive(show);
     }
 
     public void FreeCell(Vector2Int axial)
