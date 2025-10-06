@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;                 // para Selectable (Button/Toggle/etc)
+using UnityEngine.InputSystem;       // Touchscreen, Pointer, Mouse
 
 public class CardPlacer : MonoBehaviour
 {
@@ -12,28 +14,30 @@ public class CardPlacer : MonoBehaviour
     public Camera cam;
 
     [Header("Grid")]
-    public float cellRadius = 1.2f;
-    public Vector3 gridOrigin = Vector3.zero;
+    public float cellRadius = 3.31f;
+    public Vector3 gridOrigin = new Vector3(2.46f, 0f, 2.37f);
 
+    [Tooltip("Capas que considera el raycast del terreno")]
     public LayerMask groundMask = ~0;
 
     [Tooltip("Altura del preview/hex sobre el piso")]
-    public float previewYOffset = 0.03f;
+    public float previewYOffset = 0.5f;
     [Tooltip("Grosor de la línea del hex")]
-    public float lineWidth = 0.04f;
+    public float lineWidth = 0.32f;
 
-    // === NEW: Colores para estados (opcional) ===
     [Header("Preview Colors")]
-    public Color colorBuild = new Color(0.2f, 0.9f, 0.2f, 0.7f);
-    public Color colorUpgrade = new Color(1f, 0.85f, 0.1f, 1f);
-    public Color colorRemove = new Color(1f, 0.2f, 0.2f, 0.95f);
-    public Color colorInvalid = new Color(1f, 0.2f, 0.2f, 0.95f);
+    public Color colorBuild = new(0.2f, 0.9f, 0.2f, 0.7f);
+    public Color colorUpgrade = new(1f, 0.85f, 0.1f, 1f);
+    public Color colorRemove = new(1f, 0.2f, 0.2f, 0.95f);
+    public Color colorInvalid = new(1f, 0.2f, 0.2f, 0.95f);
 
-    private struct SelectedCard
-    {
-        public GameObject prefab;
-        public bool isUpgrade;
-    }
+    // ===== DEBUG toggles (si te ayudan) =====
+    [Header("Debug")]
+    public bool ignoreUIForDebug = false;     // si true, nunca bloquea por UI
+    public bool forceShowPreview = false;     // si true, muestra preview aunque no haya carta
+    public bool useAllLayersForDebug = false; // si true, raycast en ~0 (todas las capas)
+
+    private struct SelectedCard { public GameObject prefab; public bool isUpgrade; }
     private SelectedCard selected;
 
     private readonly Dictionary<Vector2Int, GameObject> placedTowers = new();
@@ -43,21 +47,25 @@ public class CardPlacer : MonoBehaviour
     private MeshFilter hexFill;
     private MeshRenderer hexFillRenderer;
 
+    // Hover
     private Vector2Int hoveredAxial;
     private bool hasValidHover;
 
+    // Pointer
     private Vector2 pointerPos;
     private bool pointerActive;
     private bool pressedThisFrame;
-    private int activeFingerId = -1;
 
-    // === NEW: Modo eliminar ===
     private bool removeMode = false;
 
     void Awake()
     {
         Instance = this;
+
+        // Asegura cámara
         if (cam == null) cam = Camera.main;
+        var comp = Object.FindFirstObjectByType<Camera>();
+        if (cam == null) Debug.LogError("[CardPlacer] No hay cámara asignada ni Camera.main en escena.");
 
         // Borde (LineRenderer)
         var lrObj = new GameObject("HexPreview");
@@ -74,11 +82,8 @@ public class CardPlacer : MonoBehaviour
         hexPreview.alignment = LineAlignment.View;
         hexPreview.textureMode = LineTextureMode.Stretch;
 
-        var shader = Shader.Find("Sprites/Default");
-        if (shader == null) shader = Shader.Find("Unlit/Color");
-        if (shader == null) shader = Shader.Find("Universal Render Pipeline/Unlit");
+        var shader = Shader.Find("Sprites/Default") ?? Shader.Find("Unlit/Color") ?? Shader.Find("Universal Render Pipeline/Unlit");
         hexPreview.material = new Material(shader);
-
         hexPreview.enabled = false;
 
         // Relleno (Mesh)
@@ -86,103 +91,73 @@ public class CardPlacer : MonoBehaviour
         fillObj.transform.SetParent(transform, false);
         hexFill = fillObj.AddComponent<MeshFilter>();
         hexFillRenderer = fillObj.AddComponent<MeshRenderer>();
-
-        var shaderFill = Shader.Find("Unlit/Color");
-        if (shaderFill == null) shaderFill = Shader.Find("Universal Render Pipeline/Unlit");
-
-        var matFill = new Material(shaderFill);
-        matFill.color = new Color(0f, 1f, 0f, 0.5f);
+        var shaderFill = Shader.Find("Unlit/Color") ?? Shader.Find("Universal Render Pipeline/Unlit");
+        var matFill = new Material(shaderFill) { color = new Color(0f, 1f, 0f, 0.5f) };
         hexFillRenderer.material = matFill;
-
         hexFillRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         hexFillRenderer.receiveShadows = false;
-
         hexFill.gameObject.SetActive(false);
 
         previewYOffset = Mathf.Max(previewYOffset, 0.03f);
         lineWidth = Mathf.Max(lineWidth, 0.03f);
     }
 
+    // ======= API =======
     public void SetSelectedBuild(GameObject towerPrefab, CardHighlight sourceHighlight = null)
     {
-        // salir del modo eliminar si estaba activo
-        removeMode = false; // NEW
+        removeMode = false;
         selected = new SelectedCard { prefab = towerPrefab, isUpgrade = false };
         currentUIHighlight = sourceHighlight;
         UpdatePreviewVisibility();
     }
-
     public void SetSelectedUpgrade(GameObject upgradePrefab, CardHighlight sourceHighlight = null)
     {
-        removeMode = false; // NEW
+        removeMode = false;
         selected = new SelectedCard { prefab = upgradePrefab, isUpgrade = true };
         currentUIHighlight = sourceHighlight;
         UpdatePreviewVisibility();
     }
+    public void CancelSelection() => ClearSelectionAndUIHighlight();
+    public void ToggleRemoveMode() { selected = default; removeMode = !removeMode; UpdatePreviewVisibility(); }
+    public void ExitRemoveMode() { if (!removeMode) return; removeMode = false; UpdatePreviewVisibility(); }
 
-    public void CancelSelection()
-    {
-        ClearSelectionAndUIHighlight();
-    }
-
-    // === NEW: API pública para el botón de UI ===
-    public void ToggleRemoveMode()
-    {
-        // si había algo seleccionado para construir/mejorar, lo limpiamos
-        selected = default;
-        removeMode = !removeMode;
-        UpdatePreviewVisibility();
-        // (Opcional) aquí podrías avisar a la UI para cambiar color del botón
-    }
-    public void ExitRemoveMode()
-    {
-        if (!removeMode) return;
-        removeMode = false;
-        UpdatePreviewVisibility();
-    }
-
+    // ======= Loop =======
     void Update()
     {
         ReadPointer();
 
-        // Mostrar preview también en modo eliminar
         UpdateHoverAndPreview(pointerActive ? (Vector2?)pointerPos : null);
 
-        // === NEW: tecla de salida rápida ===
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
             ExitRemoveMode();
 
-        // Lógica de click/tap
         if (pressedThisFrame)
         {
-            if (IsPointerOverUI()) return;
+            if (!ignoreUIForDebug && IsOverBlockingUI(pointerPos)) return;
             if (!hasValidHover) return;
 
-            // --- MODO ELIMINAR ---
             if (removeMode)
             {
-                if (placedTowers.TryGetValue(hoveredAxial, out var t) && t != null)
+                if (placedTowers.TryGetValue(hoveredAxial, out var toDel) && toDel != null)
                 {
-                    // Quita del diccionario y destruye
                     placedTowers.Remove(hoveredAxial);
-                    Destroy(t);
+                    Destroy(toDel);
                 }
-              
                 ExitRemoveMode();
                 return;
             }
 
-           
-            if (selected.prefab == null) return;
+            if (selected.prefab == null && !forceShowPreview) return;
 
             Vector3 basePos = HexGridFlat.AxialToWorld(hoveredAxial, cellRadius, gridOrigin);
             Vector3 spawnPos = basePos;
 
+            int mask = useAllLayersForDebug ? ~0 : groundMask.value;
             Ray ray = cam.ScreenPointToRay(pointerPos);
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f, groundMask))
+            if (Physics.Raycast(ray, out RaycastHit hit, 500f, mask, QueryTriggerInteraction.Collide))
                 spawnPos.y = hit.point.y;
 
-            if (!selected.isUpgrade)
+            if (selected.prefab != null && !selected.isUpgrade)
             {
                 if (!placedTowers.ContainsKey(hoveredAxial))
                 {
@@ -199,7 +174,7 @@ public class CardPlacer : MonoBehaviour
                     h.axial = hoveredAxial;
                 }
             }
-            else
+            else if (selected.prefab != null && selected.isUpgrade)
             {
                 if (placedTowers.TryGetValue(hoveredAxial, out var tower))
                 {
@@ -215,28 +190,20 @@ public class CardPlacer : MonoBehaviour
             ClearSelectionAndUIHighlight();
         }
 
-#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
-        if (Input.GetMouseButtonDown(1))
-        {
-            // click derecho cancela selección y modo eliminar
-            selected = default;
-            removeMode = false; // NEW
-            UpdatePreviewVisibility();
-        }
-#else
-        if (Input.touchCount >= 2)
+        // Salida rápida con dos dedos (si estás usando gestures propios, quítalo)
+        if (Touchscreen.current != null && Touchscreen.current.touches.Count >= 2)
         {
             selected = default;
-            removeMode = false; // NEW
+            removeMode = false;
             UpdatePreviewVisibility();
         }
-#endif
     }
 
+    // ======= Aux =======
     private void ClearSelectionAndUIHighlight()
     {
         selected = default;
-        removeMode = false; // NEW
+        removeMode = false;
 
         if (currentUIHighlight != null)
         {
@@ -252,8 +219,9 @@ public class CardPlacer : MonoBehaviour
 
     private void UpdateHoverAndPreview(Vector2? pointer)
     {
-        
-        if ((selected.prefab == null && !removeMode) || !pointer.HasValue)
+        bool showPreview = forceShowPreview || (selected.prefab != null) || removeMode;
+
+        if (!showPreview || !pointer.HasValue)
         {
             hexPreview.enabled = false;
             hexFill.gameObject.SetActive(false);
@@ -261,8 +229,9 @@ public class CardPlacer : MonoBehaviour
             return;
         }
 
+        int mask = useAllLayersForDebug ? ~0 : groundMask.value;
         Ray ray = cam.ScreenPointToRay(pointer.Value);
-        if (Physics.Raycast(ray, out RaycastHit groundHit, 100f, groundMask, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(ray, out RaycastHit groundHit, 500f, mask, QueryTriggerInteraction.Collide))
         {
             Vector3 flatPoint = groundHit.point; flatPoint.y = 0f;
 
@@ -273,26 +242,20 @@ public class CardPlacer : MonoBehaviour
             hoveredAxial = axial;
             bool cellHasTower = placedTowers.ContainsKey(axial);
 
-          
-            if (removeMode)
-                hasValidHover = cellHasTower;
-            else
-                hasValidHover = selected.isUpgrade ? cellHasTower : !cellHasTower;
+            hasValidHover = removeMode
+                ? cellHasTower
+                : (selected.prefab == null && forceShowPreview) ? true
+                : (selected.isUpgrade ? cellHasTower : !cellHasTower);
 
-            // Borde
             if (hexPreview.positionCount != 7) hexPreview.positionCount = 7;
             Vector3[] corners = HexGridFlat.GetHexCorners(center, cellRadius);
             hexPreview.enabled = true;
             for (int i = 0; i < 6; i++) hexPreview.SetPosition(i, corners[i]);
             hexPreview.SetPosition(6, corners[0]);
 
-         
-            Color c;
-            if (removeMode)
-                c = hasValidHover ? colorRemove : colorInvalid;
-            else
-                c = !hasValidHover ? colorInvalid
-                    : (selected.isUpgrade ? colorUpgrade : colorBuild);
+            Color c = removeMode
+                ? (hasValidHover ? colorRemove : colorInvalid)
+                : (!hasValidHover ? colorInvalid : (selected.isUpgrade ? colorUpgrade : colorBuild));
 
             hexPreview.startColor = c;
             hexPreview.endColor = c;
@@ -321,7 +284,7 @@ public class CardPlacer : MonoBehaviour
 
     private void UpdatePreviewVisibility()
     {
-        bool show = (selected.prefab != null) || removeMode; 
+        bool show = forceShowPreview || (selected.prefab != null) || removeMode;
         hexPreview.enabled = show;
         if (hexFill != null) hexFill.gameObject.SetActive(show);
     }
@@ -333,55 +296,54 @@ public class CardPlacer : MonoBehaviour
             placedTowers.Remove(axial);
             if (t != null) Destroy(t);
         }
-        else
-        {
-            placedTowers.Remove(axial);
-        }
+        else placedTowers.Remove(axial);
     }
 
+    // ======= INPUT (solo New) =======
     private void ReadPointer()
     {
         pressedThisFrame = false;
         pointerActive = false;
 
-#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
-        pointerPos = Input.mousePosition;
-        pointerActive = true;
-        if (Input.GetMouseButtonDown(0)) pressedThisFrame = true;
-        activeFingerId = -1;
-#else
-        if (Input.touchCount > 0)
+        // 1) Toque real (Touchscreen)
+        var ts = Touchscreen.current;
+        if (ts != null)
         {
-            Touch t = Input.GetTouch(0);
-            pointerPos = t.position;
-            pointerActive = (t.phase == TouchPhase.Began ||
-                             t.phase == TouchPhase.Moved ||
-                             t.phase == TouchPhase.Stationary);
+            var t = ts.primaryTouch;
+            pointerPos = t.position.ReadValue();
+            pressedThisFrame = t.press.wasPressedThisFrame;
+            pointerActive = t.press.isPressed;
+            if (pointerActive) return;
+        }
 
-            if (t.phase == TouchPhase.Began)
-            {
-                pressedThisFrame = true;
-                activeFingerId = t.fingerId;
-            }
-        }
-        else
+        // 2) Mouse/Pointer (Editor/PC)
+        if (Pointer.current != null)
         {
-            activeFingerId = -1;
+            pointerPos = Pointer.current.position.ReadValue();
+            pointerActive = true;
+            pressedThisFrame = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
         }
-#endif
     }
 
-    private bool IsPointerOverUI()
+    // ======= UI: bloquea SOLO controles interactivos (Buttons/Toggles/etc) =======
+    private static readonly List<RaycastResult> _uiHits = new List<RaycastResult>(16);
+    private bool IsOverBlockingUI(Vector2 screenPos)
     {
+        if (ignoreUIForDebug) return false;
         if (EventSystem.current == null) return false;
 
-#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
-        return EventSystem.current.IsPointerOverGameObject();
-#else
-        int fid = (activeFingerId >= 0) ? activeFingerId :
-                  (Input.touchCount > 0 ? Input.GetTouch(0).fingerId : -1);
-        return fid >= 0 && EventSystem.current.IsPointerOverGameObject(fid);
-#endif
+        var ped = new PointerEventData(EventSystem.current) { position = screenPos };
+        _uiHits.Clear();
+        EventSystem.current.RaycastAll(ped, _uiHits);
+
+        for (int i = 0; i < _uiHits.Count; i++)
+        {
+            var go = _uiHits[i].gameObject;
+            if (!go) continue;
+            if (go.GetComponent<Selectable>() != null) // Button/Toggle/Slider/etc
+                return true;
+        }
+        return false;
     }
 }
 

@@ -60,7 +60,7 @@ public class HandManager : MonoBehaviour
     }
 
 
-  
+
 
     public void SelectBuild(GameObject buildPrefab, CardHighlight highlight)
     {
@@ -68,9 +68,11 @@ public class HandManager : MonoBehaviour
         currentSelected = highlight;
         if (currentSelected != null) currentSelected.SetSelected(true);
 
-        
-        CardPlacer.Instance.SetSelectedBuild(buildPrefab, currentSelected);
+        // Reenvía al colocador hex con referencia al highlight
+        if (HexGridCardPlacer.Instance != null)
+            HexGridCardPlacer.Instance.SelectBuild(buildPrefab, currentSelected);
     }
+
 
     public void SelectUpgrade(GameObject upgradePrefab, CardHighlight highlight)
     {
@@ -78,7 +80,9 @@ public class HandManager : MonoBehaviour
         currentSelected = highlight;
         if (currentSelected != null) currentSelected.SetSelected(true);
 
-        CardPlacer.Instance.SetSelectedUpgrade(upgradePrefab, currentSelected);
+        // Reenvía al colocador hex con referencia al highlight
+        if (HexGridCardPlacer.Instance != null)
+            HexGridCardPlacer.Instance.SelectUpgrade(upgradePrefab, currentSelected);
     }
 
     public void DeselectAll()
@@ -190,6 +194,10 @@ public class HandManager : MonoBehaviour
 
         Debug.LogWarning($"RemoveCardByHighlight: no encontré {target.name} en cardsInHand.");
     }
+
+    
+
+
 
 
 }
