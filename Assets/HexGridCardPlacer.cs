@@ -23,6 +23,20 @@ public class HexGridCardPlacer : MonoBehaviour
     [Tooltip("Altura para asentar la torreta sobre el piso")]
     public float buildYOffset = 0.02f;
 
+    [Header("Reglas de colocación")]
+    [Tooltip("Nombre exacto de la carta Bomba si no usas Tag")]
+    public string bombCardId = "Bomba";
+
+    [Tooltip("Celdas de agua (donde colocan las cartas NO-Bomba)")]
+    public LayerMask waterLayerMask;
+
+    [Tooltip("Celdas de carretera (donde SOLO puede ir la Bomba)")]
+    public LayerMask roadLayerMask;
+
+    [Header("Hover feedback")]
+    public Color hoverOK = Color.white;
+    public Color hoverBlocked = Color.red;
+
     [Header("Hover (opcional)")]
     public bool showHover = true;
     public float lineWidth = 0.04f;
@@ -56,6 +70,9 @@ public class HexGridCardPlacer : MonoBehaviour
     {
         if (cam == null) cam = Camera.main;
 
+        // ✅ Asegura que el raycast vea tanto Road como Water
+        groundMask = groundMask | roadLayerMask | waterLayerMask;
+
         if (showHover)
         {
             var go = new GameObject("HexHover");
@@ -76,7 +93,6 @@ public class HexGridCardPlacer : MonoBehaviour
 
         // Toque (móvil)
         var touches = ETouch.activeTouches;
-
         foreach (var t in touches)
         {
             if (t.phase == UnityEngine.InputSystem.TouchPhase.Began)
@@ -127,12 +143,36 @@ public class HexGridCardPlacer : MonoBehaviour
         if (!Physics.Raycast(cam.ScreenPointToRay(screenPos), out var hit, 2000f, groundMask))
             return;
 
+        // === REGLA DE COLOCACIÓN POR LAYER ===
+        int hitLayer = hit.collider.gameObject.layer;
+        string hitLayerName = LayerMask.LayerToName(hitLayer);
+
+        bool isBomb = IsBombPrefab(selected.prefab);
+
+        bool onRoad = LayerInMask(hitLayer, roadLayerMask);
+        bool onWater = LayerInMask(hitLayer, waterLayerMask);
+
+        // 🔎 Logs para depurar
+        Debug.Log($"[Place] Hit:{hit.collider.name} | Layer:{hitLayerName}({hitLayer}) | isBomb:{isBomb} | onRoad:{onRoad} | onWater:{onWater}");
+
+        // Solo Bomba en Road; el resto solo en Water
+        if (isBomb && !onRoad)
+        {
+            Debug.LogWarning("[Grid] Bomba solo puede colocarse en capas Road.");
+            return;
+        }
+        if (!isBomb && !onWater)
+        {
+            Debug.LogWarning("[Grid] Esta carta solo puede colocarse en capas Water.");
+            return;
+        }
+        // === FIN DE REGLA ===
+
         Vector3 point = hit.point;
         Vector2Int axial = HexGridFlat.WorldToAxial(point, cellRadius, gridOrigin);
 
         if (selected.isUpgrade)
         {
-            // Mejorar requiere que exista una torre en la celda
             if (placedBuilds.TryGetValue(axial, out GameObject towerGo) && towerGo != null)
             {
                 var upg = towerGo.GetComponent<TowerUpgradable>();
@@ -153,7 +193,6 @@ public class HexGridCardPlacer : MonoBehaviour
         }
         else
         {
-            // Construir solo si la celda está libre
             if (placedBuilds.ContainsKey(axial) && placedBuilds[axial] != null)
             {
                 Debug.Log($"[{name}] Celda {axial} ocupada. No se puede construir encima.");
@@ -165,9 +204,6 @@ public class HexGridCardPlacer : MonoBehaviour
 
             var go = Instantiate(selected.prefab, spawnPos, rot);
             placedBuilds[axial] = go;
-
-            // (Opcional) si tu torre necesita saber su celda:
-            // var meta = go.GetComponent<TowerCellMeta>(); if (meta) meta.Cell = axial;
 
             AfterSuccessfulUse();
         }
@@ -189,7 +225,7 @@ public class HexGridCardPlacer : MonoBehaviour
     {
         if (!showHover || cam == null) return;
 
-        Vector2 screenPos = Vector2.zero; // ✅ inicializada
+        Vector2 screenPos = Vector2.zero;
         bool hasPointer = false;
 
         // Usa el primer toque o el mouse
@@ -204,8 +240,13 @@ public class HexGridCardPlacer : MonoBehaviour
             hasPointer = true;
         }
 
-        if (!hasPointer) return; // ✅ evita usar screenPos sin valor
+        if (!hasPointer)
+        {
+            if (hexOutline) hexOutline.enabled = false;
+            return;
+        }
 
+        // Raycast al terreno
         if (!Physics.Raycast(cam.ScreenPointToRay(screenPos), out var hit, 2000f, groundMask))
         {
             if (hexOutline) hexOutline.enabled = false;
@@ -214,23 +255,31 @@ public class HexGridCardPlacer : MonoBehaviour
         }
 
         Vector2Int axial = HexGridFlat.WorldToAxial(hit.point, cellRadius, gridOrigin);
-        if (!hasHover || axial != hoveredAxial)
-        {
-            hoveredAxial = axial;
-            hasHover = true;
+        hoveredAxial = axial;
+        hasHover = true;
 
-            if (hexOutline != null)
-            {
-                Vector3 center = HexGridFlat.AxialToWorld(axial, cellRadius, gridOrigin, hit.point.y + 0.001f);
-                var corners = HexGridFlat.GetHexCorners(center, cellRadius);
-                hexOutline.enabled = true;
-                for (int i = 0; i < 6; i++)
-                    hexOutline.SetPosition(i, corners[i]);
-                hexOutline.SetPosition(6, corners[0]); // cerrar
-            }
+        if (hexOutline != null)
+        {
+            // === color según regla ===
+            int hitLayer = hit.collider.gameObject.layer;
+
+            bool isBomb = IsBombPrefab(selected.prefab);
+            bool onRoad = LayerInMask(hitLayer, roadLayerMask);
+            bool onWater = LayerInMask(hitLayer, waterLayerMask);
+            bool allowed = (isBomb && onRoad) || (!isBomb && onWater);
+
+            hexOutline.startColor = allowed ? hoverOK : hoverBlocked;
+            hexOutline.endColor = hexOutline.startColor;
+
+            // === dibujar hexágono ===
+            Vector3 center = HexGridFlat.AxialToWorld(axial, cellRadius, gridOrigin, hit.point.y + 0.001f);
+            var corners = HexGridFlat.GetHexCorners(center, cellRadius);
+            hexOutline.enabled = true;
+            for (int i = 0; i < 6; i++)
+                hexOutline.SetPosition(i, corners[i]);
+            hexOutline.SetPosition(6, corners[0]); // cerrar
         }
     }
-
 
     // --- Utilidades ---
     bool IsPointerOverUI(Vector2 screenPos, int pointerId = -1)
@@ -242,5 +291,24 @@ public class HexGridCardPlacer : MonoBehaviour
         var results = new List<RaycastResult>();
         EventSystem.current.RaycastAll(eventData, results);
         return results.Count > 0;
+    }
+
+    static bool LayerInMask(int layer, LayerMask mask)
+    {
+        return (mask.value & (1 << layer)) != 0;
+    }
+
+    // ✅ Detección robusta de la carta bomba
+    bool IsBombPrefab(GameObject p)
+    {
+        if (p == null) return false;
+
+        // Opción 1: por Tag (recomendado)
+        if (p.CompareTag("Bomb")) return true;
+
+        // Opción 2: por nombre (tolerante a "(Clone)")
+        string n = p.name;
+        if (n.EndsWith("(Clone)")) n = n.Substring(0, n.Length - "(Clone)".Length);
+        return n == bombCardId || n.Contains(bombCardId);
     }
 }

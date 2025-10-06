@@ -768,6 +768,15 @@ MonoBehaviour:
   cellRadius: 3.31
   gridOrigin: {x: 2.46, y: 0, z: 2.37}
   buildYOffset: 0.5
+  bombCardId: Bomba
+  waterLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  roadLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  hoverOK: {r: 1, g: 1, b: 1, a: 1}
+  hoverBlocked: {r: 1, g: 0, b: 0, a: 1}
   showHover: 1
   lineWidth: 0.5
 --- !u!4 &539176995
@@ -2706,9 +2715,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1718208346}
-        m_TargetAssemblyTypeName: CardPlacer, Assembly-CSharp
-        m_MethodName: ToggleRemoveMode
+      - m_Target: {fileID: 539176994}
+        m_TargetAssemblyTypeName: HexGridCardPlacer, Assembly-CSharp
+        m_MethodName: RemoveHoveredBuild
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2787,17 +2796,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 91975530}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1718208346 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5278450603614238774, guid: 122917193ec45b44eb6fd760bc556dc3, type: 3}
-  m_PrefabInstance: {fileID: 675127490}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a9afe37055f31240ac9ebfd19bdbd24, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1734888575 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7206082263525507296, guid: 615e98e52b317014481d3c991db702be, type: 3}
@@ -9977,7 +9975,8 @@ GameObject:
   - component: {fileID: 2795633043194800442}
   - component: {fileID: 3472029421469397661}
   - component: {fileID: 1578447589485611903}
-  m_Layer: 0
+  - component: {fileID: 3472029421469397662}
+  m_Layer: 7
   m_Name: Tierra
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10148,6 +10147,28 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3345077529218347081}
+  m_Mesh: {fileID: 8572216152553094417, guid: e4670ec795cd17e47bbb8637d17682bc, type: 3}
+--- !u!64 &3472029421469397662
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3345077529218347081}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
   m_Mesh: {fileID: 8572216152553094417, guid: e4670ec795cd17e47bbb8637d17682bc, type: 3}
 --- !u!4 &3484516706771108468
 Transform:
@@ -11511,6 +11532,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5330038344404902399, guid: 9dc0c324b2daaf3489e0f32bd783d6a8, type: 3}
       propertyPath: m_Name
+      value: Coral
+      objectReference: {fileID: 0}
+    - target: {fileID: 5330038344404902399, guid: 9dc0c324b2daaf3489e0f32bd783d6a8, type: 3}
+      propertyPath: m_TagString
       value: Coral
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -17880,6 +17905,14 @@ PrefabInstance:
       propertyPath: m_RaycastTarget
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6444509922535496292, guid: 0b749cf2453113248a163b567e89a092, type: 3}
+      propertyPath: deck.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6444509922535496292, guid: 0b749cf2453113248a163b567e89a092, type: 3}
+      propertyPath: 'deck.Array.data[2]'
+      value: 
+      objectReference: {fileID: 4616683652018089834, guid: dcb7d5710cff4c047ac1f31d73721529, type: 3}
     - target: {fileID: 7312021311891581827, guid: 0b749cf2453113248a163b567e89a092, type: 3}
       propertyPath: counterText
       value: 

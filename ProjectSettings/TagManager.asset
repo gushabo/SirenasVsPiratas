@@ -8,6 +8,7 @@ TagManager:
   - Coral
   - Bullet
   - Tower
+  - Bomb
   layers:
   - Default
   - TransparentFX
@@ -16,7 +17,7 @@ TagManager:
   - Water
   - UI
   - Ground
-  - 
+  - Road
   - 
   - 
   - 
