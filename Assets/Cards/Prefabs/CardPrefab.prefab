@@ -298,7 +298,6 @@ GameObject:
   - component: {fileID: 6330923752476967383}
   - component: {fileID: 9013429051506301638}
   - component: {fileID: 3488870290350991941}
-  - component: {fileID: 582232721995337465}
   - component: {fileID: 8170453829368692706}
   - component: {fileID: 6604999619763055373}
   - component: {fileID: 9171795699881079590}
@@ -356,7 +355,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1627350631, guid: 5eca851bd89a049498d0136155ffe8b8, type: 3}
+  m_Sprite: {fileID: -1504067489, guid: bb88dc84543b95b40a59438cebfda8aa, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -422,26 +421,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &582232721995337465
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1266190538670822797}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ff2e87e11d0bb74a9825f87ebceadf1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Enemy: {fileID: 11400000, guid: d2696bb00c8445b4fa52131735032ed7, type: 2}
-  cardImage: {fileID: 9013429051506301638}
-  typeImages:
-  - {fileID: 3149975209240746278}
-  - {fileID: 7923817232165128746}
-  - {fileID: 4815515562133374614}
-  DamageText: {fileID: 4396390541764121411}
-  GoldText: {fileID: 3826238044491542146}
 --- !u!114 &8170453829368692706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -483,7 +462,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd179c74b50b4834e99823fe7abd2cf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  art: {fileID: -1627350631, guid: 5eca851bd89a049498d0136155ffe8b8, type: 3}
+  art: {fileID: -1504067489, guid: bb88dc84543b95b40a59438cebfda8aa, type: 3}
 --- !u!1 &2244250600938395605
 GameObject:
   m_ObjectHideFlags: 0
