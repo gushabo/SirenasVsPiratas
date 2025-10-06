@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 3557042819608529671}
   - component: {fileID: 3431986888232014985}
   - component: {fileID: 7703297918746665996}
+  - component: {fileID: 4965629872837546042}
+  - component: {fileID: 5934780796833794094}
   m_Layer: 0
   m_Name: MinaPez
   m_TagString: Bomb
@@ -106,3 +108,51 @@ MonoBehaviour:
   radius: 5
   damage: 20
   vfxPrefab: {fileID: 1022215825983436762, guid: 28dc6e0cee94ec248a93d3f344a942ef, type: 3}
+--- !u!135 &4965629872837546042
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 139517609707821324}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.7270611
+  m_Center: {x: -0.07688526, y: -0.016383955, z: 0.2410616}
+--- !u!54 &5934780796833794094
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 139517609707821324}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0

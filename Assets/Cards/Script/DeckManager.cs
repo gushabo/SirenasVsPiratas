@@ -13,7 +13,7 @@ public class DeckManager : MonoBehaviour
     private void Start()
     {
         HandManager hand = FindFirstObjectByType<HandManager>();
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 3; i++)
             DrawCard(hand);
     }
 

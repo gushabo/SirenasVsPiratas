@@ -6,7 +6,7 @@ public class Fish : MonoBehaviour
     [Header("Preparacion")] 
     [SerializeField] string[] triggerTags = {"Enemy"};
     [SerializeField] float armTime = 0.25f;
-    [SerializeField] float triggerDelay = 5f;
+    [SerializeField] float triggerDelay = 1f;
 
     [Header("Explosión")] 
     [SerializeField] float radius = 3f;
