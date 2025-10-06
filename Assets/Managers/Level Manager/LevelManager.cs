@@ -66,34 +66,39 @@ public class LevelManager : MonoBehaviour
     private GameManager gm;
     
     public bool isPaused;
-    
+
     void Start()
     {
         gm = GameManager.GetInstance();
         gm.onChangeGameState += OnChangeGameStateCallback;
-        if(gm.gameState ==  GameState.Pause) isPaused = true;
-        
-        
-        levelIndex = 0;
-        roundIndex = 0;
-        
-        // Rellena la lista
+        if (gm.gameState == GameState.Pause)
+            isPaused = true;
+
+        // --- Nuevo: leer el nivel elegido desde el menú ---
+        int selected = PlayerPrefs.GetInt("selectedLevelToPlay", 1); // por defecto 1
+        selected = Mathf.Clamp(selected, 1, maxLevels);
+
+        // --- Construir los niveles ---
         BuildLevels();
-        // Iniciar las rondas
-        StartRound();
+
+        // --- Iniciar desde el nivel elegido ---
+        StartFromLevel(selected);
     }
 
     public void OnChangeGameStateCallback(GameState newState)
     {
         isPaused = newState != GameState.Play;
     }
-    
+
     public void StartRound()
     {
+        if (levelIndex < 0 || levelIndex >= levelsGO.Count) { Debug.LogError("levelIndex fuera de rango"); return; }
+        if (roundIndex < 0 || roundIndex >= levelsGO[levelIndex].Count) { Debug.LogError("roundIndex fuera de rango"); return; }
+
         levelsGO[levelIndex][roundIndex].SetActive(true);
         UiManager.GetInstance().UpdateRoundLevelText(roundIndex, levelIndex);
-
     }
+
 
     public void CheckForEnemies()
     {
@@ -107,15 +112,11 @@ public class LevelManager : MonoBehaviour
 
     public IEnumerator CambioDeRonda()
     {
-        //el ui de cambio de ronda
         UiManager.GetInstance().CambioDeRonda(roundIndex);
 
-       
-        //Mi drafteo para que espere hasta que ya confirme
         if (draftPicker != null)
             yield return draftPicker.ShowAndWait();
 
-      
         float counter = 0f;
         while (counter < delayBetweenRounds)
         {
@@ -125,21 +126,32 @@ public class LevelManager : MonoBehaviour
 
         UiManager.GetInstance().ApagarCambioRondas();
 
-      
-        if (roundIndex == 2)
+
+        if (roundIndex >= levelsGO[levelIndex].Count - 1)
         {
+            int nextLevelNumber = levelIndex + 2; // desbloquea el siguiente
+            ProgressManager.SetHighestUnlocked(nextLevelNumber);
+
             roundIndex = 0;
             levelIndex++;
+
             if (levelIndex >= maxLevels)
+            {
                 gm.Win();
+                ProgressManager.SetHighestUnlocked(maxLevels);
+            }
             else
+            {
                 UiManager.GetInstance().CambiarDeNivel();
+                // opcional: StartRound();
+            }
         }
         else if (!gm.Lose)
         {
             roundIndex++;
             StartRound();
         }
+
     }
 
     public void BuildLevels()
@@ -182,6 +194,8 @@ public class LevelManager : MonoBehaviour
                 levelsEnemySpawner.Add(spawnerList);
                 levelsGO.Add(goList);
             }
+
+           
         }
 
         // las 2 listas deben de tener el mismo tamaño
@@ -189,7 +203,9 @@ public class LevelManager : MonoBehaviour
         {
             Debug.LogWarning($"Desfase en niveles: EnemySpawner={levelsEnemySpawner.Count} vs GO={levelsGO.Count}");
         }
-        
+
+        maxLevels = levelsGO.Count;
+
     }
 
     // Imprime TODA la estructura con índices, nombres y rutas en jerarquía
@@ -234,7 +250,25 @@ public class LevelManager : MonoBehaviour
         }
         return string.Join("/", stack);
     }
-    
-    
-    
+
+
+
+
+
+    //COSAS JULIO OWOWWDPOAW90AWD0OASIOFJEIOFFJAEIO´FJAIOÁWWDFO
+
+ 
+    public void StartFromLevel(int levelNumber)
+    {
+        
+        levelIndex = Mathf.Clamp(levelNumber - 1, 0, maxLevels - 1);
+        roundIndex = 0;
+
+        // Asegura que la estructura está cargada
+        if (levelsGO.Count == 0) BuildLevels();
+
+        StartRound();
+    }
+
+
 }
