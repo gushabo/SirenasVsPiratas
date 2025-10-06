@@ -12,6 +12,15 @@ public class HexGridCardPlacer : MonoBehaviour
 {
     public static HexGridCardPlacer Instance { get; private set; }
 
+    // ===== Tutorial (NUEVO) =====
+    [Header("Tutorial (primera vez)")]
+    [Tooltip("Panel/Texto con instrucciones. Se mostrará SOLO antes de colocar la primera torreta en todo el juego.")]
+    public GameObject firstPlaceTutorialUI;
+    [Tooltip("Si está activo, al colocar la primera torreta se iniciará la ronda automáticamente.")]
+    public bool startRoundOnFirstPlacement = true;
+
+    private const string PREF_FIRST_TOWER_PLACED = "first_tower_placed"; // 0=no; 1=ya colocado alguna vez
+
     [Header("Referencias")]
     public Camera cam;
     [Tooltip("Capa del piso/terreno para el raycast")]
@@ -84,6 +93,16 @@ public class HexGridCardPlacer : MonoBehaviour
             hexOutline.widthMultiplier = lineWidth;
             hexOutline.material = new Material(Shader.Find("Sprites/Default"));
             hexOutline.enabled = false;
+        }
+
+        // === Mostrar tutorial si nunca se ha colocado una torreta (persistente) ===
+        if (PlayerPrefs.GetInt(PREF_FIRST_TOWER_PLACED, 0) == 0)
+        {
+            if (firstPlaceTutorialUI != null) firstPlaceTutorialUI.SetActive(true);
+        }
+        else
+        {
+            if (firstPlaceTutorialUI != null) firstPlaceTutorialUI.SetActive(false);
         }
     }
 
@@ -204,6 +223,22 @@ public class HexGridCardPlacer : MonoBehaviour
 
             var go = Instantiate(selected.prefab, spawnPos, rot);
             placedBuilds[axial] = go;
+
+            // === NUEVO: primera vez colocada → ocultar tutorial, persistir y (opcional) iniciar ronda
+            if (PlayerPrefs.GetInt(PREF_FIRST_TOWER_PLACED, 0) == 0)
+            {
+                PlayerPrefs.SetInt(PREF_FIRST_TOWER_PLACED, 1);
+                PlayerPrefs.Save();
+
+                if (firstPlaceTutorialUI != null) firstPlaceTutorialUI.SetActive(false);
+
+                if (startRoundOnFirstPlacement)
+                {
+                    var lm = LevelManager.GetInstance();
+                    if (lm != null) lm.StartRound();
+                    else Debug.LogWarning("[HexGridCardPlacer] No encontré LevelManager para iniciar la ronda.");
+                }
+            }
 
             AfterSuccessfulUse();
         }

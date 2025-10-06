@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class LevelManager : MonoBehaviour
 {
-    
     // ----- SingleTon ---------
     #region Singleton
     public static LevelManager instance { get; private set; }
@@ -19,19 +18,30 @@ public class LevelManager : MonoBehaviour
         }
         instance = this;
     }
-    
     public static LevelManager GetInstance() => instance;
-    
+
     private void OnDestroy()
     {
         if (instance == this)
         {
             instance = null;
         }
+
+        if (gm != null) gm.onChangeGameState -= OnChangeGameStateCallback;
+
+        // Por si nos suscribimos en algún flujo/evento del placer en otro momento:
+        // (no hace daño si no existe)
+        var placer = HexGridCardPlacer.Instance;
+        if (placer != null)
+        {
+            // Si tu versión del placer expone un evento, aquí lo desuscribes.
+            // placer.OnFirstTowerPlaced -= HandleFirstTowerPlaced_StartRound;
+        }
     }
     #endregion
     // ------ Fin del singleton  ---------
 
+    private const string PREF_FIRST_TOWER_PLACED = "first_tower_placed"; // 0 = nunca; 1 = ya colocó alguna vez
 
     [Header("Draft")]
     [SerializeField] private DraftPicker draftPicker;   // <- arrástralo en el Inspector
@@ -46,25 +56,24 @@ public class LevelManager : MonoBehaviour
     private readonly List<List<EnemySpawner>> levelsEnemySpawner = new();
     private readonly List<List<GameObject>> levelsGO = new();
 
-    // Roundas y niveles
+    // Rondas y niveles
     private int levelIndex;
     private int roundIndex;
-    
+
     private int maxLevels = 3;
-    
+
     public int enemiesLeft;
-    
-    
+
     // Spawner
     private EnemySpawner currentSpawner;
 
     // Timers
     private float timer;      // para delays
     private bool waveDone;    // set por el evento del spawner
-    
+
     // Game Manager
     private GameManager gm;
-    
+
     public bool isPaused;
 
     void Start()
@@ -74,15 +83,42 @@ public class LevelManager : MonoBehaviour
         if (gm.gameState == GameState.Pause)
             isPaused = true;
 
-        // --- Nuevo: leer el nivel elegido desde el menú ---
-        int selected = PlayerPrefs.GetInt("selectedLevelToPlay", 1); // por defecto 1
-        selected = Mathf.Clamp(selected, 1, maxLevels);
+        // Leer el nivel elegido desde el menú (1-based)
+        int selected = PlayerPrefs.GetInt("selectedLevelToPlay", 1);
 
-        // --- Construir los niveles ---
+        // Construir los niveles y fijar índices (sin iniciar la ronda todavía)
         BuildLevels();
+        StartFromLevel(selected);   // <-- ya no llama StartRound por dentro
 
-        // --- Iniciar desde el nivel elegido ---
-        StartFromLevel(selected);
+        bool alreadyPlacedOnce = PlayerPrefs.GetInt(PREF_FIRST_TOWER_PLACED, 0) == 1;
+
+        if (alreadyPlacedOnce)
+        {
+            // Jugador ya colocó alguna torreta en la vida del juego → arranca normal
+            StartRound();
+        }
+        else
+        {
+            // Primera vez en la vida del juego → esperar a que el jugador coloque la 1ª torreta
+            // Si tu HexGridCardPlacer tiene panel de tutorial, muéstralo:
+            var placer = HexGridCardPlacer.Instance;
+            if (placer != null)
+            {
+                // Si tu placer tiene método para mostrar tutorial, llámalo:
+                // placer.ShowFirstPlaceTutorial(); // (si lo implementaste en el placer)
+
+                // Dos alternativas para arrancar la ronda:
+                // A) Si tu placer llama directamente LevelManager.GetInstance().StartRound() cuando detecta la primera colocación,
+                //    no necesitamos suscribirnos a nada aquí.
+                //
+                // B) Si tu placer expone un evento OnFirstTowerPlaced, puedes suscribirte así:
+                // placer.OnFirstTowerPlaced += HandleFirstTowerPlaced_StartRound;
+            }
+            else
+            {
+                Debug.LogWarning("[LevelManager] No se encontró HexGridCardPlacer.Instance; asegúrate de tenerlo en escena.");
+            }
+        }
     }
 
     public void OnChangeGameStateCallback(GameState newState)
@@ -90,6 +126,7 @@ public class LevelManager : MonoBehaviour
         isPaused = newState != GameState.Play;
     }
 
+    // Llama esto para activar la ronda actual (nivelIndex/roundIndex)
     public void StartRound()
     {
         if (levelIndex < 0 || levelIndex >= levelsGO.Count) { Debug.LogError("levelIndex fuera de rango"); return; }
@@ -99,11 +136,10 @@ public class LevelManager : MonoBehaviour
         UiManager.GetInstance().UpdateRoundLevelText(roundIndex, levelIndex);
     }
 
-
     public void CheckForEnemies()
     {
-        if(gm.Lose){gm.GameOver(); return; }
-        
+        if (gm.Lose) { gm.GameOver(); return; }
+
         if (enemiesLeft == 0)
         {
             StartCoroutine(CambioDeRonda());
@@ -126,7 +162,6 @@ public class LevelManager : MonoBehaviour
 
         UiManager.GetInstance().ApagarCambioRondas();
 
-
         if (roundIndex >= levelsGO[levelIndex].Count - 1)
         {
             int nextLevelNumber = levelIndex + 2; // desbloquea el siguiente
@@ -143,7 +178,8 @@ public class LevelManager : MonoBehaviour
             else
             {
                 UiManager.GetInstance().CambiarDeNivel();
-                // opcional: StartRound();
+                // Aquí podrías llamar StartRound() si quieres iniciar de inmediato la primera ronda del siguiente nivel
+                // StartRound();
             }
         }
         else if (!gm.Lose)
@@ -151,7 +187,6 @@ public class LevelManager : MonoBehaviour
             roundIndex++;
             StartRound();
         }
-
     }
 
     public void BuildLevels()
@@ -166,7 +201,7 @@ public class LevelManager : MonoBehaviour
             Transform levelT = levelsRoot.GetChild(i);
 
             var spawnerList = new List<EnemySpawner>();
-            var goList      = new List<GameObject>();
+            var goList = new List<GameObject>();
 
             // Sacar todos los hijos del item del transform
             var children = new List<Transform>(levelT.childCount);
@@ -194,8 +229,6 @@ public class LevelManager : MonoBehaviour
                 levelsEnemySpawner.Add(spawnerList);
                 levelsGO.Add(goList);
             }
-
-           
         }
 
         // las 2 listas deben de tener el mismo tamaño
@@ -205,7 +238,6 @@ public class LevelManager : MonoBehaviour
         }
 
         maxLevels = levelsGO.Count;
-
     }
 
     // Imprime TODA la estructura con índices, nombres y rutas en jerarquía
@@ -251,24 +283,24 @@ public class LevelManager : MonoBehaviour
         return string.Join("/", stack);
     }
 
+    // ===== Inicio controlado por "primera colocación" =====
 
-
-
-
-    //COSAS JULIO OWOWWDPOAW90AWD0OASIOFJEIOFFJAEIO´FJAIOÁWWDFO
-
- 
+   
     public void StartFromLevel(int levelNumber)
     {
-        
-        levelIndex = Mathf.Clamp(levelNumber - 1, 0, maxLevels - 1);
-        roundIndex = 0;
+        levelIndex = Mathf.Clamp(levelNumber - 1, 0, Mathf.Max(0, maxLevels - 1));
 
         // Asegura que la estructura está cargada
         if (levelsGO.Count == 0) BuildLevels();
 
-        StartRound();
+        roundIndex = 0;
+
+
     }
 
-
+    
+    private void HandleFirstTowerPlaced_StartRound()
+    {
+        StartRound();
+    }
 }
