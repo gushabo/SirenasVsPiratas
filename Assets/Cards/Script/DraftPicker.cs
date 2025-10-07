@@ -70,8 +70,8 @@ public class DraftPicker : MonoBehaviour
 
    
         var le = uiGO.GetComponent<LayoutElement>() ?? uiGO.AddComponent<LayoutElement>();
-        if (le.preferredWidth <= 0) le.preferredWidth = 400;
-        if (le.preferredHeight <= 0) le.preferredHeight = 680;
+        if (le.preferredWidth <= 0) le.preferredWidth = 1200;
+        if (le.preferredHeight <= 0) le.preferredHeight = 800;
 
         
         var art = ExtractSprite(prefabReal);

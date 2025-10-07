@@ -19,7 +19,7 @@ public class HexGridCardPlacer : MonoBehaviour
     [Tooltip("Si está activo, al colocar la primera torreta se iniciará la ronda automáticamente.")]
     public bool startRoundOnFirstPlacement = true;
 
-    private const string PREF_FIRST_TOWER_PLACED = "first_tower_placed"; // 0=no; 1=ya colocado alguna vez
+    private const string PREF_FIRST_TOWER_PLACED = "first_tower_placed"; 
 
     [Header("Referencias")]
     public Camera cam;
