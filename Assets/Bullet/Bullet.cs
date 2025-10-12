@@ -91,7 +91,8 @@ public class Bullet : MonoBehaviour
         {
             Health hp = target.GetComponent<Health>();
             if (hp) hp.TakeDamage(damage);
-            gameObject.SetActive(false);
+            Destroy(gameObject);
+            //gameObject.SetActive(false);
         }
         
     }

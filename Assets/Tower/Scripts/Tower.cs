@@ -1,4 +1,4 @@
-using System;
+using System.Collections;
 using UnityEngine;
 
 public class Tower : MonoBehaviour
@@ -6,26 +6,30 @@ public class Tower : MonoBehaviour
     [Header("Stats")]
     [SerializeField] public int damageBullet = 20;
     [SerializeField] public float range = 12f;
-    [SerializeField] public float fireRate = 1.5f;
+    [SerializeField] public float fireRate = 1.5f; // tiempo entre ataques
     [SerializeField] public float turnSpeed = 10f;
     [SerializeField] public float retarget = 0.25f;
-    
+
     [Header("References")]
     [SerializeField] private Transform head;
     [SerializeField] private Transform firePoint;
     [SerializeField] private GameObject bulletPrefab;
-    
+
     private float fireCooldown;
     private Transform currentTarget;
     private bool isPaused;
-    
+    private bool canAttack = true; // nuevo control
+
+    public Animator anim;
+    [SerializeField] private GameObject tridente;
 
     void Start()
     {
         InvokeRepeating(nameof(UpdateTarget), 0f, retarget);
         GameManager.GetInstance().onChangeGameState += OnChangeGameStateCallback;
+        anim = GetComponent<Animator>();
     }
-    
+
     public void OnChangeGameStateCallback(GameState newState)
     {
         isPaused = newState != GameState.Play;
@@ -33,13 +37,11 @@ public class Tower : MonoBehaviour
 
     private void Update()
     {
-
         if (isPaused) return;
-        
-        fireCooldown -= Time.deltaTime;
-        
+        if (!canAttack) return;
         if (currentTarget == null) return;
-        
+
+        // Rotar hacia el objetivo
         Vector3 dir = currentTarget.position - head.position;
         Vector3 direction = new Vector3(dir.x, 0f, dir.z);
 
@@ -49,23 +51,35 @@ public class Tower : MonoBehaviour
             head.rotation = Quaternion.Slerp(head.rotation, lookRotation, turnSpeed * Time.deltaTime);
         }
 
+        // Si ya pasó el tiempo del fireRate, ataca
         if (fireCooldown <= 0f)
         {
-            Shoot(currentTarget);
-            fireCooldown = 1f / fireRate;
+            anim.SetTrigger("Attack"); // la animación ejecutará el Event "Shoot"
+            StartCoroutine(AttackCooldown());
         }
+        else
+        {
+            fireCooldown -= Time.deltaTime;
+        }
+    }
+
+    IEnumerator AttackCooldown()
+    {
+        canAttack = false;
+        fireCooldown = fireRate; // espera el tiempo completo
+        yield return new WaitForSeconds(fireRate);
+        canAttack = true;
     }
 
     public void UpdateTarget()
     {
-        
         Collider[] hits = Physics.OverlapSphere(transform.position, range, ~0, QueryTriggerInteraction.Ignore);
         float bestDistance = float.MaxValue;
         Transform bestTarget = null;
 
         foreach (var h in hits)
         {
-            if(!h.CompareTag("Enemy")) continue;
+            if (!h.CompareTag("Enemy")) continue;
             float d = (h.transform.position - transform.position).sqrMagnitude;
             if (d < bestDistance)
             {
@@ -73,44 +87,45 @@ public class Tower : MonoBehaviour
                 bestTarget = h.transform;
             }
         }
-        currentTarget = (bestTarget != null && (bestTarget.position - transform.position).sqrMagnitude <= range * range) ? bestTarget : null;
+
+        currentTarget = (bestTarget != null && (bestTarget.position - transform.position).sqrMagnitude <= range * range)
+            ? bestTarget
+            : null;
     }
 
-
-    void Shoot(Transform target)
+    // 🎯 ESTE MÉTODO se llama desde el Event en la animación
+    public void Shoot()
     {
-        //FxManager.GetInstance().SetFX(FxType.Bullet, firePoint.position, firePoint.rotation);
-        
+        if (currentTarget == null) return;
+
+        tridente.SetActive(false);
         Bullet b = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation).GetComponent<Bullet>();
         b.damage = damageBullet;
-        b.Shoot(target);
+        b.Shoot(currentTarget);
     }
-    
+
+    public void ShowTridente() => tridente.SetActive(true);
+
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, range);
     }
-    
+
     public void AddDamage(float amount)
     {
         damageBullet = Mathf.Max(0, damageBullet + Mathf.RoundToInt(amount));
-        // Opcional: feedback (sonido/part�culas)
     }
 
     public void AddFireRate(float amount)
     {
-        // fireRate = disparos/segundo. Nunca dejes que sea <= 0
-        fireRate = Mathf.Max(0.05f, fireRate + amount);
-        // No hace falta tocar fireCooldown: en el pr�ximo disparo ya usa el nuevo 1f / fireRate
+        // Cuanto menor es fireRate, más rápido dispara
+        fireRate = Mathf.Max(0.1f, fireRate - amount);
     }
 
     public void AddRange(float amount)
     {
         range = Mathf.Max(0f, range + amount);
-        // Retarget inmediato para �aprovechar� el nuevo rango
         UpdateTarget();
     }
-
-
 }

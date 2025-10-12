@@ -29,13 +29,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 139517609707821324}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071068}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: -4.4836, y: 0.60988, z: -5.2092}
-  m_LocalScale: {x: 7.1998415, y: 7.1998415, z: 7.1998415}
+  m_LocalScale: {x: 15, y: 15, z: 15}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!33 &3557042819608529671
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -104,8 +104,8 @@ MonoBehaviour:
   triggerTags:
   - Enemy
   armTime: 0.25
-  triggerDelay: 5
-  radius: 5
+  triggerDelay: 0.5
+  radius: 10
   damage: 20
   vfxPrefab: {fileID: 1022215825983436762, guid: 28dc6e0cee94ec248a93d3f344a942ef, type: 3}
 --- !u!135 &4965629872837546042

@@ -10,15 +10,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: a14d22da17709e641b3cd758d239b718, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a14d22da17709e641b3cd758d239b718, type: 3}
       propertyPath: m_LocalScale.y
-      value: 3
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a14d22da17709e641b3cd758d239b718, type: 3}
       propertyPath: m_LocalScale.z
-      value: 3
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a14d22da17709e641b3cd758d239b718, type: 3}
       propertyPath: m_LocalPosition.x
@@ -59,6 +59,10 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: a14d22da17709e641b3cd758d239b718, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: a14d22da17709e641b3cd758d239b718, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a14d22da17709e641b3cd758d239b718, type: 3}
       propertyPath: m_Name
@@ -114,7 +118,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 5
-  speed: 15
+  speed: 45
   lifeTime: 20
   target: {fileID: 0}
   isPaused: 0

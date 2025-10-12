@@ -50,7 +50,7 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private Transform levelsRoot;   // padre "Levels"
 
     [Header("Delays (segundos)")]
-    [SerializeField] private float delayBetweenRounds = 1f;
+    [SerializeField] private float delayBetweenRounds = 2f;
 
     // Lista bidimensional para guardar rondas y niveles
     private readonly List<List<EnemySpawner>> levelsEnemySpawner = new();
@@ -87,7 +87,6 @@ public class LevelManager : MonoBehaviour
         int selected = PlayerPrefs.GetInt("selectedLevelToPlay", 1);
 
         // Construir los niveles y fijar índices (sin iniciar la ronda todavía)
-        BuildLevels();
         StartFromLevel(selected);   // <-- ya no llama StartRound por dentro
 
         bool alreadyPlacedOnce = PlayerPrefs.GetInt(PREF_FIRST_TOWER_PLACED, 0) == 1;
@@ -96,28 +95,6 @@ public class LevelManager : MonoBehaviour
         {
             // Jugador ya colocó alguna torreta en la vida del juego → arranca normal
             StartRound();
-        }
-        else
-        {
-            // Primera vez en la vida del juego → esperar a que el jugador coloque la 1ª torreta
-            // Si tu HexGridCardPlacer tiene panel de tutorial, muéstralo:
-            var placer = HexGridCardPlacer.Instance;
-            if (placer != null)
-            {
-                // Si tu placer tiene método para mostrar tutorial, llámalo:
-                // placer.ShowFirstPlaceTutorial(); // (si lo implementaste en el placer)
-
-                // Dos alternativas para arrancar la ronda:
-                // A) Si tu placer llama directamente LevelManager.GetInstance().StartRound() cuando detecta la primera colocación,
-                //    no necesitamos suscribirnos a nada aquí.
-                //
-                // B) Si tu placer expone un evento OnFirstTowerPlaced, puedes suscribirte así:
-                // placer.OnFirstTowerPlaced += HandleFirstTowerPlaced_StartRound;
-            }
-            else
-            {
-                Debug.LogWarning("[LevelManager] No se encontró HexGridCardPlacer.Instance; asegúrate de tenerlo en escena.");
-            }
         }
     }
 
@@ -148,11 +125,11 @@ public class LevelManager : MonoBehaviour
 
     public IEnumerator CambioDeRonda()
     {
-        UiManager.GetInstance().CambioDeRonda(roundIndex);
-
+        //UiManager.GetInstance().CambioDeRonda(roundIndex);
         if (draftPicker != null)
-            yield return draftPicker.ShowAndWait();
-
+            if(levelIndex < maxLevels && roundIndex != 2)
+                yield return draftPicker.ShowAndWait();
+        
         float counter = 0f;
         while (counter < delayBetweenRounds)
         {
@@ -160,7 +137,7 @@ public class LevelManager : MonoBehaviour
             yield return null;
         }
 
-        UiManager.GetInstance().ApagarCambioRondas();
+        //UiManager.GetInstance().ApagarCambioRondas();
 
         if (roundIndex >= levelsGO[levelIndex].Count - 1)
         {
@@ -284,8 +261,6 @@ public class LevelManager : MonoBehaviour
     }
 
     // ===== Inicio controlado por "primera colocación" =====
-
-   
     public void StartFromLevel(int levelNumber)
     {
         levelIndex = Mathf.Clamp(levelNumber - 1, 0, Mathf.Max(0, maxLevels - 1));
@@ -294,10 +269,7 @@ public class LevelManager : MonoBehaviour
         if (levelsGO.Count == 0) BuildLevels();
 
         roundIndex = 0;
-
-
     }
-
     
     private void HandleFirstTowerPlaced_StartRound()
     {

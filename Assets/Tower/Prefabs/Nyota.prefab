@@ -41,27 +41,27 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 8b59283f19889364d923551eb335652b, type: 3}
       propertyPath: m_LocalScale.x
-      value: 10
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8b59283f19889364d923551eb335652b, type: 3}
       propertyPath: m_LocalScale.y
-      value: 10
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8b59283f19889364d923551eb335652b, type: 3}
       propertyPath: m_LocalScale.z
-      value: 10
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8b59283f19889364d923551eb335652b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.7457643
+      value: 17.2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8b59283f19889364d923551eb335652b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.6513
+      value: 1.84
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8b59283f19889364d923551eb335652b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.44441
+      value: 22.86
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8b59283f19889364d923551eb335652b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -90,6 +90,14 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 8b59283f19889364d923551eb335652b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8b59283f19889364d923551eb335652b, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -7657966619581158213, guid: 8b59283f19889364d923551eb335652b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 8b59283f19889364d923551eb335652b, type: 3}
       propertyPath: m_Name
@@ -120,6 +128,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: -5397265700801360720}
   m_SourcePrefab: {fileID: 100100000, guid: 8b59283f19889364d923551eb335652b, type: 3}
+--- !u!1 &4859332482678589082 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -7657966619581158213, guid: 8b59283f19889364d923551eb335652b, type: 3}
+  m_PrefabInstance: {fileID: 6257398512598903329}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5862569294121831882 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8b59283f19889364d923551eb335652b, type: 3}
@@ -164,13 +177,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damageBullet: 20
-  range: 15
+  range: 20
   fireRate: 0.75
   turnSpeed: 10
   retarget: 0.25
   head: {fileID: 5862569294121831882}
   firePoint: {fileID: 2855180384999186618}
   bulletPrefab: {fileID: 1579005169823951863, guid: e859b00ec0b00fb4dba4bccc8215a24e, type: 3}
+  anim: {fileID: 0}
+  tridente: {fileID: 4859332482678589082}
 --- !u!114 &-5397265700801360720
 MonoBehaviour:
   m_ObjectHideFlags: 0
