@@ -10,7 +10,7 @@ public class HexGridCardPlacer : MonoBehaviour
 {
     public static HexGridCardPlacer Instance { get; private set; }
 
-    // ===== Tutorial =====
+    // ===== Tutorial (primera vez) =====
     [Header("Tutorial (primera vez)")]
     public GameObject firstPlaceTutorialUI;
     public bool startRoundOnFirstPlacement = true;
@@ -48,7 +48,7 @@ public class HexGridCardPlacer : MonoBehaviour
         public GameObject prefab;
         public bool isUpgrade;
         public CardHighlight cardHL;
-        public Vector3 scale;          // <-- NUEVO
+        public Vector3 scale; // escala del prefab (p.ej. 13,13,13)
     }
 
     private Selected selected;
@@ -96,8 +96,9 @@ public class HexGridCardPlacer : MonoBehaviour
             hexOutline.enabled = false;
         }
 
-        if (PlayerPrefs.GetInt(PREF_FIRST_TOWER_PLACED, 0) == 0)
-            if (firstPlaceTutorialUI) firstPlaceTutorialUI.SetActive(true);
+        // Mostrar al inicio SOLO si nunca se ha colocado una torre
+        bool placedOnce = PlayerPrefs.GetInt(PREF_FIRST_TOWER_PLACED, 0) == 1;
+        if (firstPlaceTutorialUI != null) firstPlaceTutorialUI.SetActive(!placedOnce);
     }
 
     void Update()
@@ -131,7 +132,7 @@ public class HexGridCardPlacer : MonoBehaviour
         selected.prefab = buildPrefab;
         selected.isUpgrade = false;
         selected.cardHL = fromCard;
-        selected.scale = buildPrefab.transform.localScale;   // <-- toma la escala del prefab
+        selected.scale = buildPrefab.transform.localScale; // usa escala del prefab
         ClearPending();
         RebuildGhostIfNeeded();
     }
@@ -141,11 +142,10 @@ public class HexGridCardPlacer : MonoBehaviour
         selected.prefab = upgradePrefab;
         selected.isUpgrade = true;
         selected.cardHL = fromCard;
-        selected.scale = upgradePrefab.transform.localScale; // <-- idem
+        selected.scale = upgradePrefab.transform.localScale;
         ClearPending();
         RebuildGhostIfNeeded();
     }
-
 
     public void ClearSelection()
     {
@@ -154,6 +154,9 @@ public class HexGridCardPlacer : MonoBehaviour
         selected.cardHL = null;
         ClearPending();
         DestroyGhost();
+
+        // Apaga tutorial si el jugador cancela
+        if (firstPlaceTutorialUI != null) firstPlaceTutorialUI.SetActive(false);
     }
 
     // === CLICK (2 pasos) ===
@@ -190,7 +193,7 @@ public class HexGridCardPlacer : MonoBehaviour
             return;
         }
 
-        // Mover selección
+        // Mover selección (no coloca)
         SetPending(axial, hit.point.y);
         EnsureGhostBuilt();
         MoveGhostTo(axial, hit.point.y);
@@ -199,68 +202,63 @@ public class HexGridCardPlacer : MonoBehaviour
 
     // === Colocar en celda validada ===
     void TryPlaceAtAxial(Vector2Int axial, float yGround)
-{
-    if (selected.prefab == null) return;
-
-    if (selected.isUpgrade)
     {
-        if (placedBuilds.TryGetValue(axial, out GameObject towerGo) && towerGo != null)
+        if (selected.prefab == null) return;
+
+        if (selected.isUpgrade)
         {
-            var upg = towerGo.GetComponent<TowerUpgradable>();
-            if (upg != null)
+            if (placedBuilds.TryGetValue(axial, out GameObject towerGo) && towerGo != null)
             {
-                upg.ApplyUpgrade(selected.prefab);
-                AfterSuccessfulUse();
+                var upg = towerGo.GetComponent<TowerUpgradable>();
+                if (upg != null)
+                {
+                    upg.ApplyUpgrade(selected.prefab);
+                    AfterSuccessfulUse();
+                }
+                else
+                {
+                    Debug.Log($"[{name}] La construcción en {axial} no tiene TowerUpgradable.");
+                }
             }
             else
             {
-                Debug.Log($"[{name}] La construcción en {axial} no tiene TowerUpgradable.");
+                Debug.Log($"[{name}] No hay construcción en {axial} para aplicar mejora.");
             }
         }
         else
         {
-            Debug.Log($"[{name}] No hay construcción en {axial} para aplicar mejora.");
-        }
-    }
-    else
-    {
-        if (placedBuilds.ContainsKey(axial) && placedBuilds[axial] != null)
-        {
-            Debug.Log($"[{name}] Celda {axial} ocupada. No se puede construir encima.");
-            return;
-        }
-
-        Vector3 spawnPos = HexGridFlat.AxialToWorld(axial, cellRadius, gridOrigin, yGround + buildYOffset);
-
-        // Instancia con la rotación del prefab por si la necesitas (usa Quaternion.identity si no)
-        var go = Instantiate(selected.prefab, spawnPos, selected.prefab.transform.rotation);
-
-        // === CLAVE: aplicar la escala del prefab ===
-        go.transform.localScale = selected.prefab.transform.localScale;
-
-        placedBuilds[axial] = go;
-
-        if (PlayerPrefs.GetInt(PREF_FIRST_TOWER_PLACED, 0) == 0)
-        {
-            PlayerPrefs.SetInt(PREF_FIRST_TOWER_PLACED, 1);
-            PlayerPrefs.Save();
-            if (firstPlaceTutorialUI) firstPlaceTutorialUI.SetActive(false);
-
-            if (startRoundOnFirstPlacement)
+            if (placedBuilds.ContainsKey(axial) && placedBuilds[axial] != null)
             {
-                var lm = LevelManager.GetInstance();
-                if (lm != null) lm.StartRound();
-                else Debug.LogWarning("[HexGridCardPlacer] No encontré LevelManager para iniciar la ronda.");
+                Debug.Log($"[{name}] Celda {axial} ocupada. No se puede construir encima.");
+                return;
             }
+
+            Vector3 spawnPos = HexGridFlat.AxialToWorld(axial, cellRadius, gridOrigin, yGround + buildYOffset);
+
+            var go = Instantiate(selected.prefab, spawnPos, selected.prefab.transform.rotation);
+            go.transform.localScale = selected.prefab.transform.localScale; // respeta escala del prefab
+            placedBuilds[axial] = go;
+
+            if (PlayerPrefs.GetInt(PREF_FIRST_TOWER_PLACED, 0) == 0)
+            {
+                PlayerPrefs.SetInt(PREF_FIRST_TOWER_PLACED, 1);
+                PlayerPrefs.Save();
+                if (firstPlaceTutorialUI) firstPlaceTutorialUI.SetActive(false);
+
+                if (startRoundOnFirstPlacement)
+                {
+                    var lm = LevelManager.GetInstance();
+                    if (lm != null) lm.StartRound();
+                    else Debug.LogWarning("[HexGridCardPlacer] No encontré LevelManager para iniciar la ronda.");
+                }
+            }
+
+            AfterSuccessfulUse();
         }
 
-        AfterSuccessfulUse();
+        ClearPending();
+        DestroyGhost();
     }
-
-    ClearPending();
-    DestroyGhost();
-}
-
 
     void AfterSuccessfulUse()
     {
@@ -342,6 +340,9 @@ public class HexGridCardPlacer : MonoBehaviour
         pendingAxial = axial;
         pendingY = yGround;
         hasPendingCell = true;
+
+        // Oculta tutorial al primer clic de fijado
+        if (firstPlaceTutorialUI != null) firstPlaceTutorialUI.SetActive(false);
     }
 
     void ClearPending()
@@ -365,14 +366,12 @@ public class HexGridCardPlacer : MonoBehaviour
         ghostInstance.name = selected.prefab.name + "_GHOST";
         ghostInstance.layer = LayerMask.NameToLayer("Ignore Raycast");
 
-
-        ghostInstance.transform.localScale = selected.scale;   // <-- NUEVO
-
+        // Escala del prefab (p.ej. 13)
+        ghostInstance.transform.localScale = selected.scale;
 
         // Desactivar lógica/sensores del prefab
         foreach (var b in ghostInstance.GetComponentsInChildren<Behaviour>(true))
         {
-            // No desactivar el Renderer
             if (b is Renderer) continue;
             b.enabled = false;
         }
@@ -390,7 +389,6 @@ public class HexGridCardPlacer : MonoBehaviour
             ghostRenderers.Add(r);
             if (ghostMaterial != null)
             {
-                // Reemplaza todos los submaterials por el ghost
                 var mats = r.sharedMaterials;
                 for (int i = 0; i < mats.Length; i++) mats[i] = ghostMaterial;
                 r.sharedMaterials = mats;
@@ -415,7 +413,7 @@ public class HexGridCardPlacer : MonoBehaviour
         if (ghostInstance == null) return;
         Vector3 p = HexGridFlat.AxialToWorld(axial, cellRadius, gridOrigin, yGround + buildYOffset);
         ghostInstance.transform.SetPositionAndRotation(p, Quaternion.identity);
-        ghostInstance.transform.localScale = selected.scale;
+        ghostInstance.transform.localScale = selected.scale; // mantener escala
     }
 
     void SetGhostTint(Color c)
