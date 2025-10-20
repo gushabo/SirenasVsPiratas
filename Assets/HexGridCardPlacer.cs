@@ -18,7 +18,14 @@ public class HexGridCardPlacer : MonoBehaviour
 
     [Header("Referencias")]
     public Camera cam;
-    public LayerMask groundMask = ~0;
+
+    [Header("Tablero / Layer de celdas")]
+    [Tooltip("Capa(s) que representan el tablero/celdas jugables. Ej: Road | Water.")]
+    public LayerMask boardMask;               // solo tablero
+    [Tooltip("Si es true, el hover/ghost usan una altura fija del tablero (independiente de coliders).")]
+    public bool useFixedBoardY = true;
+    [Tooltip("Altura del tablero si usas Y fija.")]
+    public float boardY = 0f;
 
     [Header("Grid Hex Flat-Top")]
     public float cellRadius = 1.2f;
@@ -81,8 +88,6 @@ public class HexGridCardPlacer : MonoBehaviour
     {
         if (cam == null) cam = Camera.main;
 
-        groundMask = groundMask | roadLayerMask | waterLayerMask;
-
         if (showHover)
         {
             var go = new GameObject("HexHover");
@@ -94,6 +99,14 @@ public class HexGridCardPlacer : MonoBehaviour
             hexOutline.widthMultiplier = lineWidth;
             hexOutline.material = new Material(Shader.Find("Sprites/Default"));
             hexOutline.enabled = false;
+
+            // Más estable visualmente en ángulos oblicuos
+            hexOutline.alignment = LineAlignment.View;
+            hexOutline.numCornerVertices = 2;
+            hexOutline.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            hexOutline.receiveShadows = false;
+            // Si usas URP con sorting layers:
+            // hexOutline.sortingOrder = 32767;
         }
 
         // Mostrar al inicio SOLO si nunca se ha colocado una torre
@@ -112,7 +125,7 @@ public class HexGridCardPlacer : MonoBehaviour
             {
                 Vector2 sp = t.screenPosition;
                 if (!IsPointerOverUI(sp, t.touchId))
-                    HandleClick(sp);
+                    HandleClick();
                 return;
             }
         }
@@ -122,7 +135,7 @@ public class HexGridCardPlacer : MonoBehaviour
         {
             Vector2 sp = Mouse.current.position.ReadValue();
             if (!IsPointerOverUI(sp))
-                HandleClick(sp);
+                HandleClick();
         }
     }
 
@@ -160,12 +173,16 @@ public class HexGridCardPlacer : MonoBehaviour
     }
 
     // === CLICK (2 pasos) ===
-    void HandleClick(Vector2 screenPos)
+    void HandleClick()
     {
         if (selected.prefab == null || cam == null) return;
-        if (!Physics.Raycast(cam.ScreenPointToRay(screenPos), out var hit, 2000f, groundMask)) return;
 
-        int layer = hit.collider.gameObject.layer;
+        bool gotHit = PointerToBoard(out var hit, out var fallback);
+        if (!gotHit && !(useFixedBoardY && fallback != Vector3.zero)) return;
+
+        Vector3 worldPoint = gotHit ? hit.point : fallback;
+        int layer = gotHit ? hit.collider.gameObject.layer : 0;
+
         bool isBomb = IsBombPrefab(selected.prefab);
         bool onRoad = LayerInMask(layer, roadLayerMask);
         bool onWater = LayerInMask(layer, waterLayerMask);
@@ -176,27 +193,27 @@ public class HexGridCardPlacer : MonoBehaviour
             return;
         }
 
-        Vector2Int axial = HexGridFlat.WorldToAxial(hit.point, cellRadius, gridOrigin);
+        Vector2Int axial = HexGridFlat.WorldToAxial(worldPoint, cellRadius, gridOrigin);
+        float yGround = useFixedBoardY ? boardY : worldPoint.y;
 
         if (!hasPendingCell)
         {
-            SetPending(axial, hit.point.y);
+            SetPending(axial, yGround);
             EnsureGhostBuilt();
-            MoveGhostTo(axial, hit.point.y);
+            MoveGhostTo(axial, yGround);
             SetGhostTint(ghostOK);
             return;
         }
 
         if (axial == pendingAxial)
         {
-            TryPlaceAtAxial(axial, pendingY);
+            TryPlaceAtAxial(axial, yGround);
             return;
         }
 
-        // Mover selección (no coloca)
-        SetPending(axial, hit.point.y);
+        SetPending(axial, yGround);
         EnsureGhostBuilt();
-        MoveGhostTo(axial, hit.point.y);
+        MoveGhostTo(axial, yGround);
         SetGhostTint(ghostOK);
     }
 
@@ -273,37 +290,27 @@ public class HexGridCardPlacer : MonoBehaviour
     // === Hover / Outline ===
     void UpdateHover()
     {
-        if (!showHover || cam == null) return;
-
-        Vector2 screenPos = Vector2.zero;
-        bool hasPointer = false;
-
-        if (ETouch.activeTouches.Count > 0)
-        {
-            screenPos = ETouch.activeTouches[0].screenPosition;
-            hasPointer = true;
-        }
-        else if (Mouse.current != null)
-        {
-            screenPos = Mouse.current.position.ReadValue();
-            hasPointer = true;
-        }
-
-        if (!hasPointer)
+        if (!showHover || cam == null)
         {
             if (hexOutline) hexOutline.enabled = false;
             hasHover = false;
             return;
         }
 
-        if (!Physics.Raycast(cam.ScreenPointToRay(screenPos), out var hit, 2000f, groundMask))
+        bool gotHit = PointerToBoard(out var hit, out var fallback);
+        if (!gotHit && !(useFixedBoardY && fallback != Vector3.zero))
         {
             if (hexOutline) hexOutline.enabled = false;
             hasHover = false;
             return;
         }
 
-        Vector2Int axial = HexGridFlat.WorldToAxial(hit.point, cellRadius, gridOrigin);
+        Vector3 worldPoint = gotHit ? hit.point : fallback;
+        int layerForRules = gotHit ? hit.collider.gameObject.layer : 0;
+
+        float yForDraw = useFixedBoardY ? boardY : worldPoint.y;
+
+        Vector2Int axial = HexGridFlat.WorldToAxial(worldPoint, cellRadius, gridOrigin);
         hoveredAxial = axial;
         hasHover = true;
 
@@ -316,22 +323,57 @@ public class HexGridCardPlacer : MonoBehaviour
             }
             else
             {
-                int layer = hit.collider.gameObject.layer;
                 bool isBomb = IsBombPrefab(selected.prefab);
-                bool onRoad = LayerInMask(layer, roadLayerMask);
-                bool onWater = LayerInMask(layer, waterLayerMask);
+                bool onRoad = LayerInMask(layerForRules, roadLayerMask);
+                bool onWater = LayerInMask(layerForRules, waterLayerMask);
                 bool allowed = (isBomb && onRoad) || (!isBomb && onWater);
 
                 hexOutline.startColor = allowed ? hoverOK : hoverBlocked;
                 hexOutline.endColor = hexOutline.startColor;
             }
 
-            Vector3 center = HexGridFlat.AxialToWorld(axial, cellRadius, gridOrigin, hit.point.y + 0.001f);
+            Vector3 center = HexGridFlat.AxialToWorld(axial, cellRadius, gridOrigin, yForDraw + 0.001f);
             var corners = HexGridFlat.GetHexCorners(center, cellRadius);
             hexOutline.enabled = true;
             for (int i = 0; i < 6; i++) hexOutline.SetPosition(i, corners[i]);
             hexOutline.SetPosition(6, corners[0]);
         }
+    }
+
+    // === Ray desde cámara -> tablero (layer) o plano a boardY ===
+    bool PointerToBoard(out RaycastHit hit, out Vector3 fallbackPoint)
+    {
+        hit = default;
+        fallbackPoint = Vector3.zero;
+
+        if (cam == null) return false;
+
+        Vector2 sp;
+        if (ETouch.activeTouches.Count > 0)
+            sp = ETouch.activeTouches[0].screenPosition;
+        else if (Mouse.current != null)
+            sp = Mouse.current.position.ReadValue();
+        else
+            return false;
+
+        var ray = cam.ScreenPointToRay(sp);
+
+        // 1) Intentar con colisionadores del tablero
+        if (Physics.Raycast(ray, out hit, 5000f, boardMask))
+            return true;
+
+        // 2) Fallback: intersección con plano horizontal a boardY
+        if (useFixedBoardY)
+        {
+            var plane = new Plane(Vector3.up, new Vector3(0f, boardY, 0f));
+            if (plane.Raycast(ray, out float dist))
+            {
+                fallbackPoint = ray.origin + ray.direction * dist;
+                return false; // sin collider, pero tenemos un punto válido
+            }
+        }
+
+        return false;
     }
 
     // === Pending helpers ===
@@ -411,7 +453,8 @@ public class HexGridCardPlacer : MonoBehaviour
     void MoveGhostTo(Vector2Int axial, float yGround)
     {
         if (ghostInstance == null) return;
-        Vector3 p = HexGridFlat.AxialToWorld(axial, cellRadius, gridOrigin, yGround + buildYOffset);
+        float y = useFixedBoardY ? boardY : yGround;
+        Vector3 p = HexGridFlat.AxialToWorld(axial, cellRadius, gridOrigin, y + buildYOffset);
         ghostInstance.transform.SetPositionAndRotation(p, Quaternion.identity);
         ghostInstance.transform.localScale = selected.scale; // mantener escala
     }
@@ -452,3 +495,4 @@ public class HexGridCardPlacer : MonoBehaviour
         return n == bombCardId || n.Contains(bombCardId);
     }
 }
+
