@@ -129,7 +129,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 427f3168fd0b5cf45aa75c396b52dfd7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 48.58
+      value: 47.55
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 427f3168fd0b5cf45aa75c396b52dfd7, type: 3}
       propertyPath: m_LocalPosition.y
@@ -167,6 +167,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -6732777787953953722, guid: 427f3168fd0b5cf45aa75c396b52dfd7, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: a81677d0ac825424db6af9f55c3587bc, type: 2}
     - target: {fileID: 919132149155446097, guid: 427f3168fd0b5cf45aa75c396b52dfd7, type: 3}
       propertyPath: m_Name
       value: T-PosePirataHombre
@@ -190,7 +194,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: fe147c4f506029043bb45592779247fc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 46.18
+      value: 45.69
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fe147c4f506029043bb45592779247fc, type: 3}
       propertyPath: m_LocalPosition.y
@@ -232,6 +236,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: T-PosePirataTanque
       objectReference: {fileID: 0}
+    - target: {fileID: 3144209812250065216, guid: fe147c4f506029043bb45592779247fc, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 4d0b5ec2cf20e88489c7e332112ff86f, type: 2}
     - target: {fileID: 5866666021909216657, guid: fe147c4f506029043bb45592779247fc, type: 3}
       propertyPath: m_Controller
       value: 
@@ -378,6 +386,71 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!1001 &1011695977
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: b08fb7b344e8c394db982db5222bdc69, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 48.97826
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b08fb7b344e8c394db982db5222bdc69, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b08fb7b344e8c394db982db5222bdc69, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -15.728636
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b08fb7b344e8c394db982db5222bdc69, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b08fb7b344e8c394db982db5222bdc69, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b08fb7b344e8c394db982db5222bdc69, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b08fb7b344e8c394db982db5222bdc69, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b08fb7b344e8c394db982db5222bdc69, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b08fb7b344e8c394db982db5222bdc69, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b08fb7b344e8c394db982db5222bdc69, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b08fb7b344e8c394db982db5222bdc69, type: 3}
+      propertyPath: m_Name
+      value: PirataMujer_TPose
+      objectReference: {fileID: 0}
+    - target: {fileID: 4525449429480767757, guid: b08fb7b344e8c394db982db5222bdc69, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 6a4f85a62e3320f488a09757c947fe3f, type: 2}
+    - target: {fileID: 5866666021909216657, guid: b08fb7b344e8c394db982db5222bdc69, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 765f8bad0b4d45b41ad1b993f90764bf, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b08fb7b344e8c394db982db5222bdc69, type: 3}
 --- !u!1 &2124977794
 GameObject:
   m_ObjectHideFlags: 0
@@ -507,3 +580,4 @@ SceneRoots:
   - {fileID: 2124977797}
   - {fileID: 261212342}
   - {fileID: 542945389}
+  - {fileID: 1011695977}
