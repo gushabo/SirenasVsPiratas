@@ -1,4 +1,4 @@
-using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +12,10 @@ public class Health : MonoBehaviour
     [SerializeField] public Slider healthSlider;
     [SerializeField] public GameObject sliderGO;
     private Transform cameraPosition;
+    
+    [SerializeField] public Material hitMaterial;
+    [SerializeField] public GameObject body;
+    Coroutine flashCo;
 
     void Start()
     {
@@ -32,11 +36,9 @@ public class Health : MonoBehaviour
         {
             UiManager.GetInstance().LifeText.text = "Health: " + health;
         }
-        else if (healthSlider != null)
-        {
-            healthSlider.maxValue = maxHealth;
-            sliderGO.SetActive(false);
-        }
+        
+        healthSlider.maxValue = maxHealth;
+        sliderGO.SetActive(false);
     }
 
     private void Update()
@@ -47,8 +49,29 @@ public class Health : MonoBehaviour
         }
     }
 
+    public IEnumerator wait(float seconds)
+    {
+        var originalMaterial = body.GetComponent<SkinnedMeshRenderer>().material;
+        body.GetComponent<SkinnedMeshRenderer>().material = hitMaterial;
+        yield return new WaitForSeconds(seconds);
+        body.GetComponent<SkinnedMeshRenderer>().material = originalMaterial;
+        flashCo = null;
+    }
+
+    public void CallWait()
+    {
+        if(flashCo != null) StopCoroutine(flashCo);
+        flashCo = StartCoroutine(wait(0.3f));
+    }
+    
     public void TakeDamage(int damage)
     {
+
+        if (!isCoral)
+        {
+            CallWait();
+        }
+        
         health -= damage;
         sliderGO.SetActive(true);
         healthSlider.value = health;

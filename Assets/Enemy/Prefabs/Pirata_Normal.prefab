@@ -175,6 +175,8 @@ MonoBehaviour:
   isCoral: 0
   healthSlider: {fileID: 6419652527004049199}
   sliderGO: {fileID: 5538465594358205227}
+  hitMaterial: {fileID: 2100000, guid: e741b5d47ce5ae24794b54a16fe57a3f, type: 2}
+  body: {fileID: 4463842032008502258}
 --- !u!114 &2493459878434686718
 MonoBehaviour:
   m_ObjectHideFlags: 0
