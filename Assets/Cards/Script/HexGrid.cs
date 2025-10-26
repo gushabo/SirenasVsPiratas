@@ -25,7 +25,7 @@ public static class HexGridFlat
         float qf = (2f / 3f) * x / radius;
         float rf = (-1f / 3f) * x / radius + (1f / SQRT3) * z / radius;
 
-        // redondeo cúbico correcto
+        // redondeo cï¿½bico correcto
         float xf = qf, zf = rf, yf = -xf - zf;
         int rx = Mathf.RoundToInt(xf);
         int ry = Mathf.RoundToInt(yf);
@@ -42,13 +42,13 @@ public static class HexGridFlat
         return new Vector2Int(rx, rz);
     }
 
-    // Devuelve los 6 vértices de un hexágono flat-top
+    // Devuelve los 6 vï¿½rtices de un hexï¿½gono flat-top
     public static Vector3[] GetHexCorners(Vector3 center, float radius)
     {
         var corners = new Vector3[6];
         for (int i = 0; i < 6; i++)
         {
-            // flat-top empieza en 30°
+            // flat-top empieza en 30ï¿½
             float angleDeg = 60f * i ;
             float rad = angleDeg * Mathf.Deg2Rad;
             corners[i] = center + new Vector3(radius * Mathf.Cos(rad), 0f, radius * Mathf.Sin(rad));
@@ -56,20 +56,20 @@ public static class HexGridFlat
         return corners;
     }
 
-    // Construye un mesh de hexágono (relleno sólido)
+    // Construye un mesh de hexï¿½gono (relleno sï¿½lido)
     public static Mesh BuildHexMesh(Vector3 center, float radius)
     {
         Vector3[] corners = GetHexCorners(center, radius);
 
         Mesh mesh = new Mesh();
 
-        // 7 vértices: centro + 6 esquinas
+        // 7 vï¿½rtices: centro + 6 esquinas
         Vector3[] verts = new Vector3[7];
         verts[0] = center;
         for (int i = 0; i < 6; i++)
             verts[i + 1] = corners[i];
 
-        // Triángulos (6 alrededor del centro)
+        // Triï¿½ngulos (6 alrededor del centro)
         int[] tris = new int[18];
         for (int i = 0; i < 6; i++)
         {

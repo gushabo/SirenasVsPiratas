@@ -4,7 +4,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class TowerUpgradable : MonoBehaviour
 {
-    public Transform mountPoint;   // dónde “colgar” el adorno visual (si existe)
+    public Transform mountPoint;   // dï¿½nde ï¿½colgarï¿½ el adorno visual (si existe)
     private Tower torre;           // tu script de torreta (debe tener damageBullet, fireRate, range)
 
     // Lleva conteo por tipo para stacking/duplicados
@@ -18,7 +18,7 @@ public class TowerUpgradable : MonoBehaviour
         // Mejor en Awake para usarlo si la mejora llega en el primer frame
         torre = GetComponent<Tower>();
         if (torre == null)
-            Debug.LogError($"[{name}] No encontré componente Tower. Agrega 'Tower' al prefab de la torreta.");
+            Debug.LogError($"[{name}] No encontrï¿½ componente Tower. Agrega 'Tower' al prefab de la torreta.");
     }
 
   
@@ -34,17 +34,17 @@ public class TowerUpgradable : MonoBehaviour
             return;
         }
 
-        // Reglas de acumulación
+        // Reglas de acumulaciï¿½n
         stacksPorTipo.TryGetValue(data.type, out int currentStacks);
 
         if (!data.stackable && currentStacks >= 1)
         {
-            Debug.Log($"[{name}] Ya se aplicó una mejora de tipo {data.type}. No es acumulable.");
+            Debug.Log($"[{name}] Ya se aplicï¿½ una mejora de tipo {data.type}. No es acumulable.");
             return;
         }
         if (data.stackable && data.maxStacks > 0 && currentStacks >= data.maxStacks)
         {
-            Debug.Log($"[{name}] Tope de acumulación alcanzado para {data.type} ({data.maxStacks}).");
+            Debug.Log($"[{name}] Tope de acumulaciï¿½n alcanzado para {data.type} ({data.maxStacks}).");
             return;
         }
 
