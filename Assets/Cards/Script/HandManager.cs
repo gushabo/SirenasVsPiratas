@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections.Generic;
 
 public class HandManager : MonoBehaviour
 {
-    public static HandManager Instance; // <--- NUEVO
+    public static HandManager Instance;
 
     [Header("Referencias")]
     public DeckManager deckManager;
@@ -12,130 +13,64 @@ public class HandManager : MonoBehaviour
     public GameObject cardPrefab;
     public Transform handTransform;
 
+    // ====== LAYOUT ======
+    public enum HandLayout { HorizontalFan, VerticalColumnRight, VerticalArcRight }
     [Header("Layout")]
+    public HandLayout layout = HandLayout.VerticalArcRight;
+
+    [Tooltip("Máx. cartas con las que se calcula compresión de espacio")]
+    public int cardsMaxInHand = 8;
+
+    // --- Horizontal (como lo tenías) ---
+    [Header("Horizontal Fan")]
     public float fanSpread = 6f;
     public float cardSpacing = -120f;
     public float verticalSpacing = 40f;
 
-    public int cardsMaxInHand = 8;
+    // --- Vertical recto ---
+    [Header("Vertical Column")]
+    public float vSpacing = -180f;        // negativo = hacia abajo
+    public float vTilt = -3f;             // tilt general
+
+    // --- Vertical con arco (recomendado) ---
+    [Header("Vertical Arc Right")]
+    public float vArcSpacing = -170f;     // distancia entre cartas
+    public float vArcCurveX = 80f;        // cuánto “se mete” al centro (curvatura en X)
+    public float vArcTilt = -6f;          // inclinación por carta
+    public float vArcSpread = 8f;         // abanico adicional por índice
 
     public List<GameObject> cardsInHand = new List<GameObject>();
 
-    // --- NUEVO: selección actual ---
     private CardHighlight currentSelected;
 
-    void Awake()
-    {
-        Instance = this;
-    }
+    void Awake() => Instance = this;
 
-    void Start()
+    void Start() => UpdateHandVisuals();
+
+
+    private void Update()
     {
-        // if (deckManager != null) deckManager.DrawCards(this, 6);
         UpdateHandVisuals();
     }
 
- 
-    
-
+    // ===== API =====
     public void AddCardToHand(GameObject cardPrefabToUse)
     {
-        if (cardPrefabToUse == null || handTransform == null) return;
+        if (!cardPrefabToUse || !handTransform) return;
 
-       
+        var newCard = Instantiate(cardPrefabToUse, handTransform.position, Quaternion.identity, handTransform);
 
-        GameObject newCard = Instantiate(
-            cardPrefabToUse,
-            handTransform.position,
-            Quaternion.identity,
-            handTransform
-        );
-
-       
         var hl = newCard.GetComponentInChildren<CardHighlight>(true);
-        if (hl != null) hl.BindRoot(newCard);
+        if (hl) hl.BindRoot(newCard);
 
         cardsInHand.Add(newCard);
-         UpdateHandVisuals();
-    }
-
-
-
-
-    public void SelectBuild(GameObject buildPrefab, CardHighlight highlight)
-    {
-        DeselectAll();
-        currentSelected = highlight;
-        if (currentSelected != null) currentSelected.SetSelected(true);
-
-        // Reenvía al colocador hex con referencia al highlight
-        if (HexGridCardPlacer.Instance != null)
-            HexGridCardPlacer.Instance.SelectBuild(buildPrefab, currentSelected);
-    }
-
-
-    public void SelectUpgrade(GameObject upgradePrefab, CardHighlight highlight)
-    {
-        DeselectAll();
-        currentSelected = highlight;
-        if (currentSelected != null) currentSelected.SetSelected(true);
-
-        // Reenvía al colocador hex con referencia al highlight
-        if (HexGridCardPlacer.Instance != null)
-            HexGridCardPlacer.Instance.SelectUpgrade(upgradePrefab, currentSelected);
-    }
-
-    public void DeselectAll()
-    {
-        if (handTransform == null) return;
-
-        // Apaga TODO CardHighlight que esté bajo el contenedor de la mano
-        var all = handTransform.GetComponentsInChildren<CardHighlight>(true);
-        foreach (var hl in all)
-            hl.SetSelected(false);
-
-        currentSelected = null;
-    }
-
-
-    // Lo llama CardPlacer cuando coloca o cancelas
-    public void NotifyPlacementCleared()
-    {
-        DeselectAll();
-    }
-
-    // ---------- (lo demás igual) ----------
-    void UpdateHandVisuals()
-    {
-        int cardCount = cardsInHand.Count;
-        if (cardCount == 0) return;
-
-        if (cardCount == 1)
-        {
-            cardsInHand[0].transform.localRotation = Quaternion.identity;
-            cardsInHand[0].transform.localPosition = Vector3.zero;
-            return;
-        }
-
-        for (int i = 0; i < cardCount; i++)
-        {
-            float rotationAngle = fanSpread * (i - (cardCount - 1) / 2f);
-            Transform t = cardsInHand[i].transform;
-            t.localRotation = Quaternion.Euler(0f, 0f, rotationAngle);
-
-            float horizontalOffSet = cardSpacing * (i - (cardCount - 1) / 2f);
-            float normalized = (2f * i / (cardCount - 1) - 1f);
-            float verticalOffSet = verticalSpacing * (1 - normalized * normalized);
-
-            t.localPosition = new Vector3(horizontalOffSet, verticalOffSet, 0f);
-        }
+        UpdateHandVisuals();
     }
 
     public void RemoveCard(GameObject cardGO)
     {
-        if (cardGO == null) return;
+        if (!cardGO) return;
 
-        // 1) ¿Está tal cual en la lista?
         if (cardsInHand.Contains(cardGO))
         {
             cardsInHand.Remove(cardGO);
@@ -144,7 +79,6 @@ public class HandManager : MonoBehaviour
             return;
         }
 
-        // 2) ¿Es un hijo de alguno de los roots en la mano?
         for (int i = cardsInHand.Count - 1; i >= 0; i--)
         {
             var root = cardsInHand[i];
@@ -159,16 +93,14 @@ public class HandManager : MonoBehaviour
             }
         }
 
-        // Opcional: log para depurar
-        Debug.LogWarning($"RemoveCard: no encontré {cardGO.name} en cardsInHand (¿pasaste el objeto correcto?).");
+        Debug.LogWarning($"RemoveCard: no encontré {cardGO.name} en cardsInHand.");
     }
+
     public void RemoveCardByHighlight(CardHighlight hl)
     {
-        if (hl == null) return;
+        if (!hl) return;
+        GameObject target = hl.CardRoot ? hl.CardRoot : hl.gameObject;
 
-        GameObject target = hl.CardRoot != null ? hl.CardRoot : hl.gameObject;
-
-        // 1) ¿Está tal cual en la lista?
         if (cardsInHand.Contains(target))
         {
             cardsInHand.Remove(target);
@@ -177,7 +109,6 @@ public class HandManager : MonoBehaviour
             return;
         }
 
-        // 2) ¿Es hijo de alguna carta en mano?
         for (int i = cardsInHand.Count - 1; i >= 0; i--)
         {
             var root = cardsInHand[i];
@@ -195,9 +126,86 @@ public class HandManager : MonoBehaviour
         Debug.LogWarning($"RemoveCardByHighlight: no encontré {target.name} en cardsInHand.");
     }
 
-    
+    public void SelectBuild(GameObject buildPrefab, CardHighlight highlight)
+    {
+        DeselectAll();
+        currentSelected = highlight;
+        if (currentSelected) currentSelected.SetSelected(true);
+        if (HexGridCardPlacer.Instance)
+            HexGridCardPlacer.Instance.SelectBuild(buildPrefab, currentSelected);
+    }
 
+    public void SelectUpgrade(GameObject upgradePrefab, CardHighlight highlight)
+    {
+        DeselectAll();
+        currentSelected = highlight;
+        if (currentSelected) currentSelected.SetSelected(true);
+        if (HexGridCardPlacer.Instance)
+            HexGridCardPlacer.Instance.SelectUpgrade(upgradePrefab, currentSelected);
+    }
 
+    public void DeselectAll()
+    {
+        if (!handTransform) return;
+        var all = handTransform.GetComponentsInChildren<CardHighlight>(true);
+        foreach (var hl in all) hl.SetSelected(false);
+        currentSelected = null;
+    }
 
+    public void NotifyPlacementCleared() => DeselectAll();
 
+    // ===== LAYOUT CORE =====
+    void UpdateHandVisuals()
+    {
+        int n = cardsInHand.Count;
+        if (n == 0) return;
+
+        // compresión suave cuando hay muchas cartas
+        float density = Mathf.InverseLerp(1f, Mathf.Max(2, cardsMaxInHand), n);
+
+        for (int i = 0; i < n; i++)
+        {
+            Transform t = cardsInHand[i].transform;
+
+            // que el último agregado quede “encima”
+            t.SetSiblingIndex(i);
+
+            switch (layout)
+            {
+                case HandLayout.HorizontalFan:
+                {
+                    float rot = fanSpread * (i - (n - 1) / 2f);
+                    float x = Mathf.Lerp(cardSpacing, cardSpacing * 0.6f, density) * (i - (n - 1) / 2f);
+                    float norm = (2f * i / (n - 1) - 1f);
+                    float y = Mathf.Lerp(verticalSpacing, verticalSpacing * 0.5f, density) * (1 - norm * norm);
+
+                    t.localRotation = Quaternion.Euler(0, 0, rot);
+                    t.localPosition = new Vector3(x, y, 0);
+                    break;
+                }
+
+                case HandLayout.VerticalColumnRight:
+                {
+                    float y = Mathf.Lerp(vSpacing, vSpacing * 0.7f, density) * (i - (n - 1) / 2f);
+                    t.localRotation = Quaternion.Euler(0, 0, vTilt);
+                    t.localPosition = new Vector3(0f, y, 0f);
+                    break;
+                }
+
+                case HandLayout.VerticalArcRight:
+                default:
+                {
+                    // columna vertical con curvatura hacia la izquierda (X) y pequeño abanico
+                    float y = Mathf.Lerp(vArcSpacing, vArcSpacing * 0.7f, density) * (i - (n - 1) / 2f);
+                    float norm = (n == 1) ? 0f : (2f * i / (n - 1) - 1f); // -1..1
+                    float x = vArcCurveX * (1f - norm * norm);           // curva tipo U hacia adentro
+                    float rot = vArcTilt + vArcSpread * norm;            // ligero abanico
+
+                    t.localRotation = Quaternion.Euler(0, 0, rot);
+                    t.localPosition = new Vector3(-x, y, 0f);            // “-x” si tu mano está a la derecha
+                    break;
+                }
+            }
+        }
+    }
 }

@@ -298,9 +298,9 @@ GameObject:
   - component: {fileID: 6330923752476967383}
   - component: {fileID: 9013429051506301638}
   - component: {fileID: 3488870290350991941}
+  - component: {fileID: 8170453829368692706}
   - component: {fileID: 6604999619763055373}
-  - component: {fileID: 6322380459895633289}
-  - component: {fileID: 8468447503673387002}
+  - component: {fileID: 9171795699881079590}
   m_Layer: 0
   m_Name: CardImage
   m_TagString: Untagged
@@ -316,7 +316,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1266190538670822797}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0.261}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -355,7 +355,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 18612386, guid: fa4c48c7f1c93c54dae0fc9f94767b45, type: 3}
+  m_Sprite: {fileID: -282930965, guid: f74b72b9b4b093b40b3252dec080a0b9, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -409,9 +409,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6322380459895633289}
+      - m_Target: {fileID: 8170453829368692706}
         m_TargetAssemblyTypeName: CardSpawn, Assembly-CSharp
-        m_MethodName: OnUpgradeCardClicked
+        m_MethodName: OnBuildCardClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -421,6 +421,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &8170453829368692706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1266190538670822797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3e344e3b4abca3439c8fb469bc40b46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  worldPrefab: {fileID: 8556886630779580643, guid: 986c2700ddffc8549bdff66f157d1d98, type: 3}
+  upgradePrefab: {fileID: 0}
 --- !u!114 &6604999619763055373
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -436,21 +450,7 @@ MonoBehaviour:
   glowEffect: {fileID: 93311484869445677}
   selectScale: 1.1
   cardRoot: {fileID: 0}
---- !u!114 &6322380459895633289
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1266190538670822797}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3e344e3b4abca3439c8fb469bc40b46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  worldPrefab: {fileID: 0}
-  upgradePrefab: {fileID: 3081831070071417252, guid: 6a4d6d372741e9a4483ad2383473e739, type: 3}
---- !u!114 &8468447503673387002
+--- !u!114 &9171795699881079590
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -462,7 +462,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd179c74b50b4834e99823fe7abd2cf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  art: {fileID: 18612386, guid: fa4c48c7f1c93c54dae0fc9f94767b45, type: 3}
+  art: {fileID: -282930965, guid: f74b72b9b4b093b40b3252dec080a0b9, type: 3}
 --- !u!1 &2244250600938395605
 GameObject:
   m_ObjectHideFlags: 0
@@ -702,7 +702,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1999243526354956482}
   m_Layer: 0
-  m_Name: CardMRango
+  m_Name: CardTurret3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -734,7 +734,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3462309511785617931}
   - component: {fileID: 6116629825175762122}
-  - component: {fileID: 7255342154664954336}
   - component: {fileID: 939242307306004969}
   - component: {fileID: 8998809949744294099}
   - component: {fileID: 3637855550633995175}
@@ -790,29 +789,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!114 &7255342154664954336
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4699430610588353294}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
-  m_ReferencePixelsPerUnit: 256
-  m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
-  m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
-  m_PhysicalUnit: 3
-  m_FallbackScreenDPI: 96
-  m_DefaultSpriteDPI: 96
-  m_DynamicPixelsPerUnit: 128
-  m_PresetInfoIsWorld: 1
 --- !u!114 &939242307306004969
 MonoBehaviour:
   m_ObjectHideFlags: 0
