@@ -384,7 +384,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageBullet: 40
   range: 40
-  fireRate: 0.75
+  fireRate: 0.2
   turnSpeed: 10
   retarget: 0.25
   head: {fileID: 350719983671007961}

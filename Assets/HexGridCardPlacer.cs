@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -116,7 +117,13 @@ public class HexGridCardPlacer : MonoBehaviour
 
     void Update()
     {
-        UpdateHover();
+        if (GameManager.GetInstance().gameState == GameState.Pause)
+        {
+            return;
+
+        }
+
+            UpdateHover();
 
         // Touch
         foreach (var t in ETouch.activeTouches)

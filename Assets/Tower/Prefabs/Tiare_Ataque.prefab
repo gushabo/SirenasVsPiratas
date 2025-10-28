@@ -1624,7 +1624,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damageBullet: 15
-  range: 120
+  range: 90
   fireRate: 0.75
   turnSpeed: 10
   retarget: 0.25

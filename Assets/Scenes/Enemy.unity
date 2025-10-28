@@ -530,7 +530,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1476516103943564712, guid: 122917193ec45b44eb6fd760bc556dc3, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5278450603614238774, guid: 122917193ec45b44eb6fd760bc556dc3, type: 3}
       propertyPath: cam
@@ -2477,63 +2477,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7206082263525507296, guid: 615e98e52b317014481d3c991db702be, type: 3}
   m_PrefabInstance: {fileID: 1021290367}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1795233726
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 350719983671007961, guid: 49c81ce183bda1c4c8072e303eb9e0be, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 15.89
-      objectReference: {fileID: 0}
-    - target: {fileID: 350719983671007961, guid: 49c81ce183bda1c4c8072e303eb9e0be, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.07
-      objectReference: {fileID: 0}
-    - target: {fileID: 350719983671007961, guid: 49c81ce183bda1c4c8072e303eb9e0be, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -67.082
-      objectReference: {fileID: 0}
-    - target: {fileID: 350719983671007961, guid: 49c81ce183bda1c4c8072e303eb9e0be, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 350719983671007961, guid: 49c81ce183bda1c4c8072e303eb9e0be, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 350719983671007961, guid: 49c81ce183bda1c4c8072e303eb9e0be, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 350719983671007961, guid: 49c81ce183bda1c4c8072e303eb9e0be, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 350719983671007961, guid: 49c81ce183bda1c4c8072e303eb9e0be, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 350719983671007961, guid: 49c81ce183bda1c4c8072e303eb9e0be, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 350719983671007961, guid: 49c81ce183bda1c4c8072e303eb9e0be, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1551130347827937493, guid: 49c81ce183bda1c4c8072e303eb9e0be, type: 3}
-      propertyPath: m_Name
-      value: Golpe_Nuyu
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 49c81ce183bda1c4c8072e303eb9e0be, type: 3}
 --- !u!1001 &1949160351
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20927,5 +20870,4 @@ SceneRoots:
   - {fileID: 539176995}
   - {fileID: 3768526513950337253}
   - {fileID: 86103965}
-  - {fileID: 1795233726}
   - {fileID: 1949160351}
