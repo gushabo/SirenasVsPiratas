@@ -8,6 +8,9 @@ public class Health : MonoBehaviour
     public int health;
     public int maxHealth = 100;
     public bool isCoral;
+    public bool isDead;
+
+    [SerializeField] private ParticleSystem dieParticles;
     
     [SerializeField] public Slider healthSlider;
     [SerializeField] public GameObject sliderGO;
@@ -19,6 +22,7 @@ public class Health : MonoBehaviour
 
     void Start()
     {
+        isDead = false;
         if (healthSlider == null || sliderGO == null)
         {
             var slider = GetComponentInChildren<Slider>(true);
@@ -77,6 +81,7 @@ public class Health : MonoBehaviour
         healthSlider.value = health;
         if (health <= 0)
         {
+            isDead = true;
             health = 0;
             if (isCoral)
             {
@@ -91,9 +96,18 @@ public class Health : MonoBehaviour
 
     void Die()
     {
+        sliderGO.SetActive(false);
         // Se muere el enemigo y hace danio una vez
+        StartCoroutine(DieCorrutine());
+    }
+
+    public IEnumerator DieCorrutine()
+    {
         LevelManager.GetInstance().enemiesLeft--;
         LevelManager.GetInstance().CheckForEnemies();
+        dieParticles.Play();
+        body.SetActive(false);
+        yield return new WaitForSeconds(0.5f);
         Destroy(gameObject);
     }
     
