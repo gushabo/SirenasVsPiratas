@@ -70,34 +70,43 @@ public class Health : MonoBehaviour
     
     public void TakeDamage(int damage)
     {
+        if (isDead) return;
 
         if (!isCoral)
         {
             CallWait();
         }
-        
+
         health -= damage;
         sliderGO.SetActive(true);
         healthSlider.value = health;
+
         if (health <= 0)
         {
-            isDead = true;
             health = 0;
+
             if (isCoral)
             {
                 GameManager.GetInstance().Lose = true;
                 GameManager.GetInstance().ChangeGameState(GameState.Pause);
                 UiManager.GetInstance().TurnOffPausePanel();
             }
-            else if(!isCoral) Die();
+            else
+            {
+                Die();
+            }
         }
-        if(isCoral) UiManager.GetInstance().LifeText.text = "Health: " + health;
+
+        if (isCoral)
+            UiManager.GetInstance().LifeText.text = "Health: " + health;
     }
 
-    void Die()
+    public void Die()
     {
+        if (isDead) return;
+        isDead = true;
+        
         sliderGO.SetActive(false);
-        // Se muere el enemigo y hace danio una vez
         StartCoroutine(DieCorrutine());
     }
 
