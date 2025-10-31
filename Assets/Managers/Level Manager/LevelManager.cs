@@ -117,7 +117,9 @@ public class LevelManager : MonoBehaviour
     {
         if (gm.Lose) { gm.GameOver(); return; }
 
-        if (enemiesLeft == 0)
+        if (enemiesLeft > 0) return;
+        
+        if (enemiesLeft <= 0)
         {
             StartCoroutine(CambioDeRonda());
         }

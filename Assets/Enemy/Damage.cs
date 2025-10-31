@@ -10,10 +10,7 @@ public class Damage : MonoBehaviour
         if (other.gameObject.CompareTag("Coral"))
         {
             other.gameObject.GetComponent<Health>().TakeDamage(damage);
-            // hace danio 1 vez y luego se muere
-            LevelManager.GetInstance().enemiesLeft--;
-            LevelManager.GetInstance().CheckForEnemies();
-            Destroy(gameObject);
+            gameObject.GetComponent<Health>().Die();
         }
     }
 }
