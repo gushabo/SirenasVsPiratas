@@ -445,63 +445,6 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 1
---- !u!1001 &447605194
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4560905473579544653, guid: 986c2700ddffc8549bdff66f157d1d98, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -3.8496265
-      objectReference: {fileID: 0}
-    - target: {fileID: 4560905473579544653, guid: 986c2700ddffc8549bdff66f157d1d98, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 5.360525
-      objectReference: {fileID: 0}
-    - target: {fileID: 4560905473579544653, guid: 986c2700ddffc8549bdff66f157d1d98, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 20.45325
-      objectReference: {fileID: 0}
-    - target: {fileID: 4560905473579544653, guid: 986c2700ddffc8549bdff66f157d1d98, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7502456
-      objectReference: {fileID: 0}
-    - target: {fileID: 4560905473579544653, guid: 986c2700ddffc8549bdff66f157d1d98, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4560905473579544653, guid: 986c2700ddffc8549bdff66f157d1d98, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.6611594
-      objectReference: {fileID: 0}
-    - target: {fileID: 4560905473579544653, guid: 986c2700ddffc8549bdff66f157d1d98, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4560905473579544653, guid: 986c2700ddffc8549bdff66f157d1d98, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4560905473579544653, guid: 986c2700ddffc8549bdff66f157d1d98, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 82.777
-      objectReference: {fileID: 0}
-    - target: {fileID: 4560905473579544653, guid: 986c2700ddffc8549bdff66f157d1d98, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8556886630779580643, guid: 986c2700ddffc8549bdff66f157d1d98, type: 3}
-      propertyPath: m_Name
-      value: Tiare_Ataque
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 986c2700ddffc8549bdff66f157d1d98, type: 3}
 --- !u!4 &478705056 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 876171517473337727, guid: 615e98e52b317014481d3c991db702be, type: 3}
@@ -21176,4 +21119,3 @@ SceneRoots:
   - {fileID: 832575519}
   - {fileID: 158883941}
   - {fileID: 2202430375286124618}
-  - {fileID: 447605194}
