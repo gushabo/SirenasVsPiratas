@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -76,14 +75,44 @@ public class HexGridCardPlacer : MonoBehaviour
     private GameObject ghostInstance;
     private readonly List<Renderer> ghostRenderers = new();
 
+    private bool IsPlaying => GameManager.GetInstance() == null
+                              || GameManager.GetInstance().gameState == GameState.Play;
+
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
     }
 
-    void OnEnable() => EnhancedTouchSupport.Enable();
-    void OnDisable() => EnhancedTouchSupport.Disable();
+    void OnEnable()
+    {
+        EnhancedTouchSupport.Enable();
+        var gm = GameManager.GetInstance();
+        if (gm != null) gm.onChangeGameState += OnGameStateChanged;
+    }
+
+    void OnDisable()
+    {
+        EnhancedTouchSupport.Disable();
+        var gm = GameManager.GetInstance();
+        if (gm != null) gm.onChangeGameState -= OnGameStateChanged;
+    }
+
+    private void OnGameStateChanged(GameState state)
+    {
+        if (state != GameState.Play)
+        {
+            // Apaga hover y ghost inmediatamente
+            if (hexOutline) hexOutline.enabled = false;
+            hasHover = false;
+            ClearPending();
+            DestroyGhost();
+            // Si también quieres cancelar la carta seleccionada:
+            selected.prefab = null;
+            selected.isUpgrade = false;
+            selected.cardHL = null;
+        }
+    }
 
     void Start()
     {
@@ -106,8 +135,6 @@ public class HexGridCardPlacer : MonoBehaviour
             hexOutline.numCornerVertices = 2;
             hexOutline.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             hexOutline.receiveShadows = false;
-            // Si usas URP con sorting layers:
-            // hexOutline.sortingOrder = 32767;
         }
 
         // Mostrar al inicio SOLO si nunca se ha colocado una torre
@@ -117,13 +144,9 @@ public class HexGridCardPlacer : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.GetInstance().gameState == GameState.Pause)
-        {
-            return;
+        if (GameManager.GetInstance().gameState == GameState.Pause) return;
 
-        }
-
-            UpdateHover();
+        UpdateHover();
 
         // Touch
         foreach (var t in ETouch.activeTouches)
@@ -152,9 +175,10 @@ public class HexGridCardPlacer : MonoBehaviour
         selected.prefab = buildPrefab;
         selected.isUpgrade = false;
         selected.cardHL = fromCard;
-        selected.scale = buildPrefab.transform.localScale; // usa escala del prefab
+        selected.scale = buildPrefab.transform.localScale;
         ClearPending();
-        RebuildGhostIfNeeded();
+        DestroyGhost(); // *** No construimos ghost aún
+        // *** Esperamos a tener hover válido para crearlo y posicionarlo
     }
 
     public void SelectUpgrade(GameObject upgradePrefab, CardHighlight fromCard)
@@ -164,7 +188,7 @@ public class HexGridCardPlacer : MonoBehaviour
         selected.cardHL = fromCard;
         selected.scale = upgradePrefab.transform.localScale;
         ClearPending();
-        RebuildGhostIfNeeded();
+        DestroyGhost(); // *** No construimos ghost aún
     }
 
     public void ClearSelection()
@@ -175,7 +199,6 @@ public class HexGridCardPlacer : MonoBehaviour
         ClearPending();
         DestroyGhost();
 
-        // Apaga tutorial si el jugador cancela
         if (firstPlaceTutorialUI != null) firstPlaceTutorialUI.SetActive(false);
     }
 
@@ -206,8 +229,8 @@ public class HexGridCardPlacer : MonoBehaviour
         if (!hasPendingCell)
         {
             SetPending(axial, yGround);
-            EnsureGhostBuilt();
-            MoveGhostTo(axial, yGround);
+            EnsureGhostBuilt();             // *** se crea aquí si no existe
+            MoveGhostTo(axial, yGround);    // *** y se posiciona antes de activar
             SetGhostTint(ghostOK);
             return;
         }
@@ -260,7 +283,7 @@ public class HexGridCardPlacer : MonoBehaviour
             Vector3 spawnPos = HexGridFlat.AxialToWorld(axial, cellRadius, gridOrigin, yGround + buildYOffset);
 
             var go = Instantiate(selected.prefab, spawnPos, selected.prefab.transform.rotation);
-            go.transform.localScale = selected.prefab.transform.localScale; // respeta escala del prefab
+            go.transform.localScale = selected.prefab.transform.localScale;
             placedBuilds[axial] = go;
 
             if (PlayerPrefs.GetInt(PREF_FIRST_TOWER_PLACED, 0) == 0)
@@ -297,6 +320,7 @@ public class HexGridCardPlacer : MonoBehaviour
     // === Hover / Outline ===
     void UpdateHover()
     {
+        // Outline visible sólo si está activo y hay cámara
         if (!showHover || cam == null)
         {
             if (hexOutline) hexOutline.enabled = false;
@@ -309,17 +333,37 @@ public class HexGridCardPlacer : MonoBehaviour
         {
             if (hexOutline) hexOutline.enabled = false;
             hasHover = false;
+
+            // *** Si no hay punto válido de hover, ocultamos/ destruimos el ghost
+            DestroyGhost();
             return;
         }
 
         Vector3 worldPoint = gotHit ? hit.point : fallback;
         int layerForRules = gotHit ? hit.collider.gameObject.layer : 0;
-
         float yForDraw = useFixedBoardY ? boardY : worldPoint.y;
 
         Vector2Int axial = HexGridFlat.WorldToAxial(worldPoint, cellRadius, gridOrigin);
         hoveredAxial = axial;
         hasHover = true;
+
+        // *** Si hay una carta seleccionada, construimos/movemos el ghost durante el hover
+        if (selected.prefab != null)
+        {
+            bool isBomb = IsBombPrefab(selected.prefab);
+            bool onRoad = LayerInMask(layerForRules, roadLayerMask);
+            bool onWater = LayerInMask(layerForRules, waterLayerMask);
+            bool allowed = (isBomb && onRoad) || (!isBomb && onWater);
+
+            EnsureGhostBuilt();                          // *** crea ghost si no existe (aún inactivo)
+            MoveGhostTo(axial, yForDraw);                // *** lo posiciona y activa
+            SetGhostTint(allowed ? ghostOK : ghostBlocked);
+        }
+        else
+        {
+            // *** Sin selección, no mostramos ghost
+            DestroyGhost();
+        }
 
         if (hexOutline != null)
         {
@@ -400,12 +444,6 @@ public class HexGridCardPlacer : MonoBehaviour
     }
 
     // === Ghost helpers ===
-    void RebuildGhostIfNeeded()
-    {
-        DestroyGhost();
-        if (selected.prefab != null) EnsureGhostBuilt();
-    }
-
     void EnsureGhostBuilt()
     {
         if (ghostInstance != null) return;
@@ -415,7 +453,10 @@ public class HexGridCardPlacer : MonoBehaviour
         ghostInstance.name = selected.prefab.name + "_GHOST";
         ghostInstance.layer = LayerMask.NameToLayer("Ignore Raycast");
 
-        // Escala del prefab (p.ej. 13)
+        // *** NACE DESACTIVADO para que no “flashee” en una posición basura
+        ghostInstance.SetActive(false);
+
+        // Escala del prefab
         ghostInstance.transform.localScale = selected.scale;
 
         // Desactivar lógica/sensores del prefab
@@ -463,7 +504,10 @@ public class HexGridCardPlacer : MonoBehaviour
         float y = useFixedBoardY ? boardY : yGround;
         Vector3 p = HexGridFlat.AxialToWorld(axial, cellRadius, gridOrigin, y + buildYOffset);
         ghostInstance.transform.SetPositionAndRotation(p, Quaternion.identity);
-        ghostInstance.transform.localScale = selected.scale; // mantener escala
+        ghostInstance.transform.localScale = selected.scale;
+
+        // *** Activar solo después de posicionar
+        if (!ghostInstance.activeSelf) ghostInstance.SetActive(true);
     }
 
     void SetGhostTint(Color c)
@@ -502,4 +546,3 @@ public class HexGridCardPlacer : MonoBehaviour
         return n == bombCardId || n.Contains(bombCardId);
     }
 }
-

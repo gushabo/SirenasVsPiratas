@@ -433,7 +433,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3e344e3b4abca3439c8fb469bc40b46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worldPrefab: {fileID: 940426379423101407, guid: f65d7a8fe61830046b4d8c43a177c31e, type: 3}
+  worldPrefab: {fileID: 1551130347827937493, guid: 49c81ce183bda1c4c8072e303eb9e0be, type: 3}
   upgradePrefab: {fileID: 0}
 --- !u!114 &6604999619763055373
 MonoBehaviour:

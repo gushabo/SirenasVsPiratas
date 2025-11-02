@@ -38,6 +38,9 @@ public class DraftPicker : MonoBehaviour
     private readonly List<DraftSelectableUI> _choices = new();
     private int _selectedCount;
 
+    // ===== Reroll 1 vez por sesión =====
+    private bool _rerollUsed = false;
+
     void Awake()
     {
         if (confirmButton) confirmButton.onClick.AddListener(ConfirmSelection);
@@ -49,6 +52,14 @@ public class DraftPicker : MonoBehaviour
 
     public void StartDraft()
     {
+        // ¿La UI estaba cerrada? Si sí, viene un draft "nuevo" → resetear flag
+        bool openingNow = !IsOpen();
+        if (openingNow)
+        {
+            ResetDraftSession();                  // _rerollUsed = false
+            SetRerollButtonState(true);           // prende el botón visualmente
+        }
+
         pausaGO.SetActive(false);
         salirGO.SetActive(false);
         if (!deckManager || !handManager || !draftContainer || !cardChoicePrefab) return;
@@ -63,11 +74,12 @@ public class DraftPicker : MonoBehaviour
         foreach (var prefabReal in sample)
             _choices.Add(CreateDraftCardUI(prefabReal));
 
-        RefreshButtons();
+        RefreshButtons();                         // respeta _rerollUsed para interactable
 
         var rt = draftContainer as RectTransform;
         if (rt) LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
     }
+
 
     private DraftSelectableUI CreateDraftCardUI(GameObject prefabReal)
     {
@@ -111,7 +123,6 @@ public class DraftPicker : MonoBehaviour
         ui.Init(this, prefabReal, art);
 
         // === Escalar también el hijo "Art" ===
-        // === Escalar también el hijo "Art" ===
         var artRT = uiGO.transform.Find("Art")?.GetComponent<RectTransform>();
         if (artRT != null)
         {
@@ -131,10 +142,6 @@ public class DraftPicker : MonoBehaviour
             artImg.type = Image.Type.Simple;
             artImg.preserveAspect = false; // se estira exacto al tamaño del padre
         }
-
-
-// 
-       
 
         return ui;
     }
@@ -184,13 +191,33 @@ public class DraftPicker : MonoBehaviour
         void Handler() { done = true; OnConfirmed -= Handler; }
 
         OnConfirmed += Handler;
+
+        ResetDraftSession();   // <- resetea el derecho a 1 reroll por sesión
         StartDraft();
 
         while (!done)
             yield return null;
     }
 
-    private void Reroll() => StartDraft();
+    // ====== Reroll (solo 1 vez) ======
+    private void Reroll()
+    {
+        if (_rerollUsed) return;
+
+        _rerollUsed = true;
+
+     
+        SetRerollButtonState(false);
+
+        StartDraft();     
+      
+    }
+
+
+    private void ResetDraftSession()
+    {
+        _rerollUsed = false;
+    }
 
     // === Helpers UI ===
     private void ShowDraftUI()
@@ -228,11 +255,27 @@ public class DraftPicker : MonoBehaviour
     private void RefreshButtons()
     {
         if (confirmButton) confirmButton.interactable = (_selectedCount == picksAllowed);
-        if (rerollButton) rerollButton.interactable = true;
+        if (rerollButton) rerollButton.interactable = !_rerollUsed; // habilitado solo si no se usó
     }
 
     private void UpdateCounter()
     {
         if (counterText) counterText.text = $"{_selectedCount}/{picksAllowed}";
     }
+    
+    
+    private void SetRerollButtonState(bool enabled)
+    {
+        if (!rerollButton) return;
+
+        rerollButton.interactable = enabled;
+
+        // (Opcional) feedback visual
+        var txt = rerollButton.GetComponentInChildren<TextMeshProUGUI>();
+        if (txt) txt.text = enabled ? "Reroll" : "Reroll usado";
+
+      
+       
+    }
+
 }
