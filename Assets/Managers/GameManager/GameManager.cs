@@ -74,6 +74,7 @@ public class GameManager : MonoBehaviour
         if (newGameState == GameState.Play)
         {
             UiManager.GetInstance().pausePanel.SetActive(false);
+            
         }
         else if (newGameState == GameState.Pause)
         {
