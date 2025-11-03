@@ -1,16 +1,33 @@
-// UpgradeModule.cs
 using UnityEngine;
 
 [DisallowMultipleComponent]
 public class UpgradeModule : MonoBehaviour
 {
-    public TowerUpgradable.TypeUpgrade type = TowerUpgradable.TypeUpgrade.Damage;
+    public enum TypeUpgrade { Damage, FireRate, Range }
 
-    [Header("Valores de mejora")]
-    public float amount = 10f;         // +daño, +rango, +fireRate (según tipo)
-    public bool stackable = true;      // ¿Se puede aplicar varias veces?
-    public int maxStacks = 3;          // tope de acumulación (si aplica)
+    [Header("Tipo y magnitud")]
+    public TypeUpgrade type = TypeUpgrade.Damage;
+    public float amount = 1f;
 
-    [Header("Visual")]
-    public GameObject cosmeticChild;   // opcional: si quieres un modelo/adorno
+    [Header("Stacking")]
+    public bool stackable = true;
+    [Min(0)] public int maxStacks = 0; // 0 = sin tope
+
+    [Header("Adorno visual opcional (queda colgado)")]
+    public GameObject cosmeticChild;
+
+    [Header("VFX al aplicar (PERSISTENTE)")]
+    public GameObject vfxOnApply;
+    public bool vfxFollowTarget = true;
+
+    [Header("Ajustes de posiciÃ³n/orientaciÃ³n (Locales al mountPoint)")]
+    public Vector3 vfxLocalOffset = Vector3.zero;
+    public Vector3 vfxLocalEuler = Vector3.zero;
+   
+    public bool useAnchorRotation = true;
+
+    [Header("Forzar persistencia de ParticleSystem")]
+    public bool forceLoop = true;          // pone PS.main.loop = true
+    public bool clearOnPlay = true;        // PS.Clear() antes de Play
+    public bool disableStopAction = true;  // PS.main.stopAction = None (evita Destroy)
 }

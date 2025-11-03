@@ -27,7 +27,7 @@ public class EnemyMovement : MonoBehaviour
 
     private void Update()
     {
-
+        if(gameObject.GetComponent<Health>().isDead) return;
         if (currentTarget >= targets.Count || isPaused) return;
         Vector3 destination = targets[currentTarget].position;
         

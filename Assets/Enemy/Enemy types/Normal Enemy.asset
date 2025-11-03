@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 100
   damage: 10
-  speed: 12
+  speed: 30
   image: {fileID: 2067363807, guid: 2fbaf44152dd48047b1c709712809713, type: 3}

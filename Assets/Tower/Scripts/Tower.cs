@@ -54,6 +54,7 @@ public class Tower : MonoBehaviour
         // Si ya pasó el tiempo del fireRate, ataca
         if (fireCooldown <= 0f)
         {
+            print("atacando");
             anim.SetTrigger("Attack"); // la animación ejecutará el Event "Shoot"
             StartCoroutine(AttackCooldown());
         }

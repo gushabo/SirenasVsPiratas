@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -13,18 +14,16 @@ public class HexGridCardPlacer : MonoBehaviour
     // ===== Tutorial (primera vez) =====
     [Header("Tutorial (primera vez)")]
     public GameObject firstPlaceTutorialUI;
-    public bool startRoundOnFirstPlacement = true;
+    [Tooltip("Este flag ya no arranca la ronda; la ronda inicia al terminar el tutorial.")]
+    public bool startRoundOnFirstPlacement = false; // <- mantenlo en false
     private const string PREF_FIRST_TOWER_PLACED = "first_tower_placed";
 
     [Header("Referencias")]
     public Camera cam;
 
     [Header("Tablero / Layer de celdas")]
-    [Tooltip("Capa(s) que representan el tablero/celdas jugables. Ej: Road | Water.")]
-    public LayerMask boardMask;               // solo tablero
-    [Tooltip("Si es true, el hover/ghost usan una altura fija del tablero (independiente de coliders).")]
+    public LayerMask boardMask;
     public bool useFixedBoardY = true;
-    [Tooltip("Altura del tablero si usas Y fija.")]
     public float boardY = 0f;
 
     [Header("Grid Hex Flat-Top")]
@@ -45,7 +44,6 @@ public class HexGridCardPlacer : MonoBehaviour
     public Color pendingColor = new Color(0.2f, 0.8f, 1f, 1f);
 
     [Header("Ghost Preview 3D")]
-    [Tooltip("Material semitransparente para el ghost (debe tener color).")]
     public Material ghostMaterial;
     public Color ghostOK = new Color(0.2f, 1f, 0.6f, 0.5f);
     public Color ghostBlocked = new Color(1f, 0.3f, 0.3f, 0.5f);
@@ -55,11 +53,10 @@ public class HexGridCardPlacer : MonoBehaviour
         public GameObject prefab;
         public bool isUpgrade;
         public CardHighlight cardHL;
-        public Vector3 scale; // escala del prefab (p.ej. 13,13,13)
+        public Vector3 scale;
     }
 
     private Selected selected;
-
     private readonly Dictionary<Vector2Int, GameObject> placedBuilds = new();
 
     // Hover runtime
@@ -75,14 +72,43 @@ public class HexGridCardPlacer : MonoBehaviour
     private GameObject ghostInstance;
     private readonly List<Renderer> ghostRenderers = new();
 
+    private bool IsPlaying => GameManager.GetInstance() == null
+                              || GameManager.GetInstance().gameState == GameState.Play;
+
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
     }
 
-    void OnEnable() => EnhancedTouchSupport.Enable();
-    void OnDisable() => EnhancedTouchSupport.Disable();
+    void OnEnable()
+    {
+        EnhancedTouchSupport.Enable();
+        var gm = GameManager.GetInstance();
+        if (gm != null) gm.onChangeGameState += OnGameStateChanged;
+    }
+
+    void OnDisable()
+    {
+        EnhancedTouchSupport.Disable();
+        var gm = GameManager.GetInstance();
+        if (gm != null) gm.onChangeGameState -= OnGameStateChanged;
+    }
+
+    private void OnGameStateChanged(GameState state)
+    {
+        if (state != GameState.Play)
+        {
+            if (hexOutline) hexOutline.enabled = false;
+            hasHover = false;
+            ClearPending();
+            DestroyGhost();
+
+            selected.prefab = null;
+            selected.isUpgrade = false;
+            selected.cardHL = null;
+        }
+    }
 
     void Start()
     {
@@ -100,22 +126,22 @@ public class HexGridCardPlacer : MonoBehaviour
             hexOutline.material = new Material(Shader.Find("Sprites/Default"));
             hexOutline.enabled = false;
 
-            // Más estable visualmente en ángulos oblicuos
             hexOutline.alignment = LineAlignment.View;
             hexOutline.numCornerVertices = 2;
             hexOutline.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             hexOutline.receiveShadows = false;
-            // Si usas URP con sorting layers:
-            // hexOutline.sortingOrder = 32767;
         }
 
-        // Mostrar al inicio SOLO si nunca se ha colocado una torre
+        // Si el tutorial ya fue completado en sesiones anteriores, puedes ocultar cualquier UI de "primer paso"
         bool placedOnce = PlayerPrefs.GetInt(PREF_FIRST_TOWER_PLACED, 0) == 1;
-        if (firstPlaceTutorialUI != null) firstPlaceTutorialUI.SetActive(!placedOnce);
+        if (firstPlaceTutorialUI != null)
+            firstPlaceTutorialUI.SetActive(!TutorialProgress.IsCompleted() && !placedOnce);
     }
 
     void Update()
     {
+        if (!IsPlaying) return;
+
         UpdateHover();
 
         // Touch
@@ -145,9 +171,9 @@ public class HexGridCardPlacer : MonoBehaviour
         selected.prefab = buildPrefab;
         selected.isUpgrade = false;
         selected.cardHL = fromCard;
-        selected.scale = buildPrefab.transform.localScale; // usa escala del prefab
+        selected.scale = buildPrefab.transform.localScale;
         ClearPending();
-        RebuildGhostIfNeeded();
+        DestroyGhost();
     }
 
     public void SelectUpgrade(GameObject upgradePrefab, CardHighlight fromCard)
@@ -157,7 +183,7 @@ public class HexGridCardPlacer : MonoBehaviour
         selected.cardHL = fromCard;
         selected.scale = upgradePrefab.transform.localScale;
         ClearPending();
-        RebuildGhostIfNeeded();
+        DestroyGhost();
     }
 
     public void ClearSelection()
@@ -168,7 +194,6 @@ public class HexGridCardPlacer : MonoBehaviour
         ClearPending();
         DestroyGhost();
 
-        // Apaga tutorial si el jugador cancela
         if (firstPlaceTutorialUI != null) firstPlaceTutorialUI.SetActive(false);
     }
 
@@ -231,6 +256,9 @@ public class HexGridCardPlacer : MonoBehaviour
                 {
                     upg.ApplyUpgrade(selected.prefab);
                     AfterSuccessfulUse();
+
+                    // Progreso tutorial (mejora)
+                    TutorialProgress.Increment(BuildKind.Upgrade);
                 }
                 else
                 {
@@ -253,21 +281,19 @@ public class HexGridCardPlacer : MonoBehaviour
             Vector3 spawnPos = HexGridFlat.AxialToWorld(axial, cellRadius, gridOrigin, yGround + buildYOffset);
 
             var go = Instantiate(selected.prefab, spawnPos, selected.prefab.transform.rotation);
-            go.transform.localScale = selected.prefab.transform.localScale; // respeta escala del prefab
+            go.transform.localScale = selected.prefab.transform.localScale;
             placedBuilds[axial] = go;
 
+            // Progreso tutorial (torre o mina)
+            BuildKind kindToReport = IsBombPrefab(selected.prefab) ? BuildKind.Mine : BuildKind.Tower;
+            TutorialProgress.Increment(kindToReport);
+
+            // Guardar "primera torre" si lo usas para UI, PERO YA NO INICIA LA RONDA
             if (PlayerPrefs.GetInt(PREF_FIRST_TOWER_PLACED, 0) == 0)
             {
                 PlayerPrefs.SetInt(PREF_FIRST_TOWER_PLACED, 1);
                 PlayerPrefs.Save();
                 if (firstPlaceTutorialUI) firstPlaceTutorialUI.SetActive(false);
-
-                if (startRoundOnFirstPlacement)
-                {
-                    var lm = LevelManager.GetInstance();
-                    if (lm != null) lm.StartRound();
-                    else Debug.LogWarning("[HexGridCardPlacer] No encontré LevelManager para iniciar la ronda.");
-                }
             }
 
             AfterSuccessfulUse();
@@ -302,17 +328,33 @@ public class HexGridCardPlacer : MonoBehaviour
         {
             if (hexOutline) hexOutline.enabled = false;
             hasHover = false;
+            DestroyGhost();
             return;
         }
 
         Vector3 worldPoint = gotHit ? hit.point : fallback;
         int layerForRules = gotHit ? hit.collider.gameObject.layer : 0;
-
         float yForDraw = useFixedBoardY ? boardY : worldPoint.y;
 
         Vector2Int axial = HexGridFlat.WorldToAxial(worldPoint, cellRadius, gridOrigin);
         hoveredAxial = axial;
         hasHover = true;
+
+        if (selected.prefab != null)
+        {
+            bool isBomb = IsBombPrefab(selected.prefab);
+            bool onRoad = LayerInMask(layerForRules, roadLayerMask);
+            bool onWater = LayerInMask(layerForRules, waterLayerMask);
+            bool allowed = (isBomb && onRoad) || (!isBomb && onWater);
+
+            EnsureGhostBuilt();
+            MoveGhostTo(axial, yForDraw);
+            SetGhostTint(allowed ? ghostOK : ghostBlocked);
+        }
+        else
+        {
+            DestroyGhost();
+        }
 
         if (hexOutline != null)
         {
@@ -340,7 +382,6 @@ public class HexGridCardPlacer : MonoBehaviour
         }
     }
 
-    // === Ray desde cámara -> tablero (layer) o plano a boardY ===
     bool PointerToBoard(out RaycastHit hit, out Vector3 fallbackPoint)
     {
         hit = default;
@@ -358,60 +399,43 @@ public class HexGridCardPlacer : MonoBehaviour
 
         var ray = cam.ScreenPointToRay(sp);
 
-        // 1) Intentar con colisionadores del tablero
         if (Physics.Raycast(ray, out hit, 5000f, boardMask))
             return true;
 
-        // 2) Fallback: intersección con plano horizontal a boardY
         if (useFixedBoardY)
         {
             var plane = new Plane(Vector3.up, new Vector3(0f, boardY, 0f));
             if (plane.Raycast(ray, out float dist))
             {
                 fallbackPoint = ray.origin + ray.direction * dist;
-                return false; // sin collider, pero tenemos un punto válido
+                return false;
             }
         }
 
         return false;
     }
 
-    // === Pending helpers ===
     void SetPending(Vector2Int axial, float yGround)
     {
         pendingAxial = axial;
         pendingY = yGround;
         hasPendingCell = true;
 
-        // Oculta tutorial al primer clic de fijado
         if (firstPlaceTutorialUI != null) firstPlaceTutorialUI.SetActive(false);
     }
 
-    void ClearPending()
-    {
-        hasPendingCell = false;
-    }
-
-    // === Ghost helpers ===
-    void RebuildGhostIfNeeded()
-    {
-        DestroyGhost();
-        if (selected.prefab != null) EnsureGhostBuilt();
-    }
+    void ClearPending() => hasPendingCell = false;
 
     void EnsureGhostBuilt()
     {
-        if (ghostInstance != null) return;
-        if (selected.prefab == null) return;
+        if (ghostInstance != null || selected.prefab == null) return;
 
         ghostInstance = Instantiate(selected.prefab);
         ghostInstance.name = selected.prefab.name + "_GHOST";
         ghostInstance.layer = LayerMask.NameToLayer("Ignore Raycast");
-
-        // Escala del prefab (p.ej. 13)
+        ghostInstance.SetActive(false);
         ghostInstance.transform.localScale = selected.scale;
 
-        // Desactivar lógica/sensores del prefab
         foreach (var b in ghostInstance.GetComponentsInChildren<Behaviour>(true))
         {
             if (b is Renderer) continue;
@@ -423,7 +447,6 @@ public class HexGridCardPlacer : MonoBehaviour
         var rb = ghostInstance.GetComponentInChildren<Rigidbody>(true);
         if (rb) { rb.isKinematic = true; rb.detectCollisions = false; }
 
-        // Material fantasma
         ghostRenderers.Clear();
         var rends = ghostInstance.GetComponentsInChildren<Renderer>(true);
         foreach (var r in rends)
@@ -436,7 +459,6 @@ public class HexGridCardPlacer : MonoBehaviour
                 r.sharedMaterials = mats;
             }
         }
-
         SetGhostTint(ghostOK);
     }
 
@@ -456,22 +478,19 @@ public class HexGridCardPlacer : MonoBehaviour
         float y = useFixedBoardY ? boardY : yGround;
         Vector3 p = HexGridFlat.AxialToWorld(axial, cellRadius, gridOrigin, y + buildYOffset);
         ghostInstance.transform.SetPositionAndRotation(p, Quaternion.identity);
-        ghostInstance.transform.localScale = selected.scale; // mantener escala
+        ghostInstance.transform.localScale = selected.scale;
+
+        if (!ghostInstance.activeSelf) ghostInstance.SetActive(true);
     }
 
     void SetGhostTint(Color c)
     {
         if (ghostRenderers.Count == 0) return;
         foreach (var r in ghostRenderers)
-        {
             foreach (var m in r.materials)
-            {
                 if (m.HasProperty("_Color")) m.color = c;
-            }
-        }
     }
 
-    // === Utilidades ===
     bool IsPointerOverUI(Vector2 screenPos, int pointerId = -1)
     {
         if (EventSystem.current == null) return false;
@@ -483,16 +502,14 @@ public class HexGridCardPlacer : MonoBehaviour
         return results.Count > 0;
     }
 
-    static bool LayerInMask(int layer, LayerMask mask)
-        => (mask.value & (1 << layer)) != 0;
+    static bool LayerInMask(int layer, LayerMask mask) => (mask.value & (1 << layer)) != 0;
 
     bool IsBombPrefab(GameObject p)
     {
         if (p == null) return false;
         if (p.CompareTag("Bomb")) return true;
         string n = p.name;
-        if (n.EndsWith("(Clone)")) n = n.Substring(0, n.Length - "(Clone)".Length);
+        if (n.EndsWith("(Clone)")) n = n[..^7];
         return n == bombCardId || n.Contains(bombCardId);
     }
 }
-

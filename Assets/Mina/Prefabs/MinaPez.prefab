@@ -107,7 +107,7 @@ MonoBehaviour:
   triggerDelay: 0.5
   radius: 10
   damage: 20
-  vfxPrefab: {fileID: 1022215825983436762, guid: 28dc6e0cee94ec248a93d3f344a942ef, type: 3}
+  vfxPrefab: {fileID: 6163327480264920630, guid: e0a7b33298e0df14f921ed9161570f0e, type: 3}
 --- !u!135 &4965629872837546042
 SphereCollider:
   m_ObjectHideFlags: 0
