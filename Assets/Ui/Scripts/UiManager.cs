@@ -53,6 +53,9 @@ public class UiManager : MonoBehaviour
     [SerializeField] public TextMeshProUGUI countDownText;
     [SerializeField] public GameObject changeLvlButton;
     
+    [Header("Cosas Cartas")]
+    [SerializeField] public GameObject CardCanvasSystem;
+    
     [Header("Aviso Rondas")]
     [SerializeField] public TextMeshProUGUI roundsText;
     

@@ -23,7 +23,7 @@ public class UpgradeModule : MonoBehaviour
     [Header("Ajustes de posición/orientación (Locales al mountPoint)")]
     public Vector3 vfxLocalOffset = Vector3.zero;
     public Vector3 vfxLocalEuler = Vector3.zero;
-    public Vector3 vfxLocalScale = Vector3.one;
+   
     public bool useAnchorRotation = true;
 
     [Header("Forzar persistencia de ParticleSystem")]

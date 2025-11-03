@@ -66,7 +66,7 @@ public class TowerUpgradable : MonoBehaviour
             var visual = Instantiate(data.cosmeticChild, anchor);
             visual.transform.localPosition = Vector3.zero;
             visual.transform.localRotation = Quaternion.identity;
-            visual.transform.localScale = Vector3.one;
+          
         }
 
         // 2) Stats
@@ -82,7 +82,7 @@ public class TowerUpgradable : MonoBehaviour
             vfx.transform.SetParent(anchor, worldPositionStays: false);
             vfx.transform.localPosition = Vector3.zero;
             vfx.transform.localRotation = Quaternion.identity;
-            vfx.transform.localScale   = Vector3.one;
+          
 
             PlayVfxPersistent(vfx, data);      // reproduce en loop / sin stopAction
             _persistentVfx.Add(vfx);           // guarda referencia por si luego quieres limpiarlo
