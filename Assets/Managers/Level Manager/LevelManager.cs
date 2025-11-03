@@ -30,17 +30,17 @@ public class LevelManager : MonoBehaviour
         if (gm != null) gm.onChangeGameState -= OnChangeGameStateCallback;
 
         // Por si nos suscribimos en algún flujo/evento del placer en otro momento:
-        // (no hace daño si no existe)
         var placer = HexGridCardPlacer.Instance;
         if (placer != null)
         {
-            // Si tu versión del placer expone un evento, aquí lo desuscribes.
+            // Ejemplo si en el futuro expones eventos
             // placer.OnFirstTowerPlaced -= HandleFirstTowerPlaced_StartRound;
         }
     }
     #endregion
     // ------ Fin del singleton  ---------
 
+    // Mantengo la key por si la usas en alguna UI, PERO YA NO se usa para arrancar la ronda.
     private const string PREF_FIRST_TOWER_PLACED = "first_tower_placed"; // 0 = nunca; 1 = ya colocó alguna vez
 
     [Header("Draft")]
@@ -51,6 +51,10 @@ public class LevelManager : MonoBehaviour
 
     [Header("Delays (segundos)")]
     [SerializeField] private float delayBetweenRounds = 2f;
+
+    [Header("Tutorial Gate")]
+    [Tooltip("Si está activo, la ronda NO inicia hasta que el tutorial esté completado.")]
+    public bool respectTutorialGate = true;
 
     // Lista bidimensional para guardar rondas y niveles
     private readonly List<List<EnemySpawner>> levelsEnemySpawner = new();
@@ -86,14 +90,28 @@ public class LevelManager : MonoBehaviour
         // Leer el nivel elegido desde el menú (1-based)
         int selected = PlayerPrefs.GetInt("selectedLevelToPlay", 1);
 
-        // Construir los niveles y fijar índices (sin iniciar la ronda todavía)
-        StartFromLevel(selected);   // <-- ya no llama StartRound por dentro
+        // Construir la estructura (rondas quedan desactivadas por BuildLevels)
+        StartFromLevel(selected);   // <-- NO llama StartRound
 
-        bool alreadyPlacedOnce = PlayerPrefs.GetInt(PREF_FIRST_TOWER_PLACED, 0) == 1;
-
-        if (alreadyPlacedOnce)
+        // ===== COMPUERTA DEL TUTORIAL =====
+        // Si respetamos la compuerta y el tutorial NO está completado, NO arrancamos ronda.
+        // Cuando el tutorial termine, tu TutorialObjectSequence llamará StartRound().
+        if (respectTutorialGate)
         {
-            // Jugador ya colocó alguna torreta en la vida del juego → arranca normal
+            if (TutorialProgress.IsCompleted())
+            {
+                StartRound(); // tutorial ya estaba completado: arranca normal
+            }
+            else
+            {
+                // Asegúrate de que todo sigue apagado (BuildLevels ya hace SetActive(false) por ronda)
+                // Si en tu proyecto hay otros spawners externos, apágalos aquí.
+                // (No es necesario hacer nada si todo depende de levelsGO/rondas)
+            }
+        }
+        else
+        {
+            // Si ignoras la compuerta, arrancas como antes.
             StartRound();
         }
     }
@@ -103,7 +121,7 @@ public class LevelManager : MonoBehaviour
         isPaused = newState != GameState.Play;
     }
 
-    // Llama esto para activar la ronda actual (nivelIndex/roundIndex)
+    // Llama esto para activar la ronda actual (levelIndex/roundIndex)
     public void StartRound()
     {
         if (levelIndex < 0 || levelIndex >= levelsGO.Count) { Debug.LogError("levelIndex fuera de rango"); return; }
@@ -118,7 +136,7 @@ public class LevelManager : MonoBehaviour
         if (gm.Lose) { gm.GameOver(); return; }
 
         if (enemiesLeft > 0) return;
-        
+
         if (enemiesLeft <= 0)
         {
             StartCoroutine(CambioDeRonda());
@@ -129,9 +147,9 @@ public class LevelManager : MonoBehaviour
     {
         //UiManager.GetInstance().CambioDeRonda(roundIndex);
         if (draftPicker != null)
-            if(levelIndex < maxLevels && roundIndex != 2)
+            if (levelIndex < maxLevels && roundIndex != 2)
                 yield return draftPicker.ShowAndWait();
-        
+
         float counter = 0f;
         while (counter < delayBetweenRounds)
         {
@@ -157,7 +175,7 @@ public class LevelManager : MonoBehaviour
             else
             {
                 UiManager.GetInstance().CambiarDeNivel();
-                // Aquí podrías llamar StartRound() si quieres iniciar de inmediato la primera ronda del siguiente nivel
+                // Si quieres iniciar de inmediato la primera ronda del siguiente nivel:
                 // StartRound();
             }
         }
@@ -197,7 +215,7 @@ public class LevelManager : MonoBehaviour
                 // Filtrado de items con el componente del spawner
                 if (!go.TryGetComponent<EnemySpawner>(out var sp)) continue;
 
-                go.SetActive(false);
+                go.SetActive(false); // 🔒 Importante: empiezan apagados
 
                 spawnerList.Add(sp);
                 goList.Add(go);
@@ -272,7 +290,8 @@ public class LevelManager : MonoBehaviour
 
         roundIndex = 0;
     }
-    
+
+    // Queda por si en el futuro quieres enganchar eventos
     private void HandleFirstTowerPlaced_StartRound()
     {
         StartRound();
