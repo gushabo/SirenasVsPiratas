@@ -8,9 +8,11 @@ public class EnemyMovement : MonoBehaviour
     public float speed;
     public float turnSpeed = 10f;
     public bool isPaused = false;
+    public Animator anim;
     
     private void Start()
     {
+        anim = GetComponent<Animator>();
         GameManager.GetInstance().onChangeGameState += OnChangeGameStateCallback;
         if(GameManager.GetInstance().gameState == GameState.Pause) isPaused = true;
         currentTarget = 0;
@@ -27,8 +29,13 @@ public class EnemyMovement : MonoBehaviour
 
     private void Update()
     {
-        if(gameObject.GetComponent<Health>().isDead) return;
-        if (currentTarget >= targets.Count || isPaused) return;
+        if (gameObject.GetComponent<Health>().isDead) return;
+        if (currentTarget >= targets.Count || isPaused)
+        {
+            anim.speed = 0;
+            return;
+        }
+        anim.speed = 1;
         Vector3 destination = targets[currentTarget].position;
         
         // Rotacion
