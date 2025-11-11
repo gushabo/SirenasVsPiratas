@@ -682,7 +682,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2251380624063858117, guid: 6e3072a768ddf674ebff91e3d2fc920d, type: 3}
   m_PrefabInstance: {fileID: 955327153}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1003871134}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a8a29a4caa28a5a4687e8cd6167aebe4, type: 3}
@@ -1178,11 +1178,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1003871134 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 955250617697137889, guid: 6e3072a768ddf674ebff91e3d2fc920d, type: 3}
-  m_PrefabInstance: {fileID: 955327153}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1007209347
 GameObject:
   m_ObjectHideFlags: 0
@@ -7438,11 +7433,11 @@ MonoBehaviour:
   rerollButton: {fileID: 8340808770194684828}
   overlayPanel: {fileID: 1450000756643203685}
   counterText: {fileID: 1636885255141985853}
-  choicesCount: 5
-  picksAllowed: 3
+  choicesCount: 3
+  picksAllowed: 1
   allowDuplicates: 0
   cardSize: {x: 370, y: 750}
-  artPadding: 0
+  artPadding: 20
   pausaGO: {fileID: 5578706154828997597}
   salirGO: {fileID: 8818696458858730992}
 --- !u!33 &1699453284415905311
@@ -10099,6 +10094,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff3e1dc0adcaa1645a6754e1d3b3da86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  deckManager: {fileID: 3139735670317156736}
+  handManager: {fileID: 903151971147493897}
   mode: 0
   customKind: 0
   customCount: 1
@@ -13251,6 +13248,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff3e1dc0adcaa1645a6754e1d3b3da86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  deckManager: {fileID: 3139735670317156736}
+  handManager: {fileID: 903151971147493897}
   mode: 0
   customKind: 0
   customCount: 1
@@ -17120,6 +17119,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff3e1dc0adcaa1645a6754e1d3b3da86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  deckManager: {fileID: 3139735670317156736}
+  handManager: {fileID: 903151971147493897}
   mode: 2
   customKind: 1
   customCount: 1
@@ -17401,6 +17402,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff3e1dc0adcaa1645a6754e1d3b3da86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  deckManager: {fileID: 3139735670317156736}
+  handManager: {fileID: 903151971147493897}
   mode: 3
   customKind: 2
   customCount: 1
@@ -18614,6 +18617,34 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 589308490}
+    - target: {fileID: 4049211106761904262, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4049211106761904262, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4049211106761904262, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 589308490}
+    - target: {fileID: 4049211106761904262, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4049211106761904262, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ChangeMainScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 4049211106761904262, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: GameManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4049211106761904262, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 4229378427048477789, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.8268809
@@ -18665,7 +18696,19 @@ PrefabInstance:
     - target: {fileID: 6969687766916794929, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1003871134}
+      objectReference: {fileID: 589308490}
+    - target: {fileID: 6969687766916794929, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ChangeMainScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 6969687766916794929, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: GameManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 6969687766916794929, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -19760,7 +19803,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 20
+  m_Spacing: 80
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -21145,14 +21188,14 @@ RectTransform:
   m_GameObject: {fileID: 8754303917973746734}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.66232175, y: 0.4093903, z: 0.36352003}
+  m_LocalScale: {x: 0.9, y: 0.55, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5991871243256260413}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -14.8533325, y: -39}
+  m_AnchoredPosition: {x: -14.8533325, y: -14}
   m_SizeDelta: {x: 76.88306, y: 629.27344}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &7766277560854775940
@@ -22676,6 +22719,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff3e1dc0adcaa1645a6754e1d3b3da86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  deckManager: {fileID: 3139735670317156736}
+  handManager: {fileID: 903151971147493897}
   mode: 1
   customKind: 0
   customCount: 1
@@ -23001,6 +23046,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff3e1dc0adcaa1645a6754e1d3b3da86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  deckManager: {fileID: 3139735670317156736}
+  handManager: {fileID: 903151971147493897}
   mode: 0
   customKind: 0
   customCount: 1
@@ -23174,6 +23221,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff3e1dc0adcaa1645a6754e1d3b3da86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  deckManager: {fileID: 3139735670317156736}
+  handManager: {fileID: 903151971147493897}
   mode: 0
   customKind: 0
   customCount: 1
