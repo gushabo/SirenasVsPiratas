@@ -45,14 +45,6 @@ public class Health : MonoBehaviour
         sliderGO.SetActive(false);
     }
 
-    private void Update()
-    {
-        if (sliderGO.activeSelf)
-        {
-            sliderGO.transform.rotation = Quaternion.LookRotation(sliderGO.transform.position - cameraPosition.position);
-        }
-    }
-
     public IEnumerator wait(float seconds)
     {
         var originalMaterial = body.GetComponent<SkinnedMeshRenderer>().material;

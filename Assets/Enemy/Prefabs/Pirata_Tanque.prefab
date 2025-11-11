@@ -1294,6 +1294,7 @@ GameObject:
   - component: {fileID: 4688526512716623226}
   - component: {fileID: 2219717418965645490}
   - component: {fileID: 2672747874042182050}
+  - component: {fileID: 3353272424843260443}
   m_Layer: 8
   m_Name: Pirata_Tanque
   m_TagString: Enemy
@@ -1456,6 +1457,20 @@ MonoBehaviour:
   sliderGO: {fileID: 7332151752694975254}
   hitMaterial: {fileID: 2100000, guid: cb31a9ddfb8370c4c96dda27d463d9cf, type: 2}
   body: {fileID: 911430063573286509}
+--- !u!114 &3353272424843260443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6390576872852968890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9deb2d10f9aa97d4d9f29b1a28aa3657, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lookAtTarget: {fileID: 0}
+  slider: {fileID: 4566242978889122720}
 --- !u!1 &6647403385434542951
 GameObject:
   m_ObjectHideFlags: 0
