@@ -6206,7 +6206,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1603171401}
   - component: {fileID: 1603171403}
-  - component: {fileID: 1603171402}
   m_Layer: 5
   m_Name: SliderVolumen
   m_TagString: Untagged
@@ -6236,18 +6235,6 @@ RectTransform:
   m_AnchoredPosition: {x: -153.1372, y: 68.72237}
   m_SizeDelta: {x: 674.0165, y: 75}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1603171402
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1603171400}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d743457e544b214daee00755736ba64, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1603171403
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6295,7 +6282,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0.5
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -8914,7 +8901,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1994044159505839947, guid: 9387affef0ef896499439609ad8a3973, type: 3}
       propertyPath: defaultVolume
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5321662453909326125, guid: 9387affef0ef896499439609ad8a3973, type: 3}
       propertyPath: m_Name

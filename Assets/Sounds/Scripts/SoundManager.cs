@@ -13,7 +13,7 @@ public class SoundManager : MonoBehaviour
 
     [Header("Volumen")]
     [Range(0f, 1f)]
-    [SerializeField] private float defaultVolume = 0.5f;
+    [SerializeField] private float defaultVolume = 1f;
 
     public AudioSource audioSource;
     private const string PREF_KEY = "MasterVolume";
@@ -34,26 +34,14 @@ public class SoundManager : MonoBehaviour
         {
             Debug.LogError("SoundManager requiere un AudioSource en el mismo GameObject.");
         }
-        
-        
     }
-
-    private void OnEnable()
-    {
-        //if (scrollBar != null) scrollBar.onValueChanged.AddListener(ChangeAudioValue);
-    }
+    
 
     private void Start()
     {
         float volume = PlayerPrefs.GetFloat(PREF_KEY, defaultVolume);
+        audioSource.volume = volume;
         ApplyVolume(volume);
-
-        //if (scrollBar != null) scrollBar.value = volume;
-    }
-
-    private void OnDisable()
-    {
-        //if (scrollBar != null) scrollBar.onValueChanged.RemoveListener(ChangeAudioValue);
     }
 
     private void OnDestroy()
