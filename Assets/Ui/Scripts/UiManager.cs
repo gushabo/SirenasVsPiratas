@@ -33,6 +33,7 @@ public class UiManager : MonoBehaviour
     [Header("Pause Panel")]
     [SerializeField] public GameObject pausePanel;
     [SerializeField] public TextMeshProUGUI pauseText;
+    [SerializeField] public GameObject QuitButton;
     
     [Header("GameOver Panel")]
     [SerializeField] public GameObject gameOverPanel;
@@ -69,6 +70,13 @@ public class UiManager : MonoBehaviour
         winPanel.SetActive(false);
         changeRoundPanel.SetActive(false);
         countDownPanel.SetActive(false);
+        QuitButton.SetActive(false);
+    }
+    
+    //Pausa
+    public void ActivateQuitButton()
+    {
+        QuitButton.SetActive(!QuitButton.activeSelf);
     }
 
     // Sonidos
