@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 public class DeckManager : MonoBehaviour
@@ -10,8 +11,12 @@ public class DeckManager : MonoBehaviour
 
     public bool CanDraw => deck != null && deck.Count > 0;
 
+    
+
     private void Start()
     {
+        if (!TutorialProgress.IsCompleted()) return;
+
         HandManager hand = FindFirstObjectByType<HandManager>();
         for (int i = 0; i < 4; i++)
             DrawCard(hand);

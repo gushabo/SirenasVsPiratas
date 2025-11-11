@@ -91,14 +91,14 @@ public class GameManager : MonoBehaviour
     {
         UiManager.GetInstance().gameOverPanel.SetActive(true);
         UiManager.GetInstance().CardCanvasSystem.SetActive(false);
-        Invoke(nameof(ChangeMainScene), 3f);
+     
     }
 
     public void Win()
     {
         UiManager.GetInstance().winPanel.SetActive(true);
         UiManager.GetInstance().CardCanvasSystem.SetActive(false);
-        Invoke(nameof(ChangeMainScene), 3f);
+    
     }
 
     public void ChangeMainScene()
