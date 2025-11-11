@@ -9,6 +9,7 @@ TagManager:
   - Bullet
   - Tower
   - Bomb
+  - Camera
   layers:
   - Default
   - TransparentFX

@@ -1,15 +1,24 @@
+using System;
 using UnityEngine;
 
 public class BillBoard : MonoBehaviour
 {
-    public Transform cam;
-    void Awake() => cam = Camera.main.transform;
+    public Transform lookAtTarget;
+    public GameObject slider;
 
-    void LateUpdate()
+
+    private void Awake()
     {
-        // misma orientación que la cámara (sin roll)
-        transform.rotation = Quaternion.LookRotation(cam.forward, Vector3.up);
-        // Alternativa: que “mire” a la cámara
-        // transform.LookAt(transform.position + cam.forward, Vector3.up);
+        lookAtTarget = GameObject.FindGameObjectWithTag("Camera").transform;
+    }
+
+    private void Update()
+    {
+        if (lookAtTarget == null) return;
+        
+        slider.transform.SetParent(null);
+        slider.transform.position = gameObject.transform.position;
+        slider.transform.rotation = Quaternion.Euler(new Vector3(90, -98, 0));
+        
     }
 }

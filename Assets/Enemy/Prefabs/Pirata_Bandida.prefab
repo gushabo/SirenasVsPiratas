@@ -360,7 +360,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1451724555136544313}
   - component: {fileID: 1132989572208291993}
-  - component: {fileID: 9065521648623665632}
   m_Layer: 8
   m_Name: Slider
   m_TagString: Untagged
@@ -440,19 +439,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &9065521648623665632
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2555527393963574497}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9deb2d10f9aa97d4d9f29b1a28aa3657, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cam: {fileID: 0}
 --- !u!1 &2691491886656253428
 GameObject:
   m_ObjectHideFlags: 0
@@ -853,6 +839,7 @@ GameObject:
   - component: {fileID: 5687710269849108705}
   - component: {fileID: 6367358722869561001}
   - component: {fileID: 7675425280859485849}
+  - component: {fileID: 6915434834090540456}
   m_Layer: 8
   m_Name: Pirata_Bandida
   m_TagString: Enemy
@@ -1015,6 +1002,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 0
+--- !u!114 &6915434834090540456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4508958717287486512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9deb2d10f9aa97d4d9f29b1a28aa3657, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lookAtTarget: {fileID: 0}
+  slider: {fileID: 5313171847950721203}
 --- !u!1 &4748487495135383571
 GameObject:
   m_ObjectHideFlags: 0
