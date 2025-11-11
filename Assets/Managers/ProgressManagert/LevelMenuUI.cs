@@ -13,7 +13,7 @@ public class LevelMenuUI : MonoBehaviour
     }
 
     [Header("Configuración")]
-    public string gameplaySceneName = "Enemy"; 
+   
     public LevelButton[] levelButtons;
 
     public GameObject levelsGO;
@@ -48,7 +48,7 @@ public class LevelMenuUI : MonoBehaviour
         PlayerPrefs.SetInt("selectedLevelToPlay", levelNumber);
         PlayerPrefs.Save();
 
-        SceneManager.LoadScene(gameplaySceneName);
+        SceneTransition.CargarConPantallaNegra("Enemy");
     }
 
 
