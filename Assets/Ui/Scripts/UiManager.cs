@@ -71,6 +71,7 @@ public class UiManager : MonoBehaviour
         changeRoundPanel.SetActive(false);
         countDownPanel.SetActive(false);
         QuitButton.SetActive(false);
+        ActualizarValorSlider();
     }
     
     //Pausa

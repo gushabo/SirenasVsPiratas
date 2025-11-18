@@ -10,7 +10,9 @@ public class uiManagerMenu : MonoBehaviour
 
     void Start()
     {
+        
         settings.SetActive(false);
+        ActualizarValorSlider();
     }
 
     public void ActualizarValorSlider()
