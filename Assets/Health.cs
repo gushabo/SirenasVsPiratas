@@ -19,8 +19,6 @@ public class Health : MonoBehaviour
     [SerializeField] public Material hitMaterial;
     [SerializeField] public GameObject body;
     Coroutine flashCo;
-    
-    [SerializeField] public AudioClip DieClip;
 
     void Start()
     {
@@ -106,7 +104,6 @@ public class Health : MonoBehaviour
 
     public IEnumerator DieCorrutine()
     {
-        SoundManager.GetInstance().PlaySFX(DieClip);
         LevelManager.GetInstance().enemiesLeft--;
         LevelManager.GetInstance().CheckForEnemies();
         dieParticles.Play();
