@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TutorialObjectSequence : MonoBehaviour
 {
-    [Header("Si lo dejas vacío, toma los hijos directos")]
+
     public List<GameObject> steps = new List<GameObject>();
 
     [Header("Comportamiento")]
@@ -31,14 +31,21 @@ public class TutorialObjectSequence : MonoBehaviour
     {
         if (TutorialProgress.IsCompleted())
         {
-            // Ya completado: ocultar y arrancar ronda
+          
             HideAll();
             if (hideRootWhenFinished) gameObject.SetActive(false);
             if (autoStartRoundIfCompleted) TryStartRound();
             return;
         }
+       
 
         index = Mathf.Clamp(TutorialProgress.GetStep(), 0, Mathf.Max(0, steps.Count));
+
+        if (!TutorialProgress.IsCompleted())
+        {
+
+            index = 0;
+        }
         ApplyIndex();
     }
 
@@ -63,7 +70,7 @@ public class TutorialObjectSequence : MonoBehaviour
         SaveAndApply();
     }
 
-    public void Finish() // puedes llamarlo desde el último botón "Finalizar"
+    public void Finish() 
     {
         if (TutorialProgress.IsCompleted()) return;
         index = steps.Count;
@@ -80,7 +87,7 @@ public class TutorialObjectSequence : MonoBehaviour
 
     private void ApplyIndex()
     {
-        // Mostrar solo el actual; si index == steps.Count => fin
+       
         for (int i = 0; i < steps.Count; i++)
             if (steps[i]) steps[i].SetActive(i == index);
 
@@ -95,7 +102,7 @@ public class TutorialObjectSequence : MonoBehaviour
         TutorialProgress.SetCompleted();
         HideAll();
         if (hideRootWhenFinished) gameObject.SetActive(false);
-        TryStartRound(); // <-- ARRANCA LA RONDA SOLO AQUÍ
+        TryStartRound(); 
     }
 
     private void HideAll()
@@ -108,6 +115,6 @@ public class TutorialObjectSequence : MonoBehaviour
     {
         var lm = LevelManager.GetInstance();
         if (lm != null) lm.StartRound();
-        else Debug.LogWarning("[TutorialObjectSequence] No encontré LevelManager para iniciar la ronda.");
+       
     }
 }

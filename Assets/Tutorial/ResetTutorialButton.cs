@@ -17,9 +17,8 @@ public class ResetTutorialButton : MonoBehaviour
 
         PlayerPrefs.Save();
         Debug.Log("[ResetTutorialButton] Tutorial reset. Se limpiaron PlayerPrefs del tutorial.");
+        SceneTransition.CargarConPantallaNegra("Enemy");
 
-        // (Opcional) feedback visual o recargar escena actual:
-        // UnityEngine.SceneManagement.SceneManager.LoadScene(
-        //     UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
+
     }
 }
