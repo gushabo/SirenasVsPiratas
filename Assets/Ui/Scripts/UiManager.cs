@@ -62,6 +62,7 @@ public class UiManager : MonoBehaviour
     
     [Header("Sonido")]
     [SerializeField] public Slider sliderSonido;
+    [SerializeField] public Slider sliderSFX;
     
     private void Start()
     {
@@ -83,12 +84,22 @@ public class UiManager : MonoBehaviour
     // Sonidos
     public void ActualizarValorSlider()
     {
-        sliderSonido.value = SoundManager.GetInstance().audioSource.volume;
+        var sm = SoundManager.GetInstance();
+        if (sliderSonido) sliderSonido.SetValueWithoutNotify(sm.GetMusicVolume01());
+        if (sliderSFX)    sliderSFX.SetValueWithoutNotify(sm.GetSFXVolume01());
+
+        if (sliderSonido) sliderSonido.onValueChanged.AddListener(sm.SetMusicVolume);
+        if (sliderSFX)    sliderSFX.onValueChanged.AddListener(sm.SetSFXVolume);
     }
 
     public void SendVolumeToManager()
     {
-        SoundManager.GetInstance().ChangeAudioValue(sliderSonido.value);
+        SoundManager.GetInstance().SetMusicVolume(sliderSonido.value);
+    }
+
+    public void SendSFXToManager()
+    {
+        SoundManager.GetInstance().SetSFXVolume(sliderSFX.value);
     }
 
     // Rondas y niveles
@@ -127,5 +138,8 @@ public class UiManager : MonoBehaviour
         pausePanel.SetActive(false);
     }
     
-    
+    void OnDisable() {
+        if (sliderSonido) sliderSonido.onValueChanged.RemoveAllListeners();
+        if (sliderSFX)    sliderSFX.onValueChanged.RemoveAllListeners();
+    }
 }
