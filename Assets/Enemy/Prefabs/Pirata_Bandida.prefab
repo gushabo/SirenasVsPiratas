@@ -968,6 +968,7 @@ MonoBehaviour:
   speed: 0
   turnSpeed: 10
   isPaused: 0
+  anim: {fileID: 0}
 --- !u!114 &6367358722869561001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -989,6 +990,7 @@ MonoBehaviour:
   sliderGO: {fileID: 2555527393963574497}
   hitMaterial: {fileID: 2100000, guid: 3c0ddb06f46b9184895afa503470d6f9, type: 2}
   body: {fileID: 5077969546992669006}
+  DieClip: {fileID: 8300000, guid: c3541767288495f418d4ac33cb5185c8, type: 3}
 --- !u!114 &7675425280859485849
 MonoBehaviour:
   m_ObjectHideFlags: 0
