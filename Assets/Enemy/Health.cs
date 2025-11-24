@@ -21,6 +21,7 @@ public class Health : MonoBehaviour
     Coroutine flashCo;
     
     [SerializeField] public AudioClip DieClip;
+    [SerializeField] public AudioClip HitClip;
 
     void Start()
     {
@@ -71,6 +72,7 @@ public class Health : MonoBehaviour
             CallWait();
         }
 
+        SoundManager.GetInstance().PlaySFX(HitClip);
         health -= damage;
         sliderGO.SetActive(true);
         healthSlider.value = health;

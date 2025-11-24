@@ -108,6 +108,7 @@ MonoBehaviour:
   radius: 40
   damage: 20
   vfxPrefab: {fileID: 6163327480264920630, guid: e0a7b33298e0df14f921ed9161570f0e, type: 3}
+  clip: {fileID: 8300000, guid: e6edfb56983e4ff41a025cd06354bad4, type: 3}
 --- !u!135 &4965629872837546042
 SphereCollider:
   m_ObjectHideFlags: 0
