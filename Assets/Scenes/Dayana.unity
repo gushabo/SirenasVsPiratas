@@ -606,7 +606,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &73104840703086715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1522,7 +1522,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!222 &3495483211798653326
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2670,6 +2670,10 @@ PrefabInstance:
     - target: {fileID: 976855030627108018, guid: 6440ec90dd2d16d4bba0f0d8a233d628, type: 3}
       propertyPath: m_Name
       value: FondoDerrota
+      objectReference: {fileID: 0}
+    - target: {fileID: 976855030627108018, guid: 6440ec90dd2d16d4bba0f0d8a233d628, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4588472272936279333, guid: 6440ec90dd2d16d4bba0f0d8a233d628, type: 3}
       propertyPath: m_Pivot.x
