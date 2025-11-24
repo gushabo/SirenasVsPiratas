@@ -260,21 +260,15 @@ public class HexGridCardPlacer : MonoBehaviour
                     // Progreso tutorial (mejora)
                     TutorialProgress.Increment(BuildKind.Upgrade);
                 }
-                else
-                {
-                    Debug.Log($"[{name}] La construcción en {axial} no tiene TowerUpgradable.");
-                }
+                
             }
-            else
-            {
-                Debug.Log($"[{name}] No hay construcción en {axial} para aplicar mejora.");
-            }
+           
         }
         else
         {
             if (placedBuilds.ContainsKey(axial) && placedBuilds[axial] != null)
             {
-                Debug.Log($"[{name}] Celda {axial} ocupada. No se puede construir encima.");
+                
                 return;
             }
 
