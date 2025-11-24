@@ -1459,6 +1459,7 @@ MonoBehaviour:
   hitMaterial: {fileID: 2100000, guid: cb31a9ddfb8370c4c96dda27d463d9cf, type: 2}
   body: {fileID: 911430063573286509}
   DieClip: {fileID: 8300000, guid: c3541767288495f418d4ac33cb5185c8, type: 3}
+  HitClip: {fileID: 8300000, guid: 1e1b483941dcf234087eadde11a47bed, type: 3}
 --- !u!114 &3353272424843260443
 MonoBehaviour:
   m_ObjectHideFlags: 0

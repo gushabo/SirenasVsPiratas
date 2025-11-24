@@ -12,6 +12,7 @@ public class Fish : MonoBehaviour
     [SerializeField] float radius = 3f;
     [SerializeField] int damage = 20; 
     [SerializeField] GameObject vfxPrefab;
+    [SerializeField] AudioClip clip;
 
     private bool armed;
     private bool isPaused;
@@ -76,6 +77,7 @@ public class Fish : MonoBehaviour
     public void Explode()
     {
         if (vfxPrefab) Instantiate(vfxPrefab, transform.position, Quaternion.identity);
+        SoundManager.GetInstance().PlaySFX(clip);
 
         int count = Physics.OverlapSphereNonAlloc(transform.position, radius, buffer);
         for (int i = 0; i < count; i++)
