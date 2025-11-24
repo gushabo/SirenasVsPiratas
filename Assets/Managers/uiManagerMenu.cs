@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,36 +6,70 @@ public class uiManagerMenu : MonoBehaviour
 {
     [SerializeField] GameObject menu;
     [SerializeField] GameObject settings;
-    [SerializeField] Slider volumeSlider;
-    [SerializeField] public Slider sliderSFX;
-    
+    [SerializeField] Slider volumeSlider;   // Música
+    [SerializeField] Slider sliderSFX;      // Efectos
 
     void Start()
     {
-        settings.SetActive(false);
-        ActualizarValorSlider();
+        if (settings) settings.SetActive(false);
     }
 
+    // Solo refresca VISUAL sin disparar eventos ni agregar listeners
     public void ActualizarValorSlider()
     {
-        // 1) leer valor actual del manager y reflejarlo SIN notificar
         var sm = SoundManager.GetInstance();
-        if (volumeSlider) volumeSlider.SetValueWithoutNotify(sm.GetMusicVolume01());
-        if (sliderSFX)    sliderSFX.SetValueWithoutNotify(sm.GetSFXVolume01());
+        if (!sm) return;
 
-        // 2) ahora sí, listeners
+        if (sm.TryGetMixerDb(out var mDb, out var sDb))
+        {
+            if (volumeSlider) volumeSlider.SetValueWithoutNotify(SoundManager.DbToLinear(mDb));
+            if (sliderSFX)    sliderSFX.SetValueWithoutNotify(SoundManager.DbToLinear(sDb));
+        }
+        else
+        {
+            if (volumeSlider) volumeSlider.SetValueWithoutNotify(sm.GetMusicVolume01());
+            if (sliderSFX)    sliderSFX.SetValueWithoutNotify(sm.GetSFXVolume01());
+        }
+    }
+
+    void OnEnable()
+    {
+        StartCoroutine(BindWhenReady());
+    }
+
+    IEnumerator BindWhenReady()
+    {
+        while (SoundManager.GetInstance() == null) yield return null;
+
+        var sm = SoundManager.GetInstance();
+
+        // 1) Sincroniza sin notificar
+        ActualizarValorSlider();
+
+        // 2) UI -> Manager
         if (volumeSlider) volumeSlider.onValueChanged.AddListener(sm.SetMusicVolume);
         if (sliderSFX)    sliderSFX.onValueChanged.AddListener(sm.SetSFXVolume);
-    }
-    
-    public void SendVolumeToManager()
-    {
-        SoundManager.GetInstance().SetMusicVolume(volumeSlider.value);
+
+        // 3) Manager -> UI
+        sm.OnVolumesChanged += HandleVolumesChanged;
     }
 
-    public void SendSFXToManager()
+    void OnDisable()
     {
-        SoundManager.GetInstance().SetSFXVolume(sliderSFX.value);
+        var sm = SoundManager.GetInstance();
+        if (sm != null) sm.OnVolumesChanged -= HandleVolumesChanged;
+
+        if (volumeSlider) volumeSlider.onValueChanged.RemoveAllListeners();
+        if (sliderSFX)    sliderSFX.onValueChanged.RemoveAllListeners();
     }
-    
+
+    void HandleVolumesChanged(float music01, float sfx01)
+    {
+        if (volumeSlider) volumeSlider.SetValueWithoutNotify(music01);
+        if (sliderSFX)    sliderSFX.SetValueWithoutNotify(sfx01);
+    }
+
+    // Si estás usando los eventos del Slider en el Inspector, estos siguen funcionando:
+    public void SendVolumeToManager() { var sm = SoundManager.GetInstance(); if (sm && volumeSlider) sm.SetMusicVolume(volumeSlider.value); }
+    public void SendSFXToManager()    { var sm = SoundManager.GetInstance(); if (sm && sliderSFX)    sm.SetSFXVolume(sliderSFX.value);    }
 }
