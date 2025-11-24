@@ -21,6 +21,9 @@ public class HexGridCardPlacer : MonoBehaviour
     [Header("Referencias")]
     public Camera cam;
 
+    [Header("SOUNDSSS")] 
+    private AudioSource spawnSirena;
+
     [Header("Tablero / Layer de celdas")]
     public LayerMask boardMask;
     public bool useFixedBoardY = true;
@@ -54,6 +57,7 @@ public class HexGridCardPlacer : MonoBehaviour
         public bool isUpgrade;
         public CardHighlight cardHL;
         public Vector3 scale;
+        public AudioClip sfx;
     }
 
     private Selected selected;
@@ -176,12 +180,13 @@ public class HexGridCardPlacer : MonoBehaviour
         DestroyGhost();
     }
 
-    public void SelectUpgrade(GameObject upgradePrefab, CardHighlight fromCard)
+    public void SelectUpgrade(GameObject upgradePrefab, CardHighlight fromCard, AudioClip sfx)
     {
         selected.prefab = upgradePrefab;
         selected.isUpgrade = true;
         selected.cardHL = fromCard;
         selected.scale = upgradePrefab.transform.localScale;
+        selected.sfx = sfx;
         ClearPending();
         DestroyGhost();
     }
@@ -191,6 +196,7 @@ public class HexGridCardPlacer : MonoBehaviour
         selected.prefab = null;
         selected.isUpgrade = false;
         selected.cardHL = null;
+        selected.sfx = null; 
         ClearPending();
         DestroyGhost();
 
@@ -255,6 +261,13 @@ public class HexGridCardPlacer : MonoBehaviour
                 if (upg != null)
                 {
                     upg.ApplyUpgrade(selected.prefab);
+                    
+                    if (selected.sfx != null)
+                    {
+                        SoundManager.GetInstance().PlaySFX(selected.sfx);
+                    }
+                    
+                    
                     AfterSuccessfulUse();
 
                     // Progreso tutorial (mejora)
@@ -289,7 +302,7 @@ public class HexGridCardPlacer : MonoBehaviour
                 PlayerPrefs.Save();
                 if (firstPlaceTutorialUI) firstPlaceTutorialUI.SetActive(false);
             }
-
+            SoundManager.GetInstance().PlaySFX(spawnSirena);
             AfterSuccessfulUse();
         }
 

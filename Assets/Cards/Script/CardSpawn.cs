@@ -1,9 +1,11 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CardSpawn : MonoBehaviour
 {
     public GameObject worldPrefab;    // torreta
-    public GameObject upgradePrefab;  
+    public GameObject upgradePrefab;
+    [SerializeField] public AudioClip upgradeSound;
 
 
 
@@ -18,6 +20,7 @@ public class CardSpawn : MonoBehaviour
     public void OnUpgradeCardClicked()
     {
         var highlight = GetComponent<CardHighlight>();
-        HandManager.Instance.SelectUpgrade(upgradePrefab, highlight);
+        HandManager.Instance.SelectUpgrade(upgradePrefab, highlight, upgradeSound);
+       
     }
 }

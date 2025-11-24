@@ -135,13 +135,13 @@ public class HandManager : MonoBehaviour
             HexGridCardPlacer.Instance.SelectBuild(buildPrefab, currentSelected);
     }
 
-    public void SelectUpgrade(GameObject upgradePrefab, CardHighlight highlight)
+    public void SelectUpgrade(GameObject upgradePrefab, CardHighlight highlight, AudioClip sfx)
     {
         DeselectAll();
         currentSelected = highlight;
         if (currentSelected) currentSelected.SetSelected(true);
         if (HexGridCardPlacer.Instance)
-            HexGridCardPlacer.Instance.SelectUpgrade(upgradePrefab, currentSelected);
+            HexGridCardPlacer.Instance.SelectUpgrade(upgradePrefab, currentSelected, sfx);
     }
 
     public void DeselectAll()
