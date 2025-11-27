@@ -49,12 +49,26 @@ public class TutorialManagerPlayerPrefs : MonoBehaviour
 
     void Start()
     {
+        int savedStep = TutorialProgress.GetStep();
+
+        // ¿Ya se terminó el tutorial?
+        bool completed = TutorialProgress.IsCompleted() || savedStep >= steps.Count;
+
+        if (completed)
+        {
+            // Ocultamos todo, pero NO deshabilitamos el componente
+            if (panel) panel.SetActive(false);
+            if (nextButton) nextButton.gameObject.SetActive(false);
+            return;
+        }
+
+        // Si aún no se completa, mostramos el panel
         if (panel) panel.SetActive(true);
 
-        // Cargar paso guardado (persistente)
-        index = Mathf.Clamp(TutorialProgress.GetStep(), 0, Mathf.Max(0, steps.Count - 1));
+        index = Mathf.Clamp(savedStep, 0, Mathf.Max(0, steps.Count - 1));
         EnterStep(index);
     }
+
 
     public void OnClickNext()
     {
