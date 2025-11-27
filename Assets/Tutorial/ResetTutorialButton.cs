@@ -14,9 +14,6 @@ public class ResetTutorialButton : MonoBehaviour
 
         if (alsoClearFirstTowerPlaced)
             PlayerPrefs.DeleteKey(firstTowerKey);
-            PlayerPrefs.DeleteKey(TutorialProgress.PREF_TUTORIAL_STEP);
-            PlayerPrefs.Save();
-       
 
         PlayerPrefs.Save();
         Debug.Log("[ResetTutorialButton] Tutorial reset. Se limpiaron PlayerPrefs del tutorial.");
