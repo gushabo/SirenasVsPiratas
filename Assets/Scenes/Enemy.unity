@@ -1099,6 +1099,8 @@ MonoBehaviour:
   firstPlaceTutorialUI: {fileID: 3082997683462916466}
   startRoundOnFirstPlacement: 0
   cam: {fileID: 1508782073}
+  spawnSirena: {fileID: 8300000, guid: d6e1bb97dc95406409ed482f7c0def2b, type: 3}
+  spawnbomba: {fileID: 8300000, guid: c27098e053a77bc4e871bcd1b21a306a, type: 3}
   boardMask:
     serializedVersion: 2
     m_Bits: 192

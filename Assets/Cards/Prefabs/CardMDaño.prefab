@@ -450,6 +450,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   worldPrefab: {fileID: 0}
   upgradePrefab: {fileID: 3081831070071417252, guid: 314a621256aef5d4f9ebaff0146c528c, type: 3}
+  upgradeSound: {fileID: 8300000, guid: 2431097377e51c148a03a08fee465dd5, type: 3}
 --- !u!114 &8468447503673387002
 MonoBehaviour:
   m_ObjectHideFlags: 0
