@@ -922,8 +922,12 @@ RectTransform:
   - {fileID: 536232092}
   - {fileID: 1034733024}
 <<<<<<< HEAD
+<<<<<<< HEAD
   - {fileID: 1739204760}
   - {fileID: 1076269999}
+=======
+  - {fileID: 1635999621}
+>>>>>>> parent of 3a53b59 (Todos los cambios)
 =======
   - {fileID: 1635999621}
 >>>>>>> parent of 3a53b59 (Todos los cambios)
