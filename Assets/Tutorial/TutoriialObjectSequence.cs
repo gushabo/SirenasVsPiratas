@@ -1,10 +1,8 @@
-// Assets/Scripts/Tutorial/TutorialObjectSequence.cs
 using System.Collections.Generic;
 using UnityEngine;
 
 public class TutorialObjectSequence : MonoBehaviour
 {
-
     public List<GameObject> steps = new List<GameObject>();
 
     [Header("Comportamiento")]
@@ -22,58 +20,53 @@ public class TutorialObjectSequence : MonoBehaviour
             steps.Clear();
             for (int i = 0; i < transform.childCount; i++)
                 steps.Add(transform.GetChild(i).gameObject);
+
             if (sortByName)
-                steps.Sort((a,b)=>string.Compare(a.name,b.name,System.StringComparison.Ordinal));
+                steps.Sort((a, b) => string.Compare(a.name, b.name, System.StringComparison.Ordinal));
         }
     }
 
     void Start()
     {
-        if (TutorialProgress.IsCompleted())
+        int savedStep = TutorialProgress.GetStep();
+
+        // Si el índice guardado ya está al final, no mostramos nada
+        if (savedStep >= steps.Count)
         {
-          
             HideAll();
             if (hideRootWhenFinished) gameObject.SetActive(false);
             if (autoStartRoundIfCompleted) TryStartRound();
             return;
         }
-       
 
-        index = Mathf.Clamp(TutorialProgress.GetStep(), 0, Mathf.Max(0, steps.Count));
-
-        if (!TutorialProgress.IsCompleted())
-        {
-
-            index = 0;
-        }
+        // Clampeamos al rango válido de pasos visibles
+        index = Mathf.Clamp(savedStep, 0, Mathf.Max(0, steps.Count - 1));
         ApplyIndex();
     }
 
     public void Next()
     {
-        if (TutorialProgress.IsCompleted()) return;
+        Debug.Log($"TutorialObjectSequence.Next() index={index}");
         index++;
         SaveAndApply();
     }
 
     public void Prev()
     {
-        if (TutorialProgress.IsCompleted()) return;
         index = Mathf.Max(0, index - 1);
         SaveAndApply();
     }
 
     public void JumpTo(int newIndex)
     {
-        if (TutorialProgress.IsCompleted()) return;
+        // Permitimos llegar hasta steps.Count (estado "terminado")
         index = Mathf.Clamp(newIndex, 0, steps.Count);
         SaveAndApply();
     }
 
-    public void Finish() 
+    public void Finish()
     {
-        if (TutorialProgress.IsCompleted()) return;
-        index = steps.Count;
+        index = steps.Count;   // estado "terminado"
         SaveAndApply();
         CompleteTutorial();
     }
@@ -87,10 +80,11 @@ public class TutorialObjectSequence : MonoBehaviour
 
     private void ApplyIndex()
     {
-       
+        // Activa solo el paso actual mientras index esté dentro del rango
         for (int i = 0; i < steps.Count; i++)
             if (steps[i]) steps[i].SetActive(i == index);
 
+        // Si index apunta más allá del último, damos por terminado
         if (index >= steps.Count)
         {
             CompleteTutorial();
@@ -99,10 +93,12 @@ public class TutorialObjectSequence : MonoBehaviour
 
     private void CompleteTutorial()
     {
+        // Si quieres, sigue marcando como completado (por compatibilidad)
         TutorialProgress.SetCompleted();
+
         HideAll();
         if (hideRootWhenFinished) gameObject.SetActive(false);
-        TryStartRound(); 
+        TryStartRound();
     }
 
     private void HideAll()
@@ -115,6 +111,5 @@ public class TutorialObjectSequence : MonoBehaviour
     {
         var lm = LevelManager.GetInstance();
         if (lm != null) lm.StartRound();
-       
     }
 }
