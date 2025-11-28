@@ -22,8 +22,7 @@ public class HexGridCardPlacer : MonoBehaviour
     public Camera cam;
 
     [Header("SOUNDSSS")] 
-    [SerializeField] public AudioClip spawnSirena;
-    [SerializeField] public AudioClip spawnbomba;
+    private AudioSource spawnSirena;
 
     [Header("Tablero / Layer de celdas")]
     public LayerMask boardMask;
@@ -293,7 +292,6 @@ public class HexGridCardPlacer : MonoBehaviour
             placedBuilds[axial] = go;
 
             // Progreso tutorial (torre o mina)
-            bool isMine = IsBombPrefab(selected.prefab); 
             BuildKind kindToReport = IsBombPrefab(selected.prefab) ? BuildKind.Mine : BuildKind.Tower;
             TutorialProgress.Increment(kindToReport);
 
@@ -304,16 +302,7 @@ public class HexGridCardPlacer : MonoBehaviour
                 PlayerPrefs.Save();
                 if (firstPlaceTutorialUI) firstPlaceTutorialUI.SetActive(false);
             }
-
-            if (!isMine)
-            {
-                SoundManager.GetInstance().PlaySFX(spawnSirena);
-            }
-            else
-            {
-                SoundManager.GetInstance().PlaySFX(spawnbomba);
-            }
-           
+            SoundManager.GetInstance().PlaySFX(spawnSirena);
             AfterSuccessfulUse();
         }
 
