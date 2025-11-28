@@ -70,9 +70,11 @@ public class TutorialManagerPlayerPrefs : MonoBehaviour
     }
 
 
+
     public void OnClickNext()
     {
         if (waiting) return; // no saltar mientras se espera una acción
+        Debug.log
         GoTo(index + 1);
     }
 
