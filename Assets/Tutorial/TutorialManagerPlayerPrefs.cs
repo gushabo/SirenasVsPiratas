@@ -1,3 +1,4 @@
+// Assets/Scripts/Tutorial/TutorialManagerPlayerPrefs.cs
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -31,6 +32,7 @@ public class TutorialManagerPlayerPrefs : MonoBehaviour
 
         [Header("Botón Next")]
         public bool hideNextButtonWhileWaiting = true;
+        public bool disableNextButtonWhileWaiting = false;
         public bool autoAdvanceWhenSatisfied = true;
     }
 
@@ -56,15 +58,9 @@ public class TutorialManagerPlayerPrefs : MonoBehaviour
         EnterStep(index);
     }
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> parent of f49a8f1 (cambiosnormales)
     public void OnClickNext()
     {
         if (waiting) return; // no saltar mientras se espera una acción
-        Debug.log
         GoTo(index + 1);
     }
 
@@ -72,8 +68,12 @@ public class TutorialManagerPlayerPrefs : MonoBehaviour
     {
         if (newIndex >= steps.Count)
         {
+            // Llegaste al final
             if (panel) panel.SetActive(false);
             TutorialProgress.SetStep(newIndex);
+            // Marca completado si quieres cerrar flujo aquí:
+            // TutorialProgress.SetCompleted();
+            // LevelManager.GetInstance()?.StartRound();
             return;
         }
         index = newIndex;
@@ -101,11 +101,12 @@ public class TutorialManagerPlayerPrefs : MonoBehaviour
         // Config
         waiting = s.mode != StepMode.ClickToContinue;
 
-        // Botón Next visible/oculto
+        // Botón Next visible/activo según configuración
         if (nextButton)
         {
             bool show = (s.mode == StepMode.ClickToContinue) || !s.hideNextButtonWhileWaiting;
             nextButton.gameObject.SetActive(show);
+            nextButton.interactable = !s.disableNextButtonWhileWaiting || (s.mode == StepMode.ClickToContinue);
         }
 
         // Si espera acción, arrancar chequeo periódico
@@ -124,28 +125,42 @@ public class TutorialManagerPlayerPrefs : MonoBehaviour
             int upgs   = TutorialProgress.GetCount(BuildKind.Upgrade) - baseUpg;
 
             bool ok = false;
+            int have = 0, need = 1;
+
             switch (s.mode)
             {
-                case StepMode.RequireTower:   ok = towers >= 1; break;
-                case StepMode.RequireMine:    ok = mines  >= 1; break;
-                case StepMode.RequireUpgrade: ok = upgs   >= 1; break;
+                case StepMode.RequireTower:   have = towers; need = 1; break;
+                case StepMode.RequireMine:    have = mines;  need = 1; break;
+                case StepMode.RequireUpgrade: have = upgs;   need = 1; break;
                 case StepMode.RequireCustomCount:
-                    int v = s.requiredKind == BuildKind.Tower ? towers :
-                            s.requiredKind == BuildKind.Mine  ? mines  :
+                    have = s.requiredKind == BuildKind.Tower ? towers :
+                           s.requiredKind == BuildKind.Mine  ? mines  :
                                                                 upgs;
-                    ok = v >= Mathf.Max(1, s.requiredCount);
-                    if (dialogText) dialogText.text = $"{s.text}\n\n({Mathf.Clamp(v,0,s.requiredCount)}/{s.requiredCount})";
+                    need = Mathf.Max(1, s.requiredCount);
                     break;
             }
+
+            ok = have >= need;
+
+            // Feedback opcional en el mismo TMP
+            if (dialogText && s.mode == StepMode.RequireCustomCount)
+                dialogText.text = $"{s.text}\n\n({Mathf.Clamp(have,0,need)}/{need})";
 
             if (ok)
             {
                 waiting = false;
-                if (nextButton) nextButton.gameObject.SetActive(true);
-                if (s.autoAdvanceWhenSatisfied) GoTo(index + 1);
+
+                if (nextButton)
+                {
+                    nextButton.gameObject.SetActive(true);
+                    nextButton.interactable = true;
+                }
+
+                if (s.autoAdvanceWhenSatisfied)
+                    GoTo(index + 1);
             }
 
-            yield return null; // revisa cada frame (puedes cambiar a WaitForSeconds(0.1f))
+            yield return null; // cada frame; puedes hacerlo menos frecuente con WaitForSeconds(0.1f)
         }
     }
 }

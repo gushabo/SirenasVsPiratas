@@ -5,9 +5,6 @@ using UnityEngine.UI;
 
 public class StepRequirement : MonoBehaviour
 {
-
-    public DeckManager deckManager;
-    public HandManager handManager;
     public enum Mode
     {
         None,            // No requiere nada: el botón Next está habilitado
@@ -21,9 +18,6 @@ public class StepRequirement : MonoBehaviour
     public Mode mode = Mode.None;
     public BuildKind customKind = BuildKind.Tower;
     public int customCount = 1;
-    private bool alreadycard;
-    
-    
 
     [Header("UI")]
     public Button nextButton;                     // botón “Siguiente” de este paso
@@ -49,7 +43,6 @@ public class StepRequirement : MonoBehaviour
         satisfied = (mode == Mode.None);
         ApplyNextButtonState();
 
-       
         UpdateProgressUI(0, Needed());
     }
 
@@ -65,31 +58,9 @@ public class StepRequirement : MonoBehaviour
 
         switch (mode)
         {
-            case Mode.RequireTower:   have = towers; need = 1;
-
-                if(!alreadycard)
-                {
-                    deckManager.DrawCard(handManager);
-
-                }
-                alreadycard = true;
-                break;
-            case Mode.RequireMine:    have = mines;  need = 1;
-                if (!alreadycard)
-                {
-                    deckManager.DrawCard(handManager);
-
-                }
-                alreadycard = true;
-                break; ;
-            case Mode.RequireUpgrade: have = upgs;   need = 1;
-                if (!alreadycard)
-                {
-                    deckManager.DrawCard(handManager);
-
-                }
-                alreadycard = true;
-                break; ;
+            case Mode.RequireTower:   have = towers; need = 1; break;
+            case Mode.RequireMine:    have = mines;  need = 1; break;
+            case Mode.RequireUpgrade: have = upgs;   need = 1; break;
             case Mode.RequireCustom:
                 have = customKind == BuildKind.Tower ? towers :
                        customKind == BuildKind.Mine  ? mines  :
@@ -139,7 +110,6 @@ public class StepRequirement : MonoBehaviour
         progressText.text = $"({Mathf.Clamp(have,0,need)}/{need})";
     }
 
-    // Si prefieres avanzar por botón aunque ya esté satisfecho:
     public void OnClickNext()
     {
         if (seq != null) seq.Next();

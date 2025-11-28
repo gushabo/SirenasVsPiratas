@@ -4,14 +4,17 @@ using UnityEngine;
 
 public class TutorialObjectSequence : MonoBehaviour
 {
-
+    [Header("Si lo dejas vacío, toma los hijos directos")]
     public List<GameObject> steps = new List<GameObject>();
 
     [Header("Comportamiento")]
     public bool autoCollectChildren = true;
     public bool sortByName = true;
     public bool hideRootWhenFinished = true;
-    public bool autoStartRoundIfCompleted = true; // si ya estaba completado al entrar
+    public bool autoStartRoundIfCompleted = true;
+
+    [Header("Reinicio si quedó a medias")]
+    public bool restartIfLeftUnfinished = true; // << Activa esto para reiniciar si no se completó
 
     private int index;
 
@@ -29,23 +32,25 @@ public class TutorialObjectSequence : MonoBehaviour
 
     void Start()
     {
+        // Si ya estaba completado: ocultar y (opcional) arrancar la ronda
         if (TutorialProgress.IsCompleted())
         {
-          
             HideAll();
             if (hideRootWhenFinished) gameObject.SetActive(false);
             if (autoStartRoundIfCompleted) TryStartRound();
             return;
         }
-       
+
+        // Si NO está completado y había quedado "en progreso", reinicia
+        if (restartIfLeftUnfinished)
+        {
+            TutorialProgress.ResetIfAbandoned();
+        }
+
+        // A partir de aquí comienza una nueva sesión (o continúa si no quisiste reiniciar)
+        TutorialProgress.BeginSession();
 
         index = Mathf.Clamp(TutorialProgress.GetStep(), 0, Mathf.Max(0, steps.Count));
-
-        if (!TutorialProgress.IsCompleted())
-        {
-
-            index = 0;
-        }
         ApplyIndex();
     }
 
@@ -70,7 +75,7 @@ public class TutorialObjectSequence : MonoBehaviour
         SaveAndApply();
     }
 
-    public void Finish() 
+    public void Finish()
     {
         if (TutorialProgress.IsCompleted()) return;
         index = steps.Count;
@@ -87,7 +92,6 @@ public class TutorialObjectSequence : MonoBehaviour
 
     private void ApplyIndex()
     {
-       
         for (int i = 0; i < steps.Count; i++)
             if (steps[i]) steps[i].SetActive(i == index);
 
@@ -99,10 +103,12 @@ public class TutorialObjectSequence : MonoBehaviour
 
     private void CompleteTutorial()
     {
-        TutorialProgress.SetCompleted();
+        // Marca completado y cierra sesión de tutorial
+        TutorialProgress.EndSessionCompleted();
+
         HideAll();
         if (hideRootWhenFinished) gameObject.SetActive(false);
-        TryStartRound(); 
+        TryStartRound(); // inicia la ronda SOLO aquí
     }
 
     private void HideAll()
@@ -115,6 +121,6 @@ public class TutorialObjectSequence : MonoBehaviour
     {
         var lm = LevelManager.GetInstance();
         if (lm != null) lm.StartRound();
-       
+        else Debug.LogWarning("[TutorialObjectSequence] No encontré LevelManager para iniciar la ronda.");
     }
 }
