@@ -14,10 +14,13 @@ public class ResetTutorialButton : MonoBehaviour
 
         if (alsoClearFirstTowerPlaced)
             PlayerPrefs.DeleteKey(firstTowerKey);
+<<<<<<< HEAD
             PlayerPrefs.DeleteKey(TutorialProgress.PREF_TUTORIAL_STEP);
            
             PlayerPrefs.Save();
        
+=======
+>>>>>>> parent of f49a8f1 (cambiosnormales)
 
         PlayerPrefs.Save();
         Debug.Log("[ResetTutorialButton] Tutorial reset. Se limpiaron PlayerPrefs del tutorial.");

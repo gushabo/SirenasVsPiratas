@@ -295,50 +295,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 868340011341700995, guid: 4bee8a0f8a32d3746ac2abaa9a7f6ce9, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -2133331395, guid: a9cbf0caa9699f847bca51f94f60cb0f, type: 3}
-    - target: {fileID: 1046874724458520080, guid: 4bee8a0f8a32d3746ac2abaa9a7f6ce9, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -2133331395, guid: a9cbf0caa9699f847bca51f94f60cb0f, type: 3}
-    - target: {fileID: 1130264978022813182, guid: 4bee8a0f8a32d3746ac2abaa9a7f6ce9, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -2133331395, guid: a9cbf0caa9699f847bca51f94f60cb0f, type: 3}
-    - target: {fileID: 1286548230071496361, guid: 4bee8a0f8a32d3746ac2abaa9a7f6ce9, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -2133331395, guid: a9cbf0caa9699f847bca51f94f60cb0f, type: 3}
-    - target: {fileID: 4818580728851650142, guid: 4bee8a0f8a32d3746ac2abaa9a7f6ce9, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -2133331395, guid: a9cbf0caa9699f847bca51f94f60cb0f, type: 3}
-    - target: {fileID: 5037298081754526736, guid: 4bee8a0f8a32d3746ac2abaa9a7f6ce9, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -2133331395, guid: a9cbf0caa9699f847bca51f94f60cb0f, type: 3}
-    - target: {fileID: 5107999833286385233, guid: 4bee8a0f8a32d3746ac2abaa9a7f6ce9, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -2133331395, guid: a9cbf0caa9699f847bca51f94f60cb0f, type: 3}
     - target: {fileID: 5864678337146462072, guid: 4bee8a0f8a32d3746ac2abaa9a7f6ce9, type: 3}
       propertyPath: m_Name
       value: FONDOBONITO
       objectReference: {fileID: 0}
-    - target: {fileID: 5925932333819744546, guid: 4bee8a0f8a32d3746ac2abaa9a7f6ce9, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -2133331395, guid: a9cbf0caa9699f847bca51f94f60cb0f, type: 3}
-    - target: {fileID: 5953699332247482424, guid: 4bee8a0f8a32d3746ac2abaa9a7f6ce9, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -2133331395, guid: a9cbf0caa9699f847bca51f94f60cb0f, type: 3}
-    - target: {fileID: 6681055976902581261, guid: 4bee8a0f8a32d3746ac2abaa9a7f6ce9, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -2133331395, guid: a9cbf0caa9699f847bca51f94f60cb0f, type: 3}
     - target: {fileID: 7935494702844634824, guid: 4bee8a0f8a32d3746ac2abaa9a7f6ce9, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -419,14 +379,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8235310101863181693, guid: 4bee8a0f8a32d3746ac2abaa9a7f6ce9, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -2133331395, guid: a9cbf0caa9699f847bca51f94f60cb0f, type: 3}
-    - target: {fileID: 8720934324731573988, guid: 4bee8a0f8a32d3746ac2abaa9a7f6ce9, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -2133331395, guid: a9cbf0caa9699f847bca51f94f60cb0f, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -18278,7 +18230,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4525794207758211342, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -221
+      value: -94
       objectReference: {fileID: 0}
     - target: {fileID: 4525794207758211342, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -18438,7 +18390,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8871873545698068890, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -244
+      value: -117
       objectReference: {fileID: 0}
     - target: {fileID: 8871873545698068890, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
       propertyPath: m_AnchoredPosition.y
