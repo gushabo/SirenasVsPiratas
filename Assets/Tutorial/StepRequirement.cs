@@ -117,7 +117,7 @@ public class StepRequirement : MonoBehaviour
         if (!satisfied)
         {
             if (hideNextWhileWaiting) nextButton.gameObject.SetActive(false);
-            if (disableNextWhileWaiting) nextButton.interactable = false;
+            
         }
         else
         {
