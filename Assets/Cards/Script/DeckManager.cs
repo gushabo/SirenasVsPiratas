@@ -18,7 +18,7 @@ public class DeckManager : MonoBehaviour
         if (!TutorialProgress.IsCompleted()) return;
 
         HandManager hand = FindFirstObjectByType<HandManager>();
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 3; i++)
             DrawCard(hand);
     }
 
@@ -84,7 +84,7 @@ public class DeckManager : MonoBehaviour
             result.Add(deck[indices[i]]);
         }
 
-        // Si pidieron más que el tamaño del deck, rellena con aleatorias (permitiendo repetidos)
+        // Si pidieron mï¿½s que el tamaï¿½o del deck, rellena con aleatorias (permitiendo repetidos)
         while (result.Count < count)
             result.Add(GetRandomCard());
 
