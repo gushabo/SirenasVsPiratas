@@ -89,6 +89,7 @@ public class LevelManager : MonoBehaviour
 
         // Leer el nivel elegido desde el menú (1-based)
         int selected = PlayerPrefs.GetInt("selectedLevelToPlay", 1);
+        levelIndex = PlayerPrefs.GetInt("selectedLevelToPlay", 1);
 
         // Construir la estructura (rondas quedan desactivadas por BuildLevels)
         StartFromLevel(selected);   // <-- NO llama StartRound
