@@ -30,10 +30,7 @@ public class DraftPicker : MonoBehaviour
     public Vector2 cardSize = new Vector2(370f, 800f);  // <-- puedes editar desde el Inspector
     public float artPadding = 24f;
 
-    [Header("UIEliminar")] // <-- margen interior para el arte
-    public GameObject pausaGO;
 
-    public GameObject salirGO;
 
     private readonly List<DraftSelectableUI> _choices = new();
     private int _selectedCount;
@@ -60,8 +57,7 @@ public class DraftPicker : MonoBehaviour
             SetRerollButtonState(true);           // prende el botón visualmente
         }
 
-        pausaGO.SetActive(false);
-        salirGO.SetActive(false);
+       
         if (!deckManager || !handManager || !draftContainer || !cardChoicePrefab) return;
 
         _selectedCount = 0;
@@ -178,8 +174,7 @@ public class DraftPicker : MonoBehaviour
 
         ClearChoices();
         HideDraftUI();
-        pausaGO.SetActive(false);
-        salirGO.SetActive(false);
+     
         handManager.DeselectAll();
 
         OnConfirmed?.Invoke();  // <- ¡dispara el callback!
