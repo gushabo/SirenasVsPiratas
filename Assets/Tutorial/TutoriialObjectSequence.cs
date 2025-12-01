@@ -15,6 +15,8 @@ public class TutorialObjectSequence : MonoBehaviour
 
     private int index;
 
+    public GameObject siguienteGO;
+
     void Awake()
     {
         if (autoCollectChildren)
@@ -31,7 +33,7 @@ public class TutorialObjectSequence : MonoBehaviour
     {
         if (TutorialProgress.IsCompleted())
         {
-          
+            siguienteGO.SetActive(false);
             HideAll();
             if (hideRootWhenFinished) gameObject.SetActive(false);
             if (autoStartRoundIfCompleted) TryStartRound();

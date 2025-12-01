@@ -2430,7 +2430,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6823786500204076635, guid: e81a7be114b075247abed698e6f42fdd, type: 3}
   m_PrefabInstance: {fileID: 8506990638635210334}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1458299505}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
@@ -2639,6 +2639,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 91975530}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1458299505 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1118344162557853528, guid: e81a7be114b075247abed698e6f42fdd, type: 3}
+  m_PrefabInstance: {fileID: 8506990638635210334}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1502786095
 GameObject:
   m_ObjectHideFlags: 0
@@ -8415,8 +8420,6 @@ MonoBehaviour:
   allowDuplicates: 0
   cardSize: {x: 370, y: 750}
   artPadding: 20
-  pausaGO: {fileID: 6707687796586576179}
-  salirGO: {fileID: 2044961085}
 --- !u!33 &1699453284415905311
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -18508,11 +18511,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8906431883026710253, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
   m_PrefabInstance: {fileID: 6707687796586576176}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &6707687796586576179 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 9161231614633013105, guid: 10b766807a9673f42b929645cd26e1ad, type: 3}
-  m_PrefabInstance: {fileID: 6707687796586576176}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6726908474669173338
 Transform:
   m_ObjectHideFlags: 0
@@ -22435,6 +22433,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2018790076359397624, guid: e81a7be114b075247abed698e6f42fdd, type: 3}
+      propertyPath: siguienteGO
+      value: 
+      objectReference: {fileID: 1458299505}
     - target: {fileID: 2020704127537456068, guid: e81a7be114b075247abed698e6f42fdd, type: 3}
       propertyPath: m_fontColor.b
       value: 0
